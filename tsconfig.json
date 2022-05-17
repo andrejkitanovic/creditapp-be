@@ -5,19 +5,14 @@
 		"moduleResolution": "node",
 		"baseUrl": "./src",
 		"rootDir": "./src",
-		"paths": {
-			"helpers/*": ["helpers/*"],
-			"routes/*": ["routes/*"],
-			"models/*": ["models/*"],
-			"controllers/*": ["controllers/*"],
-			"middleware/*": ["middleware/*"]
-		},
 		"outDir": "./dist",
 		"esModuleInterop": true,
 		"forceConsistentCasingInFileNames": true,
 		"strict": true,
-		"skipLibCheck": true
+		"skipLibCheck": true,
+		"resolveJsonModule": true,
+		"typeRoots": ["./src/types", "./node_modules/@types"]
 	},
-	"include": ["src/**/*.ts"],
-	"exclude": ["node_modules", ".vscode"]
+	"include": ["src/**/*.ts", "src/**/*.json"],
+	"exclude": ["node_modules", ".vscode", "src/__tests__"]
 }

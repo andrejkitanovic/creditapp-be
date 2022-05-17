@@ -1,0 +1,110 @@
+{
+	"swagger": "2.0",
+	"info": {
+		"version": "1.0.0-alpha",
+		"title": "Destilery API",
+		"description": "Destilery API Information",
+		"license": {
+			"name": "MIT",
+			"url": "https://opensource.org/licenses/MIT"
+		}
+	},
+	"host": "https://destilerija-be.herokuapp.com",
+	"basePath": "/api",
+	"schemes": ["http"],
+	"consumes": ["application/json"],
+	"produces": ["application/json"],
+	"tags": [
+		{
+			"name": "Auth",
+			"description": ""
+		},
+		{
+			"name": "Users",
+			"description": ""
+		},
+		{
+			"name": "Organisation",
+			"description": ""
+		},
+		{
+			"name": "Partner",
+			"description": ""
+		},
+		{
+			"name": "Product",
+			"description": ""
+		},
+		{
+			"name": "Procurement",
+			"description": ""
+		},
+		{
+			"name": "Processing",
+			"description": ""
+		},
+		{
+			"name": "Distillation",
+			"description": ""
+		},
+		{
+			"name": "Waste",
+			"description": ""
+		},
+		{
+			"name": "Cost",
+			"description": ""
+		}
+	],
+	"definitions": {
+		"User": {
+			"type": "object",
+			"properties": {
+				"_id": {
+					"type": "string",
+					"format": "uuid"
+				},
+				"organisation": {
+					"type": "string",
+					"format": "uuid"
+				},
+				"role": {
+					"type": "string"
+				},
+				"email": {
+					"type": "string"
+				},
+				"password": {
+					"type": "string"
+				},
+				"name": {
+					"type": "string"
+				}
+			}
+		},
+		"Organisation": {
+			"type": "object"
+		},
+		"Partner": {
+			"type": "object"
+		},
+		"Product": {
+			"type": "object"
+		},
+		"Procurement": {
+			"type": "object"
+		},
+		"Processing": {
+			"type": "object"
+		},
+		"Distillation": {
+			"type": "object"
+		},
+		"Waste": {
+			"type": "object"
+		},
+		"Cost": {
+			"type": "object"
+		}
+	}
+}
