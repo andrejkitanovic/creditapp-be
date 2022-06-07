@@ -1,3 +1,4 @@
+import { PermissionsType } from 'helpers/permissions';
 import { Schema, model, Document } from 'mongoose';
 
 // type TypeWhiteLabeledDomains = 'gmail' | 'deckerdevs';
@@ -10,6 +11,7 @@ export type RoleType = `${RolesEnum}`;
 interface IUser extends Document {
 	email: string;
 	role: RolesEnum;
+	permissions: PermissionsType[];
 }
 
 const userSchema: Schema = new Schema({
@@ -21,7 +23,7 @@ const userSchema: Schema = new Schema({
 	role: {
 		type: String,
 		enum: RolesEnum,
-		default: RolesEnum.USER
+		default: RolesEnum.USER,
 	},
 });
 
