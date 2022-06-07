@@ -5,7 +5,7 @@ const PORT: number | string = process.env.PORT || 8080;
 
 export default function (app: Express) {
   mongoose.connect(
-    process.env.MONGODB_URI || 'mongodb://localhost/credit-app-be',
+    process.env.MONGODB_URI || 'mongodb://localhost/creditapp-be',
   );
 
   const server = app.listen(PORT, () => {
