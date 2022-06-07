@@ -1,7 +1,7 @@
 import dayjs, { ManipulateType } from 'dayjs';
 
 export const populateDates = (
-	dates: { startDate: Date, endDate?: Date },
+	dates: { startDate: Date; endDate?: Date },
 	values: { date: string; value: number }[],
 	period: 'month' | 'year'
 ) => {
@@ -24,7 +24,7 @@ export const populateDates = (
 	}
 
 	values.forEach(({ date, value }) => {
-		dateMap.set(date, +Number(value).toFixed(0));
+		dateMap.set(date, +Number(value));
 	});
 
 	return {
