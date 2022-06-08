@@ -155,7 +155,6 @@ const customerSchema: Schema = new Schema({
 		bankruptcy: Boolean,
 		previoiusFinanceCompany: Boolean,
 	},
-
 	employmentInfo: {
 		employerName: String,
 		employerPhone: String,
