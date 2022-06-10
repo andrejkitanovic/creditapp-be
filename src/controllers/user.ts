@@ -26,38 +26,38 @@ export const getUsers: RequestHandler = async (req, res, next) => {
 	}
 };
 
-// export const putUser: RequestHandler = async (req, res, next) => {
-// 	try {
-// 		const { id } = req.params;
-// 		const { role, email, name } = req.body;
+export const putUser: RequestHandler = async (req, res, next) => {
+	try {
+		const { id } = req.params;
+		const { role, email, name } = req.body;
 
-// 		await User.findByIdAndUpdate(id, {
-// 			role,
-// 			email,
-// 			name,
-// 		});
+		await User.findByIdAndUpdate(id, {
+			role,
+			email,
+			name,
+		});
 
-// 		res.json({
-// 			message: i18n.__('CONTROLLER.USER.PUT_USER.UPDATED'),
-// 		});
-// 	} catch (err) {
-// 		next(err);
-// 	}
-// };
+		res.json({
+			// message: i18n.__('CONTROLLER.USER.PUT_USER.UPDATED'),
+		});
+	} catch (err) {
+		next(err);
+	}
+};
 
-// export const deleteUser: RequestHandler = async (req, res, next) => {
-// 	try {
-// 		const { id } = req.params;
+export const deleteUser: RequestHandler = async (req, res, next) => {
+	try {
+		const { id } = req.params;
 
-// 		await User.findByIdAndDelete(id);
+		await User.findByIdAndDelete(id);
 
-// 		res.json({
-// 			message: i18n.__('CONTROLLER.USER.DELETE_USER.DELETED'),
-// 		});
-// 	} catch (err) {
-// 		next(err);
-// 	}
-// };
+		res.json({
+			// message: i18n.__('CONTROLLER.USER.DELETE_USER.DELETED'),
+		});
+	} catch (err) {
+		next(err);
+	}
+};
 
 // export const postResendEmail: RequestHandler = async (req, res, next) => {
 // 	try {

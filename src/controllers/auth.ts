@@ -2,7 +2,7 @@ import { RequestHandler } from 'express';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 
-import i18n from 'helpers/i18n';
+// import i18n from 'helpers/i18n';
 import User from 'models/user';
 import { adminPermissions } from 'helpers/permissions';
 
@@ -36,7 +36,7 @@ export const postLogin: RequestHandler = async (req, res, next) => {
 
 		res.json({
 			token,
-			message: i18n.__('CONTROLLER.AUTH.POST_LOGIN.LOGGED_IN'),
+			// message: i18n.__('CONTROLLER.AUTH.POST_LOGIN.LOGGED_IN'),
 		});
 	} catch (err) {
 		next(err);
@@ -62,7 +62,7 @@ export const postRegister: RequestHandler = async (req, res, next) => {
 
 		res.json({
 			token,
-			message: i18n.__('CONTROLLER.AUTH.POST_REGISTER.REGISTERED'),
+			// message: i18n.__('CONTROLLER.AUTH.POST_REGISTER.REGISTERED'),
 		});
 	} catch (err) {
 		next(err);
@@ -80,7 +80,7 @@ export const putMe: RequestHandler = async (req, res, next) => {
 		});
 
 		res.json({
-			message: i18n.__('CONTROLLER.AUTH.PUT_ME.UPDATED'),
+			// message: i18n.__('CONTROLLER.AUTH.PUT_ME.UPDATED'),
 		});
 	} catch (err) {
 		next(err);
