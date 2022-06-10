@@ -18,7 +18,7 @@ defineRoutes(router, [
 	{
 		method: 'get',
 		route: '/me',
-		// roles: ['portal-admin', 'organisation-owner', 'organisation-employee'],
+		roles: ['admin', 'user'],
 		controller: getMeController,
 	},
 	{

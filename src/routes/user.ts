@@ -20,21 +20,21 @@ defineRoutes(router, [
 	{
 		method: 'get',
 		route: '/',
-		// roles: ['portal-admin', 'organisation-owner', 'organisation-employee'],
+		roles: ['admin', 'user'],
 		permissions: ['read:users'],
 		controller: getUsersController,
 	},
 	// {
 	// 	method: 'get',
 	// 	route: '/statistics',
-	// 	roles: ['portal-admin', 'organisation-owner', 'organisation-employee'],
+	// roles: ['admin', 'user'],
 	// 	permissions: ['read:users'],
 	// 	controller: getStatisticsUsersController,
 	// },
 	// {
 	// 	method: 'post',
 	// 	route: '/invite',
-	// 	// roles: ['portal-admin', 'organisation-owner'],
+	// roles: ['admin', 'user'],
 	// 	permissions: ['write:users'],
 	// 	// validator: postInviteUserValidator,
 	// 	controller: postInviteUserController,
@@ -42,7 +42,7 @@ defineRoutes(router, [
 	{
 		method: 'put',
 		route: '/:id',
-		// roles: ['portal-admin', 'organisation-owner'],
+		// 		roles: ['admin', 'user'],
 		permissions: ['update:users'],
 		// validator: putUserValidator, // TODO | Validator missing
 		controller: putUserController,
@@ -50,7 +50,7 @@ defineRoutes(router, [
 	{
 		method: 'delete',
 		route: '/:id',
-		// roles: ['portal-admin', 'organisation-owner'],
+		// roles: ['admin', 'user'],
 		permissions: ['delete:users'],
 		// validator: deleteUserValidator, // TODO | Validator missing
 		controller: deleteUserController,

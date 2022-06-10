@@ -25,6 +25,7 @@ const auth: (roles: RoleType[]) => RequestHandler = (roles) => async (req, res, 
 			}
 		} else res.status(403).json({ message: i18n.__('MIDDLEWARE.AUTH.MISSING_TOKEN') });
 	} catch (err) {
+		console.log(err);
 		res.status(500).json({ message: i18n.__('GLOBAL.ERROR.NETWORK') });
 	}
 };
