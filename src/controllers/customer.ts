@@ -7,14 +7,14 @@ import Customer from 'models/customer';
 
 export const getCustomers: RequestHandler = async (req, res, next) => {
 	try {
-		const { data: partners, count } = await queryFilter({
+		const { data: customers, count } = await queryFilter({
 			Model: Customer,
 			query: req.query,
 			searchFields: ['firstName', 'lastName', 'middleName'],
 		});
 
 		res.json({
-			data: partners,
+			data: customers,
 			meta: createMeta({ count }),
 		});
 	} catch (err) {

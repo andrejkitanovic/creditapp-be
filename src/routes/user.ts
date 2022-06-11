@@ -20,7 +20,7 @@ defineRoutes(router, [
 	{
 		method: 'get',
 		route: '/',
-		roles: ['admin', 'user'],
+		roles: ['admin'],
 		permissions: ['read:users'],
 		controller: getUsersController,
 	},
@@ -34,7 +34,7 @@ defineRoutes(router, [
 	// {
 	// 	method: 'post',
 	// 	route: '/invite',
-	// roles: ['admin', 'user'],
+	// roles: ['admin'],
 	// 	permissions: ['write:users'],
 	// 	// validator: postInviteUserValidator,
 	// 	controller: postInviteUserController,
@@ -42,7 +42,7 @@ defineRoutes(router, [
 	{
 		method: 'put',
 		route: '/:id',
-		// 		roles: ['admin', 'user'],
+		// roles: ['admin'],
 		permissions: ['update:users'],
 		// validator: putUserValidator, // TODO | Validator missing
 		controller: putUserController,

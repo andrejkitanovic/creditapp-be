@@ -2,6 +2,7 @@ import { PermissionsType } from 'helpers/permissions';
 import { Schema, model, Document } from 'mongoose';
 
 // type TypeWhiteLabeledDomains = 'gmail' | 'deckerdevs';
+
 enum RolesEnum {
 	ADMIN = 'admin',
 	USER = 'user',

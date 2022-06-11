@@ -11,38 +11,38 @@ import {
 // 	postCustomer as postCustomerValidator,
 // 	putCustomer as putCustomerValidator,
 // 	deleteCustomer as deleteCustomerValidator,
-// } from 'validators/distillation';
+// } from 'validators/customer';
 
 const router = Router();
 defineRoutes(router, [
 	{
 		method: 'get',
 		route: '/',
-		// roles: ['portal-admin', 'organisation-owner', 'organisation-employee'],
-		// permissions: ['read:distillation'],
+		roles: ['user', 'admin'],
+		permissions: ['read:customers'],
 		controller: getCustomersController,
 	},
 	{
 		method: 'post',
 		route: '/',
-		// roles: ['portal-admin', 'organisation-owner', 'organisation-employee'],
-		// permissions: ['write:distillation'],
+		roles: ['user', 'admin'],
+		permissions: ['write:customers'],
 		// validator: postCustomerValidator,
 		controller: postCustomerController,
 	},
 	{
 		method: 'put',
 		route: '/:id',
-		// roles: ['portal-admin', 'organisation-owner', 'organisation-employee'],
-		// permissions: ['update:distillation'],
+		roles: ['user', 'admin'],
+		permissions: ['update:customers'],
 		// validator: putCustomerValidator,
 		controller: putCustomerController,
 	},
 	{
 		method: 'delete',
 		route: '/:id',
-		// roles: ['portal-admin', 'organisation-owner', 'organisation-employee'],
-		// permissions: ['delete:distillation'],
+		roles: ['user', 'admin'],
+		permissions: ['delete:customers'],
 		// validator: deleteCustomerValidator,
 		controller: deleteCustomerController,
 	},
