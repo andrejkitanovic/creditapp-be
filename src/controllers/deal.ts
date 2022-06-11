@@ -25,9 +25,9 @@ export const getDeals: RequestHandler = async (req, res, next) => {
 
 export const postDeal: RequestHandler = async (req, res, next) => {
 	try {
-		const {} = req.body;
+		const { customer } = req.body;
 
-		await Deal.create({});
+		await Deal.create({ customer });
 
 		res.json({
 			// message: i18n.__('CONTROLLER.PARTNER.POST_PARTNER.ADDED'),
@@ -40,9 +40,9 @@ export const postDeal: RequestHandler = async (req, res, next) => {
 export const putDeal: RequestHandler = async (req, res, next) => {
 	try {
 		const { id } = req.params;
-		const {} = req.body;
+		const { customer } = req.body;
 
-		await Deal.findByIdAndUpdate(id, {});
+		await Deal.findByIdAndUpdate(id, { customer });
 
 		res.json({
 			// message: i18n.__('CONTROLLER.PARTNER.PUT_PARTNER.UPDATED'),

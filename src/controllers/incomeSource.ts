@@ -10,7 +10,7 @@ export const getIncomeSources: RequestHandler = async (req, res, next) => {
 		const { data: incomeSources, count } = await queryFilter({
 			Model: IncomeSource,
 			query: req.query,
-            populate: 'customer',
+			populate: 'customer',
 			// searchFields: ['firstName', 'lastName', 'middleName'],
 		});
 
@@ -25,9 +25,9 @@ export const getIncomeSources: RequestHandler = async (req, res, next) => {
 
 export const postIncomeSource: RequestHandler = async (req, res, next) => {
 	try {
-		const {} = req.body;
+		const { customer } = req.body;
 
-		await IncomeSource.create({});
+		await IncomeSource.create({ customer });
 
 		res.json({
 			// message: i18n.__('CONTROLLER.PARTNER.POST_PARTNER.ADDED'),
@@ -40,9 +40,9 @@ export const postIncomeSource: RequestHandler = async (req, res, next) => {
 export const putIncomeSource: RequestHandler = async (req, res, next) => {
 	try {
 		const { id } = req.params;
-		const {} = req.body;
+		const { customer } = req.body;
 
-		await IncomeSource.findByIdAndUpdate(id, {});
+		await IncomeSource.findByIdAndUpdate(id, { customer });
 
 		res.json({
 			// message: i18n.__('CONTROLLER.PARTNER.PUT_PARTNER.UPDATED'),
