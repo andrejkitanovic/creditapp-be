@@ -27,6 +27,10 @@ const userSchema: Schema = new Schema({
 		default: RolesEnum.USER,
 	},
 	permissions: [{ type: String }],
+	confirmed: {
+		type: Boolean,
+		default: false,
+	},
 });
 
 const objectModel = model<IUser>('User', userSchema);

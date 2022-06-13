@@ -58,32 +58,3 @@ export const deleteUser: RequestHandler = async (req, res, next) => {
 		next(err);
 	}
 };
-
-// export const postResendEmail: RequestHandler = async (req, res, next) => {
-// 	try {
-// 		const { id } = req.params;
-// 		const user = (await User.findById(id)) as IUser;
-
-// 		await sendEmailInvitation({ organisationId: user.organisation, userId: user._id, email: user.email });
-
-// 		res.json({
-// 			message: i18n.__('CONTROLLER.USER.RESEND_EMAIL.SENDED'),
-// 		});
-// 	} catch (err) {
-// 		next(err);
-// 	}
-// };
-
-// export const getSingleUnconfirmedUser: RequestHandler = async (req, res, next) => {
-// 	try {
-// 		const { id } = req.params;
-
-// 		const user = await User.findById(id).populate('organisation');
-
-// 		res.json({
-// 			data: user,
-// 		});
-// 	} catch (err) {
-// 		next(err);
-// 	}
-// };

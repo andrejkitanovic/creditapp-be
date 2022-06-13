@@ -7,8 +7,6 @@ import {
 	// postInviteUser as postInviteUserController,
 	putUser as putUserController,
 	deleteUser as deleteUserController,
-	// postResendEmail as postResendEmailController,
-	// getSingleUnconfirmedUser as getSingleUnconfirmedUserController,
 } from 'controllers/user';
 // import {
 // 	postInviteUser as postInviteUserValidator,
@@ -31,18 +29,10 @@ defineRoutes(router, [
 	// 	permissions: ['read:users'],
 	// 	controller: getStatisticsUsersController,
 	// },
-	// {
-	// 	method: 'post',
-	// 	route: '/invite',
-	// roles: ['admin'],
-	// 	permissions: ['write:users'],
-	// 	// validator: postInviteUserValidator,
-	// 	controller: postInviteUserController,
-	// },
 	{
 		method: 'put',
 		route: '/:id',
-		// roles: ['admin'],
+		roles: ['admin'],
 		permissions: ['update:users'],
 		// validator: putUserValidator, // TODO | Validator missing
 		controller: putUserController,
@@ -50,24 +40,11 @@ defineRoutes(router, [
 	{
 		method: 'delete',
 		route: '/:id',
-		// roles: ['admin', 'user'],
+		roles: ['admin'],
 		permissions: ['delete:users'],
 		// validator: deleteUserValidator, // TODO | Validator missing
 		controller: deleteUserController,
 	},
-	// {
-	// 	method: 'post',
-	// 	route: '/resend-email/:id',
-	// 	permissions: ['write:users'],
-	// 	// validator: postResendEmailValidator, // TODO | Validator missing
-	// 	controller: postResendEmailController,
-	// },
-	// {
-	// 	method: 'get',
-	// 	route: '/unconfirmed/:id',
-	// 	validator: getSingleUnconfirmedUserValidator,
-	// 	controller: getSingleUnconfirmedUserController,
-	// },
 ]);
 
 export default router;
