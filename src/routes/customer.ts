@@ -6,6 +6,7 @@ import {
 	postCustomer as postCustomerController,
 	putCustomer as putCustomerController,
 	deleteCustomer as deleteCustomerController,
+	getSingleCustomer as getSingleCustomerController,
 } from 'controllers/customer';
 // import {
 // 	postCustomer as postCustomerValidator,
@@ -45,6 +46,13 @@ defineRoutes(router, [
 		permissions: ['delete:customers'],
 		// validator: deleteCustomerValidator,
 		controller: deleteCustomerController,
+	},
+	{
+		method: 'get',
+		route: '/:id',
+		roles: ['user', 'admin'],
+		permissions: ['read:customers'],
+		controller: getSingleCustomerController,
 	},
 ]);
 

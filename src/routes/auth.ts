@@ -7,11 +7,11 @@ import {
 	postRegister as postRegisterController,
 	putMe as putMeController,
 } from 'controllers/auth';
-// import {
-// 	postLogin as postLoginValidator,
-// 	postRegister as postRegisterValidator,
-// 	putMe as putMeValidator,
-// } from 'validators/auth';
+import {
+	postLogin as postLoginValidator,
+	postRegister as postRegisterValidator,
+	putMe as putMeValidator,
+} from 'validators/auth';
 
 const router = Router();
 defineRoutes(router, [
@@ -24,20 +24,20 @@ defineRoutes(router, [
 	{
 		method: 'post',
 		route: '/login',
-		// validator: postLoginValidator,
+		validator: postLoginValidator,
 		controller: postLoginController,
 	},
 	{
 		method: 'post',
 		route: '/register',
-		// validator: postRegisterValidator,
+		validator: postRegisterValidator,
 		controller: postRegisterController,
 	},
 	{
 		method: 'put',
 		route: '/me',
-		// roles: ['portal-admin', 'organisation-owner', 'organisation-employee'],
-		// validator: putMeValidator,
+		roles: ['user', 'admin'],
+		validator: putMeValidator,
 		controller: putMeController,
 	},
 ]);

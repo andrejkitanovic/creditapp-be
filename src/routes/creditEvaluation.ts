@@ -6,6 +6,7 @@ import {
 	postCreditEvaluation as postCreditEvaluationController,
 	putCreditEvaluation as putCreditEvaluationController,
 	deleteCreditEvaluation as deleteCreditEvaluationController,
+	getSingleCreditEvaluation as getSingleCreditEvaluationController,
 } from 'controllers/creditEvaluation';
 // import {
 // 	postCreditEvaluation as postCreditEvaluationValidator,
@@ -45,6 +46,13 @@ defineRoutes(router, [
 		// permissions: ['delete:distillation'],
 		// validator: deleteCreditEvaluationValidator,
 		controller: deleteCreditEvaluationController,
+	},
+	{
+		method: 'get',
+		route: '/:id',
+		roles: ['user', 'admin'],
+		// permissions: ['read:customers'],
+		controller: getSingleCreditEvaluationController,
 	},
 ]);
 

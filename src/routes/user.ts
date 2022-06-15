@@ -7,6 +7,7 @@ import {
 	// postInviteUser as postInviteUserController,
 	putUser as putUserController,
 	deleteUser as deleteUserController,
+	getSingleUser as getSingleUserController
 } from 'controllers/user';
 // import {
 // 	postInviteUser as postInviteUserValidator,
@@ -44,6 +45,13 @@ defineRoutes(router, [
 		permissions: ['delete:users'],
 		// validator: deleteUserValidator, // TODO | Validator missing
 		controller: deleteUserController,
+	},
+	{
+		method: 'get',
+		route: '/:id',
+		roles: ['user', 'admin'],
+		permissions: ['read:users'],
+		controller: getSingleUserController,
 	},
 ]);
 

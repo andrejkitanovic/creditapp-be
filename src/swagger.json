@@ -2,58 +2,48 @@
 	"swagger": "2.0",
 	"info": {
 		"version": "1.0.0-alpha",
-		"title": "Destilery API",
-		"description": "Destilery API Information",
+		"title": "Credit App API",
+		"description": "Credit App API Information",
 		"license": {
 			"name": "MIT",
 			"url": "https://opensource.org/licenses/MIT"
 		}
 	},
-	"host": "https://destilerija-be.herokuapp.com",
+	"host": "http://164.92.103.154",
 	"basePath": "/api",
-	"schemes": ["http"],
-	"consumes": ["application/json"],
-	"produces": ["application/json"],
+	"schemes": [
+		"http"
+	],
+	"consumes": [
+		"application/json"
+	],
+	"produces": [
+		"application/json"
+	],
 	"tags": [
 		{
 			"name": "Auth",
-			"description": ""
+			"description": "Authorization API Calls"
 		},
 		{
 			"name": "Users",
-			"description": ""
+			"description": "Users API Calls"
 		},
 		{
-			"name": "Organisation",
-			"description": ""
+			"name": "Customers",
+			"description": "Customers API Calls"
 		},
 		{
-			"name": "Partner",
-			"description": ""
+			"name": "Deals",
+			"description": "Deals API Calls"
 		},
 		{
-			"name": "Product",
-			"description": ""
+			"name": "Credit Evaluations",
+			"description": "Credit Evaluations API Calls"
 		},
 		{
-			"name": "Procurement",
-			"description": ""
-		},
-		{
-			"name": "Processing",
-			"description": ""
-		},
-		{
-			"name": "Distillation",
-			"description": ""
-		},
-		{
-			"name": "Waste",
-			"description": ""
-		},
-		{
-			"name": "Cost",
-			"description": ""
+			"name": "Income Sources",
+			"description": "Income Sources API Calls"
 		}
 	],
 	"definitions": {
@@ -64,47 +54,19 @@
 					"type": "string",
 					"format": "uuid"
 				},
-				"organisation": {
-					"type": "string",
-					"format": "uuid"
+				"email": {
+					"type": "string"
 				},
 				"role": {
 					"type": "string"
 				},
-				"email": {
-					"type": "string"
+				"permissions": {
+					"type": "array"
 				},
-				"password": {
-					"type": "string"
-				},
-				"name": {
-					"type": "string"
+				"confirmed": {
+					"type": "boolean"
 				}
 			}
-		},
-		"Organisation": {
-			"type": "object"
-		},
-		"Partner": {
-			"type": "object"
-		},
-		"Product": {
-			"type": "object"
-		},
-		"Procurement": {
-			"type": "object"
-		},
-		"Processing": {
-			"type": "object"
-		},
-		"Distillation": {
-			"type": "object"
-		},
-		"Waste": {
-			"type": "object"
-		},
-		"Cost": {
-			"type": "object"
 		}
 	}
 }

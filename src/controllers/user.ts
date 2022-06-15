@@ -58,3 +58,17 @@ export const deleteUser: RequestHandler = async (req, res, next) => {
 		next(err);
 	}
 };
+
+export const getSingleUser: RequestHandler = async (req, res, next) => {
+	try {
+		const { id } = req.params;
+
+		const user = await User.findById(id);
+
+		res.json({
+			data: user,
+		});
+	} catch (err) {
+		next(err);
+	}
+};

@@ -6,6 +6,7 @@ import {
 	postDeal as postDealController,
 	putDeal as putDealController,
 	deleteDeal as deleteDealController,
+	getSingleDeal as getSingleDealController
 } from 'controllers/deal';
 // import {
 // 	postDeal as postDealValidator,
@@ -45,6 +46,13 @@ defineRoutes(router, [
 		// permissions: ['delete:distillation'],
 		// validator: deleteDealValidator,
 		controller: deleteDealController,
+	},
+	{
+		method: 'get',
+		route: '/:id',
+		roles: ['user', 'admin'],
+		// permissions: ['delete:distillation'],
+		controller: getSingleDealController,
 	},
 ]);
 
