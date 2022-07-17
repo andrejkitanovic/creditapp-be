@@ -13,6 +13,7 @@ interface IUser extends Document {
 	hubspotId?: string;
 	name?: string;
 	email: string;
+	password: string;
 	phone?: string;
 	role: RolesEnum;
 	permissions: PermissionsType[];
@@ -23,6 +24,9 @@ const userSchema: Schema = new Schema({
 		type: String,
 	},
 	name: {
+		type: String,
+	},
+	password: {
 		type: String,
 	},
 	email: {

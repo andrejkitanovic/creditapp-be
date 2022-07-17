@@ -33,8 +33,9 @@ export const postUser: RequestHandler = async (req, res, next) => {
 
 		const { total, results } = await hsGetSingleContact('email', email);
 
+		let hsUser;
 		if (total) {
-			const hsUser = results[0].properties;
+			hsUser = results[0].properties;
 
 			await User.create({
 				hubspotId: hsUser.hs_object_id,
@@ -43,10 +44,10 @@ export const postUser: RequestHandler = async (req, res, next) => {
 				phone: hsUser.phone,
 			});
 		} else {
-			const hsNewUser = await hsCreateContact({ properties: { email } });
-			
+			hsUser = await hsCreateContact({ properties: { email } });
+
 			await User.create({
-				hubspotId: hsNewUser.id,
+				hubspotId: hsUser.id,
 				email,
 			});
 		}

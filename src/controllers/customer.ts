@@ -1,9 +1,9 @@
 import { RequestHandler } from 'express';
 
-// import i18n from 'helpers/i18n';
 import { queryFilter } from 'helpers/filters';
 import { createMeta } from 'helpers/meta';
 import Customer from 'models/customer';
+import { hsGetSingleContact } from './hubspot';
 
 export const getCustomers: RequestHandler = async (req, res, next) => {
 	try {
@@ -43,6 +43,16 @@ export const postCustomer: RequestHandler = async (req, res, next) => {
 			employmentInfo,
 			assetInfo,
 		} = req.body;
+
+		const { total, results } = await hsGetSingleContact('email', email);
+
+		let hsUser;
+		if (total) {
+			hsUser = results[0].properties;
+			console.log(hsUser);
+		} else {
+			// hsUser = await hsCreateContact({ properties: {} });
+		}
 
 		await Customer.create({
 			firstName,
