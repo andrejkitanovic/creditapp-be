@@ -10,7 +10,7 @@ export const getCustomers: RequestHandler = async (req, res, next) => {
 		const { data: customers, count } = await queryFilter({
 			Model: Customer,
 			query: req.query,
-			searchFields: ['firstName', 'lastName', 'middleName'],
+			searchFields: ['firstName', 'lastName', 'middleName', 'address', 'email'],
 		});
 
 		res.json({

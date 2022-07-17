@@ -2,6 +2,7 @@ import { Schema, model, Document } from 'mongoose';
 
 interface IDeal extends Document {
 	customer: string;
+	hubspotId?: string;
 }
 
 const dealSchema: Schema = new Schema({
@@ -9,6 +10,9 @@ const dealSchema: Schema = new Schema({
 		type: Schema.Types.ObjectId,
 		ref: 'Customer',
 		required: true,
+	},
+	hubspotId: {
+		type: String,
 	},
 });
 

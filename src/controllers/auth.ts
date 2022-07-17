@@ -2,16 +2,15 @@ import { RequestHandler } from 'express';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 
-// import i18n from 'helpers/i18n';
-import User from 'models/user';
+import i18n from 'helpers/i18n';
+import User, { IUser } from 'models/user';
 import { adminPermissions } from 'helpers/permissions';
 
 export const getMe: RequestHandler = async (req, res, next) => {
 	try {
 		const { id } = req.auth;
 
-		const me = await User.findById(id);
-		if (!me) throw new Error();
+		const me = await User.findById(id) as IUser;
 
 		me.permissions = adminPermissions;
 
@@ -35,7 +34,7 @@ export const postLogin: RequestHandler = async (req, res, next) => {
 
 		res.json({
 			token,
-			// message: i18n.__('CONTROLLER.AUTH.POST_LOGIN.LOGGED_IN'),
+			message: i18n.__('CONTROLLER.AUTH.POST_LOGIN.LOGGED_IN'),
 		});
 	} catch (err) {
 		next(err);
@@ -61,7 +60,7 @@ export const postRegister: RequestHandler = async (req, res, next) => {
 
 		res.json({
 			token,
-			// message: i18n.__('CONTROLLER.AUTH.POST_REGISTER.REGISTERED'),
+			message: i18n.__('CONTROLLER.AUTH.POST_REGISTER.REGISTERED'),
 		});
 	} catch (err) {
 		next(err);
@@ -71,15 +70,16 @@ export const postRegister: RequestHandler = async (req, res, next) => {
 export const putMe: RequestHandler = async (req, res, next) => {
 	try {
 		const { id } = req.auth;
-		const { name, phone } = req.body;
+		const { name, email, phone } = req.body;
 
 		await User.findByIdAndUpdate(id, {
 			name,
+			email,
 			phone,
 		});
 
 		res.json({
-			// message: i18n.__('CONTROLLER.AUTH.PUT_ME.UPDATED'),
+			message: i18n.__('CONTROLLER.AUTH.PUT_ME.UPDATED'),
 		});
 	} catch (err) {
 		next(err);

@@ -18,11 +18,6 @@ enum Permissions {
 	DEALS_WRITE = 'write:deals',
 	DEALS_UPDATE = 'update:deals',
 	DEALS_DELETE = 'delete:deals',
-
-	INCOME_SORUCES_READ = 'read:income-sources',
-	INCOME_SORUCES_WRITE = 'write:income-sources',
-	INCOME_SORUCES_UPDATE = 'update:income-sources',
-	INCOME_SORUCES_DELETE = 'delete:income-sources',
 }
 
 export type PermissionsType = `${Permissions}`;

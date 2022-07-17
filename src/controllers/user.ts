@@ -4,6 +4,7 @@ import { RequestHandler } from 'express';
 import { queryFilter } from 'helpers/filters';
 import { createMeta } from 'helpers/meta';
 import User from 'models/user';
+import { hsCreateContact, hsGetSingleContact } from './hubspot';
 // import { sendEmailInvitation } from 'utils/mailer';
 
 export const getUsers: RequestHandler = async (req, res, next) => {
@@ -20,6 +21,38 @@ export const getUsers: RequestHandler = async (req, res, next) => {
 		res.json({
 			data: users,
 			meta: createMeta({ count }),
+		});
+	} catch (err) {
+		next(err);
+	}
+};
+
+export const postUser: RequestHandler = async (req, res, next) => {
+	try {
+		const { email } = req.body;
+
+		const { total, results } = await hsGetSingleContact('email', email);
+
+		if (total) {
+			const hsUser = results[0].properties;
+
+			await User.create({
+				hubspotId: hsUser.hs_object_id,
+				email,
+				name: `${hsUser.firstname} ${hsUser.lastname}`,
+				phone: hsUser.phone,
+			});
+		} else {
+			const hsNewUser = await hsCreateContact({ properties: { email } });
+			
+			await User.create({
+				hubspotId: hsNewUser.id,
+				email,
+			});
+		}
+
+		res.json({
+			// message: i18n.__('CONTROLLER.USER.PUT_USER.CREATED'),
 		});
 	} catch (err) {
 		next(err);

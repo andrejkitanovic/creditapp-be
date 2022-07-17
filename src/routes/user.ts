@@ -3,11 +3,10 @@ import defineRoutes from 'helpers/defineRoutes';
 
 import {
 	getUsers as getUsersController,
-	// getStatisticsUsers as getStatisticsUsersController,
-	// postInviteUser as postInviteUserController,
+	postUser as postUserController,
 	putUser as putUserController,
 	deleteUser as deleteUserController,
-	getSingleUser as getSingleUserController
+	getSingleUser as getSingleUserController,
 } from 'controllers/user';
 // import {
 // 	postInviteUser as postInviteUserValidator,
@@ -23,13 +22,14 @@ defineRoutes(router, [
 		permissions: ['read:users'],
 		controller: getUsersController,
 	},
-	// {
-	// 	method: 'get',
-	// 	route: '/statistics',
-	// roles: ['admin', 'user'],
-	// 	permissions: ['read:users'],
-	// 	controller: getStatisticsUsersController,
-	// },
+	{
+		method: 'post',
+		route: '/',
+		roles: ['admin'],
+		permissions: ['write:users'],
+		// validator: postUserValidator, // TODO | Validator missing
+		controller: postUserController,
+	},
 	{
 		method: 'put',
 		route: '/:id',

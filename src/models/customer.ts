@@ -1,6 +1,7 @@
 import { Schema, model, Document } from 'mongoose';
 
 interface ICustomer extends Document {
+	hubspotId?: string;
 	firstName: string;
 	lastName: string;
 	middleName?: string;
@@ -73,6 +74,9 @@ interface ICustomer extends Document {
 }
 
 const customerSchema: Schema = new Schema({
+	hubspotId: {
+		type: String,
+	},
 	firstName: {
 		type: String,
 		required: true,

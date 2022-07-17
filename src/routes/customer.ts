@@ -50,8 +50,8 @@ defineRoutes(router, [
 	{
 		method: 'get',
 		route: '/:id',
-		roles: ['user', 'admin'],
-		permissions: ['read:customers'],
+		// roles: ['user', 'admin'],
+		// permissions: ['read:customers'],
 		controller: getSingleCustomerController,
 	},
 ]);
