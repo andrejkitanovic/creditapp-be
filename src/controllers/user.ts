@@ -63,12 +63,13 @@ export const postUser: RequestHandler = async (req, res, next) => {
 export const putUser: RequestHandler = async (req, res, next) => {
 	try {
 		const { id } = req.params;
-		const { role, email, name } = req.body;
+		const { role, email, name, phone } = req.body;
 
 		await User.findByIdAndUpdate(id, {
 			role,
 			email,
 			name,
+			phone,
 		});
 
 		res.json({

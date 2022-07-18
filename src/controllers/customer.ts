@@ -22,6 +22,32 @@ export const getCustomers: RequestHandler = async (req, res, next) => {
 	}
 };
 
+export const getHSCustomer: RequestHandler = async (req, res, next) => {
+	try {
+		const { email } = req.query;
+
+		const { total, results } = await hsGetSingleContact('email', email as string);
+
+		let customer = null;
+
+		if (total) {
+			const { firstname, lastname } = results[0].properties;
+
+			customer = {
+				firstName: firstname,
+				lastName: lastname,
+			};
+		}
+
+		res.json({
+			data: customer,
+			// message: i18n.__('CONTROLLER.PARTNER.POST_PARTNER.ADDED'),
+		});
+	} catch (err) {
+		next(err);
+	}
+};
+
 export const postCustomer: RequestHandler = async (req, res, next) => {
 	try {
 		const {

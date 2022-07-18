@@ -3,6 +3,7 @@ import defineRoutes from 'helpers/defineRoutes';
 
 import {
 	getCustomers as getCustomersController,
+	getHSCustomer as getHSCustomerController,
 	postCustomer as postCustomerController,
 	putCustomer as putCustomerController,
 	deleteCustomer as deleteCustomerController,
@@ -22,6 +23,13 @@ defineRoutes(router, [
 		roles: ['user', 'admin'],
 		permissions: ['read:customers'],
 		controller: getCustomersController,
+	},
+	{
+		method: 'get',
+		route: '/hubspot',
+		roles: ['user', 'admin'],
+		permissions: ['read:customers'],
+		controller: getHSCustomerController,
 	},
 	{
 		method: 'post',
