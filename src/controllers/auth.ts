@@ -1,6 +1,6 @@
 import { RequestHandler } from 'express';
 import jwt from 'jsonwebtoken';
-import bcrypt from 'bcryptjs';
+// import bcrypt from 'bcryptjs';
 
 import i18n from 'helpers/i18n';
 import User, { IUser } from 'models/user';
@@ -10,7 +10,7 @@ export const getMe: RequestHandler = async (req, res, next) => {
 	try {
 		const { id } = req.auth;
 
-		const me = await User.findById(id) as IUser;
+		const me = (await User.findById(id)) as IUser;
 
 		me.permissions = adminPermissions;
 
@@ -41,31 +41,31 @@ export const postLogin: RequestHandler = async (req, res, next) => {
 	}
 };
 
-export const postRegister: RequestHandler = async (req, res, next) => {
-	try {
-		const { id } = req.params;
-		const { name, password } = req.body;
+// export const postRegister: RequestHandler = async (req, res, next) => {
+// 	try {
+// 		const { id } = req.params;
+// 		const { name, password } = req.body;
 
-		const hashedPassword = await bcrypt.hash(password, 12);
+// 		const hashedPassword = await bcrypt.hash(password, 12);
 
-		await User.findByIdAndUpdate(id, {
-			password: hashedPassword,
-			name,
-			confirmed: true,
-		});
+// 		await User.findByIdAndUpdate(id, {
+// 			password: hashedPassword,
+// 			name,
+// 			confirmed: true,
+// 		});
 
-		const token = jwt.sign({ id }, process.env.DECODE_KEY || '', {
-			// expiresIn: "1h",
-		});
+// 		const token = jwt.sign({ id }, process.env.DECODE_KEY || '', {
+// 			// expiresIn: "1h",
+// 		});
 
-		res.json({
-			token,
-			message: i18n.__('CONTROLLER.AUTH.POST_REGISTER.REGISTERED'),
-		});
-	} catch (err) {
-		next(err);
-	}
-};
+// 		res.json({
+// 			token,
+// 			message: i18n.__('CONTROLLER.AUTH.POST_REGISTER.REGISTERED'),
+// 		});
+// 	} catch (err) {
+// 		next(err);
+// 	}
+// };
 
 export const putMe: RequestHandler = async (req, res, next) => {
 	try {

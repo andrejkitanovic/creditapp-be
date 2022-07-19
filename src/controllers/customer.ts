@@ -48,6 +48,29 @@ export const getHSCustomer: RequestHandler = async (req, res, next) => {
 	}
 };
 
+(async function () {
+	try {
+		const email = 'nicholaees@deckerdevs.com';
+
+		const { total, results } = await hsGetSingleContact('email', email as string);
+
+		let customer = null;
+
+		if (total) {
+			const { firstname, lastname } = results[0].properties;
+
+			customer = {
+				firstName: firstname,
+				lastName: lastname,
+			};
+
+			console.log(customer);
+		}
+	} catch (err) {
+		console.log(err);
+	}
+})();
+
 export const postCustomer: RequestHandler = async (req, res, next) => {
 	try {
 		const {

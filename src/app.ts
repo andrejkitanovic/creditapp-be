@@ -24,6 +24,8 @@ import connection from 'helpers/connection';
 
 import routing from 'routes';
 
+import 'controllers/cbc'
+
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
