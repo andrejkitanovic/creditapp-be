@@ -46,6 +46,11 @@ const userSchema: Schema = new Schema({
 		type: Boolean,
 		default: false,
 	},
+	permissions: [
+		{
+			type: String,
+		},
+	],
 });
 
 const objectModel = model<IUser>('User', userSchema);

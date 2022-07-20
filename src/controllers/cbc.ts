@@ -31,9 +31,9 @@ const cbcXML = (data: CBCJsonType) => {
 		data_area: {
 			...data.data_area,
 			header_data: {
-				...data.data_area.header_data,
 				user_id: CBC_USER_ID,
 				cus_id: CBC_CUS_ID,
+				...data.data_area.header_data,
 			},
 		},
 	};
@@ -45,12 +45,12 @@ const cbcXML = (data: CBCJsonType) => {
 };
 
 // CBC Functions
-export const cbcChangePassword = async () => {
+export const cbcChangePassword = async (newPassword: string) => {
 	const xml = cbcXML({
 		data_area: {
 			header_data: {
 				user_pwd: cbcPassword('password'),
-				new_pwd: '1234',
+				new_pwd: cbcPassword(newPassword),
 				action: 'PWD_CHANGE',
 			},
 		},
