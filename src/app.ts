@@ -1,7 +1,8 @@
 import dotenv from 'dotenv';
+import path from 'path';
 import moduleAlias from 'module-alias';
 
-dotenv.config();
+dotenv.config({path: path.join(__dirname, "../.env")});
 moduleAlias.addAliases({
 	helpers: __dirname + '/helpers',
 	routes: __dirname + '/routes',
