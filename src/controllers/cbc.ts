@@ -23,6 +23,7 @@ const cbcPassword = (password: string) => {
 type CBCJsonType = {
 	data_area: {
 		header_data: any;
+		user_data?: any;
 	};
 };
 const cbcXML = (data: CBCJsonType) => {
@@ -44,12 +45,14 @@ const cbcXML = (data: CBCJsonType) => {
 	`;
 };
 
+// Current password: test123
+
 // CBC Functions
 export const cbcChangePassword = async (newPassword: string) => {
 	const xml = cbcXML({
 		data_area: {
 			header_data: {
-				user_pwd: cbcPassword('password'),
+				user_pwd: cbcPassword('test123'),
 				new_pwd: cbcPassword(newPassword),
 				action: 'PWD_CHANGE',
 			},
@@ -58,3 +61,35 @@ export const cbcChangePassword = async (newPassword: string) => {
 
 	return await axiosCbc.post('', xml);
 };
+
+type CBCUser = {
+	ip: string;
+	name: string;
+	uid: string;
+	password: string;
+	email: string;
+};
+
+export const cbcAddUser = async (user: CBCUser) => {
+	const xml = cbcXML({
+		data_area: {
+			header_data: {
+				user_pwd: cbcPassword('test123'),
+				action: 'ADD_USER',
+			},
+			user_data: {
+				ip: user.password,
+				name: user.name,
+				uid: user.uid,
+				user_pwd: cbcPassword(user.password),
+				emal: user.email,
+			},
+		},
+	});
+
+	return await axiosCbc.post('', xml);
+};
+
+// (async function () {
+// 	console.log(await cbcAddUser());
+// })();
