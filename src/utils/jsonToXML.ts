@@ -34,15 +34,3 @@ export const jsonToXml = (obj: any) => {
 	xml = xml.replace(/<\/?[0-9]{1,}>/g, '');
 	return xml;
 };
-
-export const xmlToJson = (xml: string) => {
-	const json: any = {};
-
-	for (const res of xml.matchAll(/(?:<(\w*)(?:\s[^>]*)*>)((?:(?!<\1).)*)(?:<\/\1>)|<(\w*)(?:\s*)*\/>/gm)) {
-		const key = res[1] || res[3];
-		const value = res[2] && xmlToJson(res[2]);
-		json[key] = (value && Object.keys(value).length ? value : res[2]) || null;
-	}
-
-	return json;
-};

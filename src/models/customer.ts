@@ -10,11 +10,11 @@ interface ICustomer extends Document {
 	state: string;
 	zip: string;
 	phone?: string;
-	social: string;
+	social?: string; // TO CHECK
 	email: string;
 	birthday: Date;
 	referralPartner?: string;
-	associatedBrand: string;
+	associatedBrand?: string;
 	personalInfo: {
 		placeOfBirth?: string;
 		bornInDifferentCountry?: boolean;
