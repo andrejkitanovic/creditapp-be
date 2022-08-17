@@ -5,7 +5,8 @@ import Customer from 'models/customer';
 
 export const postWebhookCustomer: RequestHandler = async (req, res, next) => {
 	try {
-		const { hubspotId, firstName, lastName, address, email, city, state, zip, birthday } = req.body;
+		const { hubspotId, firstName, lastName, address, social, email, city, state, zip, birthday, associatedBrand } =
+			req.body;
 
 		await Customer.create({
 			hubspotId,
@@ -15,8 +16,10 @@ export const postWebhookCustomer: RequestHandler = async (req, res, next) => {
 			city,
 			state,
 			zip,
+			social,
 			email,
 			birthday,
+			associatedBrand,
 			personalInfo: {},
 			educationInfo: {},
 			employmentInfo: {},
