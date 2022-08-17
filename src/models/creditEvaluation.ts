@@ -10,6 +10,9 @@ const creditEvaluationSchema: Schema = new Schema({
 		ref: 'Customer',
 		required: true,
 	},
+	html: {
+		type: String,
+	},
 });
 
 const objectModel = model<ICreditEvaluation>('Credit Evaluation', creditEvaluationSchema);

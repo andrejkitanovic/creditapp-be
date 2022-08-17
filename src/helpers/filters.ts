@@ -124,7 +124,7 @@ export const queryStatisticFilter = async ({ Model, query, defaultFilters, opera
 		{
 			$group: {
 				_id: { $dateToString: { format: '%Y-%m', date: '$date' } },
-				value: { [`$${operator}`]: `$${field}` },
+				// value: { [`$${operator}`]: `$${field}` },
 			},
 		},
 		{
