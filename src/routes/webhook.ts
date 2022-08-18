@@ -3,7 +3,7 @@ import defineRoutes from 'helpers/defineRoutes';
 
 import {
 	postWebhookCustomer as postWebhookCustomerController,
-	postWebhookCreditEvaluation as postWebhookCreditEvaluationController,
+	// postWebhookCreditEvaluation as postWebhookCreditEvaluationController,
 } from 'controllers/webhook';
 // import {
 // 	postDeal as postDealValidator,
@@ -20,13 +20,13 @@ defineRoutes(router, [
 		// permissions: ['read:distillation'],
 		controller: postWebhookCustomerController,
 	},
-	{
-		method: 'post',
-		route: '/credit-evaluation',
-		// roles: ['user', 'admin'],
-		// permissions: ['read:distillation'],
-		controller: postWebhookCreditEvaluationController,
-	},
+	// {
+	// 	method: 'post',
+	// 	route: '/credit-evaluation',
+	// 	// roles: ['user', 'admin'],
+	// 	// permissions: ['read:distillation'],
+	// 	controller: postWebhookCreditEvaluationController,
+	// },
 ]);
 
 export default router;

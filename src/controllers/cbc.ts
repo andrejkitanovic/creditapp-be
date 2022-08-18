@@ -104,7 +104,7 @@ enum CBCDealStatus {
 	SOLD = 'Sold',
 }
 
-type CBCApplicant = {
+export type CBCApplicant = {
 	personalBusiness: 'personal';
 	firstName: string;
 	middleName: string;
@@ -161,7 +161,7 @@ type CBCSale = {
 	};
 };
 
-export const cbcPullConsumerCredit = async (
+export const cbcPullCreditReport = async (
 	type: CBCRequestType,
 	dealStatus: CBCDealStatus,
 	applicant: CBCApplicant,
@@ -234,7 +234,7 @@ export const cbcPullConsumerCredit = async (
 	return await axiosCbc.post('', xml);
 };
 
-export const cbcGenerateCreditApplication = async (applicant: CBCApplicant, sale?: CBCSale) => {
+export const cbcPostCreditReport = async (applicant: CBCApplicant, sale?: CBCSale) => {
 	const xml = cbcXML({
 		data_area: {
 			header_data: {
