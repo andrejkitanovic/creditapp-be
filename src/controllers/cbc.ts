@@ -241,7 +241,8 @@ export const cbcPostCreditReport = async (applicant: CBCApplicant, sale?: CBCSal
 				user_pwd: cbcPassword('test123'),
 				single_joint: 0,
 				pre_qual: 0,
-				action: 'CREDIT APP',
+				action: 'CREDIT_APP',
+				// app_id: '1'
 			},
 			applicant_data: {
 				[`applicant[type="primary"]`]: {
@@ -302,13 +303,30 @@ export const cbcPostCreditReport = async (applicant: CBCApplicant, sale?: CBCSal
 };
 
 // import fs from 'fs';
+// import dayjs from 'dayjs';
 // (async function () {
-// 	const response = await cbcMakeRequest();
+// 	const cbcApplicant: CBCApplicant = {
+// 		personalBusiness: 'personal',
+// 		firstName: 'A',
+// 		middleName: '',
+// 		lastName: 'K',
+// 		email: 'kitanovicandrej213@gmail.com',
+// 		birthdate: '18/04/2000',
+// 		ssn: '123456',
+// 		address: {
+// 			line: 'test',
+// 			city: 'Nis',
+// 			state: 'A',
+// 			postalCode: '1234',
+// 		},
+// 	};
+// 	const response = await cbcPostCreditReport(cbcApplicant);
+// 	console.log(response);
 
-// 	const jsonResponse = JSON.parse(xmlToJson.toJson(response.data));
-// 	const htmlReport = jsonResponse.XML_INTERFACE.CREDITREPORT.REPORT;
+// 	// 	const jsonResponse = JSON.parse(xmlToJson.toJson(response.data));
+// 	// 	const htmlReport = jsonResponse.XML_INTERFACE.CREDITREPORT.REPORT;
 
-// 	fs.writeFile('response.html', htmlReport, () => {
-// 		console.log('DONE');
-// 	});
+// 	// 	fs.writeFile('response.html', htmlReport, () => {
+// 	// 		console.log('DONE');
+// 	// 	});
 // })();
