@@ -47,6 +47,7 @@ export const postWebhookCustomer: RequestHandler = async (req, res, next) => {
 			},
 		};
 		const cbcResponse = await cbcPostCreditReport(cbcApplicant);
+		console.log(cbcResponse)
 		const jsonResponse = JSON.parse(xmlToJson.toJson(cbcResponse.data));
 		const htmlReport = jsonResponse.XML_INTERFACE.CREDITREPORT.REPORT;
 
