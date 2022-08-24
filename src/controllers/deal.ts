@@ -3,7 +3,7 @@ import { RequestHandler } from 'express';
 // import i18n from 'helpers/i18n';
 import { queryFilter } from 'helpers/filters';
 import { createMeta } from 'helpers/meta';
-import Deal from 'models/deal';
+import Deal from 'models/dealLoanPackage';
 
 export const getDeals: RequestHandler = async (req, res, next) => {
 	try {
