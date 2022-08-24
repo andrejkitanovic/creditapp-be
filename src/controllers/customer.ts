@@ -3,7 +3,7 @@ import { RequestHandler } from 'express';
 import { queryFilter } from 'helpers/filters';
 import { createMeta } from 'helpers/meta';
 import Customer from 'models/customer';
-import { hsGetSingleContact } from './hubspot';
+import { hsGetSingleContact, hsCreateContact } from './hubspot';
 
 export const getCustomers: RequestHandler = async (req, res, next) => {
 	try {
@@ -41,35 +41,11 @@ export const getHSCustomer: RequestHandler = async (req, res, next) => {
 
 		res.json({
 			data: customer,
-			// message: i18n.__('CONTROLLER.PARTNER.POST_PARTNER.ADDED'),
 		});
 	} catch (err) {
 		next(err);
 	}
 };
-
-(async function () {
-	try {
-		const email = 'nicholaees@deckerdevs.com';
-
-		const { total, results } = await hsGetSingleContact('email', email as string);
-
-		let customer = null;
-
-		if (total) {
-			const { firstname, lastname } = results[0].properties;
-
-			customer = {
-				firstName: firstname,
-				lastName: lastname,
-			};
-
-			console.log(customer);
-		}
-	} catch (err) {
-		console.log(err);
-	}
-})();
 
 export const postCustomer: RequestHandler = async (req, res, next) => {
 	try {
@@ -95,15 +71,16 @@ export const postCustomer: RequestHandler = async (req, res, next) => {
 
 		const { total, results } = await hsGetSingleContact('email', email);
 
-		let hsUser;
+		let hubspotId;
 		if (total) {
-			hsUser = results[0].properties;
-			console.log(hsUser);
+			hubspotId = results[0].id;
 		} else {
-			// hsUser = await hsCreateContact({ properties: {} });
+			const hubspotUser = await hsCreateContact(req.body);
+			hubspotId = hubspotUser.id;
 		}
 
 		await Customer.create({
+			hubspotId,
 			firstName,
 			lastName,
 			middleName,

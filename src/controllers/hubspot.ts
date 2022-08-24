@@ -4,6 +4,7 @@ import {
 	FilterGroup as ContactFilterGroup,
 } from '@hubspot/api-client/lib/codegen/crm/contacts';
 import { Filter as DealFilter, FilterGroup as DealFilterGroup } from '@hubspot/api-client/lib/codegen/crm/deals';
+import { ICustomer } from 'models/customer';
 
 const hubspotClient = new Client({ accessToken: process.env.HS_ACCESS_TOKEN });
 
@@ -25,8 +26,15 @@ export const hsGetSingleContact = async (property: string, value: string) => {
 	return await hubspotClient.crm.contacts.searchApi.doSearch(searchFilter);
 };
 
-export const hsCreateContact = async (data: any) => {
-	return await hubspotClient.crm.contacts.basicApi.create({ properties: data });
+export const hsCreateContact = async (customer: any) => {
+	return await hubspotClient.crm.contacts.basicApi.create({
+		properties: {
+			email: customer.email,
+			firstname: customer.firstName,
+			lastname: customer.lastName,
+			phone: customer.phone,
+		},
+	});
 };
 
 // DEALS

@@ -71,6 +71,7 @@ interface ICustomer extends Document {
 		estimatedValue?: number;
 		realEquity?: number;
 	};
+	creditEvaluation?: string;
 }
 
 const customerSchema: Schema = new Schema({
@@ -179,6 +180,7 @@ const customerSchema: Schema = new Schema({
 		estimatedValue: Number,
 		realEquity: Number,
 	},
+	creditEvaluation: String
 });
 
 const objectModel = model<ICustomer>('Customer', customerSchema);

@@ -2,7 +2,6 @@ import axios from 'axios';
 import crypto from 'crypto';
 import { bin2hex } from 'utils/bin2hex';
 import { jsonToXml } from 'utils/jsonToXML';
-// import xmlToJson from 'xml2json';
 
 // Configuration
 const { CBC_URL, CBC_USER_ID, CBC_CUS_ID } = process.env;
@@ -46,14 +45,15 @@ const cbcXML = (data: CBCJsonType) => {
 	`;
 };
 
-// Current password: test123
+// Current password: test1234
+const currentPassword = 'test1234';
 
 // CBC Functions
 export const cbcChangePassword = async (newPassword: string) => {
 	const xml = cbcXML({
 		data_area: {
 			header_data: {
-				user_pwd: cbcPassword('test123'),
+				user_pwd: cbcPassword(currentPassword),
 				new_pwd: cbcPassword(newPassword),
 				action: 'PWD_CHANGE',
 			},
@@ -75,7 +75,7 @@ export const cbcAddUser = async (user: CBCUser) => {
 	const xml = cbcXML({
 		data_area: {
 			header_data: {
-				user_pwd: cbcPassword('test123'),
+				user_pwd: cbcPassword(currentPassword),
 				action: 'ADD_USER',
 			},
 			user_data: {
@@ -153,28 +153,29 @@ export type CBCApplicant = {
 	};
 };
 
-type CBCSale = {
-	type: string;
-	salesperson: {
-		type: string;
-		value: string;
-	};
-};
+// type CBCSale = {
+// 	type: string;
+// 	salesperson: {
+// 		type: string;
+// 		value: string;
+// 	};
+// };
 
 export const cbcPullCreditReport = async (
 	type: CBCRequestType,
 	dealStatus: CBCDealStatus,
-	applicant: CBCApplicant,
-	sale?: CBCSale
+	applicant: CBCApplicant
+	// sale?: CBCSale
 ) => {
 	const xml = cbcXML({
 		data_area: {
 			header_data: {
-				user_pwd: cbcPassword('test123'),
+				user_pwd: cbcPassword(currentPassword),
 				action: type,
 				single_joint: 0,
 				deal_status: dealStatus,
 				pre_qual: 1,
+				// app_id: '{8F7C2F65-D242-73F2-8242-746D080D5A8C}',
 			},
 			applicant_data: {
 				[`applicant[type="primary"]`]: {
@@ -234,15 +235,18 @@ export const cbcPullCreditReport = async (
 	return await axiosCbc.post('', xml);
 };
 
-export const cbcPostCreditReport = async (applicant: CBCApplicant, sale?: CBCSale) => {
+export const cbcPostCreditReport = async (
+	applicant: CBCApplicant
+	// sale?: CBCSale
+) => {
 	const xml = cbcXML({
 		data_area: {
 			header_data: {
-				user_pwd: cbcPassword('test123'),
+				user_pwd: cbcPassword(currentPassword),
 				single_joint: 0,
 				pre_qual: 0,
 				action: 'CREDIT_APP',
-				// app_id: '1'
+				// app_id: '{8F7C2F65-D242-73F2-8242-746D080D5A8C}',
 			},
 			applicant_data: {
 				[`applicant[type="primary"]`]: {
@@ -303,30 +307,36 @@ export const cbcPostCreditReport = async (applicant: CBCApplicant, sale?: CBCSal
 };
 
 // import fs from 'fs';
-// import dayjs from 'dayjs';
+// // import dayjs from 'dayjs';
+// import xmlToJson from 'xml2json';
 // (async function () {
+// 	// console.log('START');
+
 // 	const cbcApplicant: CBCApplicant = {
 // 		personalBusiness: 'personal',
-// 		firstName: 'A',
+// 		firstName: 'EMILIONO',
 // 		middleName: '',
-// 		lastName: 'K',
-// 		email: 'kitanovicandrej213@gmail.com',
-// 		birthdate: '18/04/2000',
-// 		ssn: '123456',
+// 		lastName: 'BROWN',
+// 		email: '',
+// 		birthdate: '10/16/1955',
+// 		ssn: '666535944',
 // 		address: {
-// 			line: 'test',
-// 			city: 'Nis',
-// 			state: 'A',
-// 			postalCode: '1234',
+// 			line: '900 NW LOVEJOY ST APT 901',
+// 			city: 'PORTLAND',
+// 			state: 'OR',
+// 			postalCode: '972093482',
 // 		},
 // 	};
-// 	const response = await cbcPostCreditReport(cbcApplicant);
-// 	console.log(response);
+// 	const response = await cbcPullCreditReport(CBCRequestType.EXPERIAN, CBCDealStatus.WEB_LEAD, cbcApplicant);
 
-// 	// 	const jsonResponse = JSON.parse(xmlToJson.toJson(response.data));
-// 	// 	const htmlReport = jsonResponse.XML_INTERFACE.CREDITREPORT.REPORT;
+// 	console.log('END');
 
-// 	// 	fs.writeFile('response.html', htmlReport, () => {
-// 	// 		console.log('DONE');
-// 	// 	});
+// 	const jsonResponse = JSON.parse(xmlToJson.toJson(response.data));
+// 	fs.writeFile('response.json', JSON.stringify(jsonResponse), () => {
+// 		console.log('DONE');
+// 	});
+// 	const htmlReport = jsonResponse.XML_INTERFACE.CREDITREPORT.REPORT;
+// 	fs.writeFile('response.html', htmlReport, () => {
+// 		console.log('DONE');
+// 	});
 // })();
