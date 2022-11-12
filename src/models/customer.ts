@@ -5,14 +5,14 @@ interface ICustomer extends Document {
 	firstName: string;
 	lastName: string;
 	middleName?: string;
-	address: string;
-	city: string;
-	state: string;
-	zip: string;
+	address?: string;
+	city?: string;
+	state?: string;
+	zip?: string;
 	phone?: string;
 	social?: string; // TO CHECK
 	email: string;
-	birthday: Date;
+	birthday?: Date;
 	referralPartner?: string;
 	associatedBrand?: string;
 	personalInfo: {
@@ -89,24 +89,19 @@ const customerSchema: Schema = new Schema({
 	middleName: String,
 	address: {
 		type: String,
-		required: true,
 	},
 	city: {
 		type: String,
-		required: true,
 	},
 	state: {
 		type: String,
-		required: true,
 	},
 	zip: {
 		type: String,
-		required: true,
 	},
 	phone: String,
 	social: {
 		type: String,
-		required: true,
 	},
 	email: {
 		type: String,
@@ -114,12 +109,10 @@ const customerSchema: Schema = new Schema({
 	},
 	birthday: {
 		type: Date,
-		required: true,
 	},
 	referralPartner: String,
 	associatedBrand: {
 		type: String,
-		required: true,
 	},
 	personalInfo: {
 		placeOfBirth: String,
