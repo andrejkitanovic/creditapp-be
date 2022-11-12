@@ -63,8 +63,32 @@ const dealApplicationSchema: Schema = new Schema({
 		type: String,
 		required: true,
 	},
+	interestRate: {
+		type: Number,
+		required: true,
+	},
+	loanWeightFactor: {
+		type: Number,
+		required: true,
+	},
+	originationFee: {
+		type: Number,
+		required: true,
+	},
+	reasonCode: {
+		type: String,
+		required: true,
+	},
+	apr: {
+		type: Number,
+		required: true,
+	},
 });
 
+dealApplicationSchema.pre('validate', function (next) {
+	this.loanWeightFactor = this.loanAmount * this.interestRate;
+	next();
+});
 const objectModel = model<IDealApplication>('Deal Application', dealApplicationSchema);
 
 export { IDealApplication };

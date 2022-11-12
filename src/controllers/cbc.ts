@@ -306,37 +306,37 @@ export const cbcPostCreditReport = async (
 	return await axiosCbc.post('', xml);
 };
 
-import fs from 'fs';
-import xmlToJson from 'xml2json';
+// import fs from 'fs';
+// import xmlToJson from 'xml2json';
 
-(async function () {
-	console.log('START');
+// (async function () {
+// 	console.log('START');
 
-	const cbcApplicant: CBCApplicant = {
-		personalBusiness: 'personal',
-		firstName: 'EMILIONO',
-		middleName: '',
-		lastName: 'BROWN',
-		email: '',
-		birthdate: '10/16/1955',
-		ssn: '666535944',
-		address: {
-			line: '900 NW LOVEJOY ST APT 901',
-			city: 'PORTLAND',
-			state: 'OR',
-			postalCode: '972093482',
-		},
-	};
-	const response = await cbcPullCreditReport(CBCRequestTypeEnum.EXPERIAN, CBCDealStatus.WEB_LEAD, cbcApplicant);
+// 	const cbcApplicant: CBCApplicant = {
+// 		personalBusiness: 'personal',
+// 		firstName: 'EMILIONO',
+// 		middleName: '',
+// 		lastName: 'BROWN',
+// 		email: '',
+// 		birthdate: '10/16/1955',
+// 		ssn: '666535944',
+// 		address: {
+// 			line: '900 NW LOVEJOY ST APT 901',
+// 			city: 'PORTLAND',
+// 			state: 'OR',
+// 			postalCode: '972093482',
+// 		},
+// 	};
+// 	const response = await cbcPullCreditReport(CBCRequestTypeEnum.EXPERIAN, CBCDealStatus.WEB_LEAD, cbcApplicant);
 
-	const jsonResponse = JSON.parse(xmlToJson.toJson(response.data));
-	fs.writeFile('response.json', JSON.stringify(jsonResponse), () => {
-		console.log('Saved Response');
-	});
-	const htmlReport = jsonResponse.XML_INTERFACE.CREDITREPORT.REPORT;
-	fs.writeFile('response.html', htmlReport, () => {
-		console.log('Saved');
-	});
+// 	const jsonResponse = JSON.parse(xmlToJson.toJson(response.data));
+// 	fs.writeFile('response.json', JSON.stringify(jsonResponse), () => {
+// 		console.log('Saved Response');
+// 	});
+// 	const htmlReport = jsonResponse.XML_INTERFACE.CREDITREPORT.REPORT;
+// 	fs.writeFile('response.html', htmlReport, () => {
+// 		console.log('Saved');
+// 	});
 
-	console.log('END');
-})();
+// 	console.log('END');
+// })();
