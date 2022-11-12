@@ -12,7 +12,7 @@ interface ICustomer extends Document {
 	phone?: string;
 	social?: string; // TO CHECK
 	email: string;
-	birthday?: Date;
+	birthday: Date;
 	referralPartner?: string;
 	associatedBrand?: string;
 	personalInfo: {
@@ -109,6 +109,7 @@ const customerSchema: Schema = new Schema({
 	},
 	birthday: {
 		type: Date,
+		required: true,
 	},
 	referralPartner: String,
 	associatedBrand: {
