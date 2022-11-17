@@ -3,7 +3,7 @@ import dayjs from 'dayjs';
 import fs from 'fs';
 import { RequestHandler } from 'express';
 
-import { CBCApplicant, cbcPostCreditReport } from './cbc';
+import { CBCApplicant, cbcPullCreditReport } from './cbc';
 import Customer from 'models/customer';
 import { absoluteFilePath } from 'utils/absoluteFilePath';
 
@@ -48,7 +48,7 @@ export const postWebhookCustomer: RequestHandler = async (req, res, next) => {
 		};
 
 		// CBC CALL
-		const cbcResponse = await cbcPostCreditReport(cbcApplicant);
+		const cbcResponse = await cbcPullCreditReport(cbcApplicant);
 		const jsonResponse = JSON.parse(xmlToJson.toJson(cbcResponse.data));
 
 		const htmlReport = jsonResponse.XML_INTERFACE?.CREDITREPORT?.REPORT;

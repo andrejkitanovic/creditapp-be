@@ -162,8 +162,8 @@ export type CBCApplicant = {
 // };
 
 export const cbcPullCreditReport = async (
-	type: CBCRequestTypeEnum,
-	dealStatus: CBCDealStatus,
+	// type: CBCRequestTypeEnum,
+	// dealStatus: CBCDealStatus,
 	applicant: CBCApplicant
 	// sale?: CBCSale
 ) => {
@@ -171,9 +171,9 @@ export const cbcPullCreditReport = async (
 		data_area: {
 			header_data: {
 				user_pwd: cbcPassword(currentPassword),
-				action: type,
-				single_joint: 0,
-				deal_status: dealStatus,
+				action: 'XPN|TU|EFX|CL',
+				single_joint: 1,
+				// deal_status: dealStatus,
 				pre_qual: 1,
 				// app_id: '{8F7C2F65-D242-73F2-8242-746D080D5A8C}',
 			},
