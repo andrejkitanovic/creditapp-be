@@ -54,8 +54,7 @@ export const postWebhookCustomer: RequestHandler = async (req, res, next) => {
 		const htmlReport = jsonResponse.XML_INTERFACE?.CREDITREPORT?.REPORT;
 
 		const creditReportResponse: { [key: string]: any } = {
-			credit_eval_exists: false,
-			credit_eval_date: nowUnix,
+			loanly_recent_report_date: nowUnix,
 		};
 
 		if (htmlReport) {
@@ -64,13 +63,16 @@ export const postWebhookCustomer: RequestHandler = async (req, res, next) => {
 				next(err);
 			});
 
-			creditReportResponse.credit_eval_exists = true;
-			creditReportResponse.credit_eval_link = absoluteFilePath(req, reportName);
+			creditReportResponse.loanly_recent_report = absoluteFilePath(req, reportName);
+			creditReportResponse.loanly_status = 'Credit Report Successful';
+		} else {
+			creditReportResponse.credit_inquiry_error = jsonResponse.XML_INTERFACE?.ERROR_DESCRIPT || 'Error';
+			creditReportResponse.credit_inquiry_error_bureau = 'XPN';
+			creditReportResponse.loanly_status = 'Credit Report Error';
 		}
 
 		res.json({
 			message: 'Successfully created user',
-			// message: i18n.__('CONTROLLER.PARTNER.POST_PARTNER.ADDED'),
 			...creditReportResponse,
 		});
 	} catch (err) {

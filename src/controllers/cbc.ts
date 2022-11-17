@@ -171,7 +171,7 @@ export const cbcPullCreditReport = async (
 		data_area: {
 			header_data: {
 				user_pwd: cbcPassword(currentPassword),
-				action: 'XPN|TU|EFX|CL',
+				action: 'XPN',
 				single_joint: 1,
 				// deal_status: dealStatus,
 				pre_qual: 1,
