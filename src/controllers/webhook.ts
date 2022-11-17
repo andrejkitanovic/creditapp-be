@@ -3,9 +3,7 @@ import dayjs from 'dayjs';
 import fs from 'fs';
 import { RequestHandler } from 'express';
 
-import { CBCApplicant, 
-	cbcPostCreditReport
- } from './cbc';
+import { CBCApplicant, cbcPostCreditReport } from './cbc';
 import Customer from 'models/customer';
 import { absoluteFilePath } from 'utils/absoluteFilePath';
 
@@ -52,18 +50,28 @@ export const postWebhookCustomer: RequestHandler = async (req, res, next) => {
 		// CBC CALL
 		const cbcResponse = await cbcPostCreditReport(cbcApplicant);
 		const jsonResponse = JSON.parse(xmlToJson.toJson(cbcResponse.data));
-		const htmlReport = jsonResponse.XML_INTERFACE.CREDITREPORT.REPORT;
 
-		const reportName = `./uploads/${hubspotId}-${nowUnix}_credit-report.html`;
-		fs.writeFile(reportName, htmlReport, (err) => {
-			next(err);
-		});
+		const htmlReport = jsonResponse.XML_INTERFACE?.CREDITREPORT?.REPORT;
+
+		const creditReportResponse: { [key: string]: any } = {
+			credit_eval_exists: false,
+			credit_eval_date: nowUnix,
+		};
+
+		if (htmlReport) {
+			const reportName = `./uploads/${hubspotId}-${nowUnix}_credit-report.html`;
+			fs.writeFile(reportName, htmlReport, (err) => {
+				next(err);
+			});
+
+			creditReportResponse.credit_eval_exists = true;
+			creditReportResponse.credit_eval_link = absoluteFilePath(req, reportName);
+		}
 
 		res.json({
 			message: 'Successfully created user',
 			// message: i18n.__('CONTROLLER.PARTNER.POST_PARTNER.ADDED'),
-			credit_eval_link: absoluteFilePath(req, reportName),
-			credit_eval_date: nowUnix,
+			...creditReportResponse,
 		});
 	} catch (err) {
 		next(err);

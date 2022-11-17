@@ -30,5 +30,3 @@ defineRoutes(router, [
 ]);
 
 export default router;
-
-// https://backend.loanly.ai/api/webhook/customer
