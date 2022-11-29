@@ -25,6 +25,7 @@ type CreditEvaluationLoan = {
 
 interface ICreditEvaluation extends Document {
 	customer: string;
+	html: string;
 
 	reportDate: Date;
 	firstCreditAccount: string;
@@ -33,12 +34,15 @@ interface ICreditEvaluation extends Document {
 	ageOfFile: string;
 	averageAgeOfOpenRevolvingCredit: string;
 	loanPackageAmount: number;
-
-	// creditScores: {};
+	creditScores: {
+		type: 'XPN';
+		score: number;
+	}[];
 	recentInquiries: {
-		type: string;
-	};
-	// dregoatoryInformation: {};
+		type: 'XPN';
+		lastSixMonths: number;
+	}[];
+	// dregoatoryInformation: {}[];
 	tradelines: CreditEvaluationTradeline[];
 	businessTradelines: CreditEvaluationTradeline[];
 	loans: CreditEvaluationLoan[];
@@ -56,6 +60,46 @@ const creditEvaluationSchema: Schema = new Schema({
 	html: {
 		type: String,
 	},
+	reportDate: {
+		type: Date,
+	},
+	firstCreditAccount: {
+		type: String,
+	},
+	monitoringService: {
+		type: String,
+	},
+	state: {
+		type: String,
+	},
+	ageOfFile: {
+		type: String,
+	},
+	averageAgeOfOpenRevolvingCredit: {
+		type: String,
+	},
+	loanPackageAmount: {
+		type: Number,
+	},
+	creditScores: [
+		{
+			type: {
+				type: String,
+				enum: ['XPN'],
+			},
+			score: {
+				type: Number,
+			},
+		},
+	],
+	recentInquiries: [
+		{
+			type: {
+				type: String,
+				enum: ['XPN'],
+			},
+		},
+	],
 });
 
 const objectModel = model<ICreditEvaluation>('Credit Evaluation', creditEvaluationSchema);

@@ -1,3 +1,4 @@
+import dayjs from 'dayjs';
 import { RequestHandler } from 'express';
 
 // import i18n from 'helpers/i18n';
@@ -80,4 +81,73 @@ export const getSingleCreditEvaluation: RequestHandler = async (req, res, next) 
 	} catch (err) {
 		next(err);
 	}
+};
+
+export const cbcReportToCreditEvaluation = async (customerId: string, reportData: any, reportLink: string) => {
+	const tradelines = reportData.CC_ATTRIB.CCTRADELINES.ITEM_TRADELINE.map((tradelineData: any) => ({
+		creditor: tradelineData.FIRMNAME_ID,
+		balance: parseFloat(tradelineData.BALANCEPAYMENT) ?? undefined,
+		payment: parseFloat(tradelineData.MONTHLYPAYMENT) ?? undefined,
+		creditLimit: parseFloat(tradelineData.CREDITLIMIT) ?? undefined,
+		opened: tradelineData.DATEOPENED,
+		reportDate: tradelineData.DATEREPORTED,
+		accountType: tradelineData.OWNERSHIP.DESCRIPTION,
+		utilizationRate: tradelineData.BALANCEPAYMENT / tradelineData.CREDITLIMIT,
+	}));
+	const recentInquiries = [
+		{
+			type: 'XPN',
+			lastSixMonths: parseInt(reportData.CC_ATTRIB.CCSUMMARY.LAST_6MINQUIRIES) ?? 0,
+			lastTwelveMonths: reportData.CC_ATTRIB.CCINQUIRIES.ITEM_INQUIRY?.length ?? 0,
+		},
+	];
+
+	console.log({
+		customer: customerId,
+		html: reportLink,
+		reportDate: dayjs().toDate(),
+		// firstCreditAccount: "",
+		monitoringService: 'CBC',
+		// state: "",
+		// ageOfFile: "",
+		// averageAgeOfOpenRevolvingCredit: "",
+		// loanPackageAmount: 0,
+		creditScores: [
+			{
+				type: 'XPN',
+				score: reportData.SCORES.SCORE,
+			},
+		],
+		recentInquiries,
+		tradelines,
+		// businessTradelines: [{}].
+		// loans: [{}],
+		// debtDetails: {};
+		// income: {};
+		// loanAffordabilityCalculator: {};
+	});
+	// await CreditEvaluation.create({
+	// 	customer: customerId,
+	// 	html: reportLink,
+	// 	reportDate: dayjs().toDate(),
+	// 	// firstCreditAccount: "",
+	// 	monitoringService: 'CBC',
+	// 	// state: "",
+	// 	// ageOfFile: "",
+	// 	// averageAgeOfOpenRevolvingCredit: "",
+	// 	// loanPackageAmount: 0,
+	// 	creditScores: [
+	// 		{
+	// 			type: 'XPN',
+	// 			score: reportData.SCORES.SCORE,
+	// 		},
+	// 	],
+	// 	recentInquiries,
+	// 	tradelines,
+	// 	// businessTradelines: [{}].
+	// 	// loans: [{}],
+	// 	// debtDetails: {};
+	// 	// income: {};
+	// 	// loanAffordabilityCalculator: {};
+	// });
 };

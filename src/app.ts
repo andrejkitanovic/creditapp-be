@@ -40,9 +40,3 @@ routing(app);
 app.use(errorMiddleware);
 
 connection(app);
-
-// import { cbcChangePassword } from 'controllers/cbc';
-
-// (async function () {
-// 	console.log(await cbcChangePassword("test1234"));
-// })();

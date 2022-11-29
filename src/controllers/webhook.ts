@@ -6,6 +6,7 @@ import { RequestHandler } from 'express';
 import { CBCApplicant, cbcPullCreditReport } from './cbc';
 import Customer from 'models/customer';
 import { absoluteFilePath } from 'utils/absoluteFilePath';
+import { cbcReportToCreditEvaluation } from './creditEvaluation';
 
 export const postWebhookCustomer: RequestHandler = async (req, res, next) => {
 	try {
@@ -13,7 +14,7 @@ export const postWebhookCustomer: RequestHandler = async (req, res, next) => {
 		const { hubspotId, firstName, lastName, address, social, email, city, state, zip, birthday, associatedBrand } =
 			req.body;
 
-		await Customer.create({
+		const customer = await Customer.create({
 			hubspotId,
 			firstName,
 			lastName,
@@ -62,9 +63,13 @@ export const postWebhookCustomer: RequestHandler = async (req, res, next) => {
 			fs.writeFile(reportName, htmlReport, (err) => {
 				next(err);
 			});
+			const reportLink = absoluteFilePath(req, reportName);
 
-			creditReportResponse.loanly_recent_report = absoluteFilePath(req, reportName);
+			creditReportResponse.loanly_recent_report = reportLink;
 			creditReportResponse.loanly_status = 'Credit Report Successful';
+
+			const reportData = jsonResponse.XML_INTERFACE.CREDITREPORT.BUREAU_TYPE;
+			await cbcReportToCreditEvaluation(customer._id, reportData, reportLink);
 		} else {
 			creditReportResponse.credit_inquiry_error = jsonResponse.XML_INTERFACE?.ERROR_DESCRIPT || 'Error';
 			creditReportResponse.credit_inquiry_error_bureau = 'XPN';
@@ -79,21 +84,3 @@ export const postWebhookCustomer: RequestHandler = async (req, res, next) => {
 		next(err);
 	}
 };
-
-// export const postWebhookCreditEvaluation: RequestHandler = async (req, res, next) => {
-// 	try {
-// 		const { applicant, sale } = req.body;
-
-// 		const cbcResponse = await cbcGenerateCreditApplication(applicant, sale);
-
-// 		const jsonResponse = JSON.parse(xmlToJson.toJson(cbcResponse.data));
-// 		const htmlReport = jsonResponse.XML_INTERFACE.CREDITREPORT.REPORT;
-
-// 		res.json({
-// 			message: 'Successfully created credit evaluation',
-// 			// message: i18n.__('CONTROLLER.PARTNER.POST_PARTNER.ADDED'),
-// 		});
-// 	} catch (err) {
-// 		next(err);
-// 	}
-// };
