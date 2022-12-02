@@ -58,13 +58,14 @@ export const postWebhookCustomer: RequestHandler = async (req, res, next) => {
 			loanly_recent_report_date: nowUnix,
 		};
 
-		if (htmlReport) {
+		if (htmlReport && jsonResponse.XML_INTERFACE.CREDITREPORT.BUREAU_TYPE?.NOHIT !== 'True') {
 			const reportName = `./uploads/${hubspotId}-${nowUnix}_credit-report.html`;
 			fs.writeFile(reportName, htmlReport, (err) => {
 				next(err);
 			});
 			const reportLink = absoluteFilePath(req, reportName);
 
+			creditReportResponse.message = 'Successfully created user';
 			creditReportResponse.loanly_recent_report = reportLink;
 			creditReportResponse.loanly_status = 'Credit Report Successful';
 
@@ -77,7 +78,6 @@ export const postWebhookCustomer: RequestHandler = async (req, res, next) => {
 		}
 
 		res.json({
-			message: 'Successfully created user',
 			...creditReportResponse,
 		});
 	} catch (err) {
