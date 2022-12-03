@@ -85,6 +85,10 @@ export const postWebhookCustomer: RequestHandler = async (req, res, next) => {
 			const reportData = jsonResponse.XML_INTERFACE.CREDITREPORT.BUREAU_TYPE;
 			await cbcReportToCreditEvaluation(customer._id, reportData, reportLink);
 		} else {
+			if (htmlReport && jsonResponse.XML_INTERFACE.CREDITREPORT.BUREAU_TYPE?.NOHIT === 'True') {
+				creditReportResponse.message = 'No hit';
+			} else creditReportResponse.message = 'Error while fetching report';
+
 			creditReportResponse.credit_inquiry_error = jsonResponse.XML_INTERFACE?.ERROR_DESCRIPT || 'Error';
 			creditReportResponse.credit_inquiry_error_bureau = 'XPN';
 			creditReportResponse.loanly_status = 'Credit Report Error';
