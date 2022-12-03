@@ -102,30 +102,6 @@ export const cbcReportToCreditEvaluation = async (customerId: string, reportData
 		},
 	];
 
-	console.log({
-		customer: customerId,
-		html: reportLink,
-		reportDate: dayjs().toDate(),
-		// firstCreditAccount: "",
-		monitoringService: 'CBC',
-		// state: "",
-		// ageOfFile: "",
-		// averageAgeOfOpenRevolvingCredit: "",
-		// loanPackageAmount: 0,
-		creditScores: [
-			{
-				type: 'XPN',
-				score: reportData.SCORES.SCORE,
-			},
-		],
-		recentInquiries,
-		tradelines,
-		// businessTradelines: [{}].
-		// loans: [{}],
-		// debtDetails: {};
-		// income: {};
-		// loanAffordabilityCalculator: {};
-	});
 	// await CreditEvaluation.create({
 	// 	customer: customerId,
 	// 	html: reportLink,

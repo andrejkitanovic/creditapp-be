@@ -2,6 +2,7 @@ import xmlToJson from 'xml2json';
 import dayjs from 'dayjs';
 import fs from 'fs';
 import { RequestHandler } from 'express';
+import htmlToPDF from 'html-pdf-node';
 
 import { CBCApplicant, cbcPullCreditReport } from './cbc';
 import Customer from 'models/customer';
@@ -54,6 +55,8 @@ export const postWebhookCustomer: RequestHandler = async (req, res, next) => {
 
 		const htmlReport = jsonResponse.XML_INTERFACE?.CREDITREPORT?.REPORT;
 
+		const pdfReport = await htmlToPDF.generatePdf({ content: htmlReport }, { format: 'A4' });
+
 		const creditReportResponse: { [key: string]: any } = {
 			loanly_recent_report_date: nowUnix,
 		};
@@ -65,8 +68,15 @@ export const postWebhookCustomer: RequestHandler = async (req, res, next) => {
 			});
 			const reportLink = absoluteFilePath(req, reportName);
 
+			const reportPDFName = reportName.replace('html', 'pdf');
+			fs.writeFile(reportPDFName, pdfReport as unknown as Buffer, (err) => {
+				next(err);
+			});
+			const reportPDFLink = absoluteFilePath(req, reportPDFName);
+
 			creditReportResponse.message = 'Successfully created user';
 			creditReportResponse.loanly_recent_report = reportLink;
+			creditReportResponse.loanly_recent_report_pdf = reportPDFLink;
 			creditReportResponse.loanly_status = 'Credit Report Successful';
 
 			const reportData = jsonResponse.XML_INTERFACE.CREDITREPORT.BUREAU_TYPE;
