@@ -55,7 +55,10 @@ export const postWebhookCustomer: RequestHandler = async (req, res, next) => {
 
 		const htmlReport = jsonResponse.XML_INTERFACE?.CREDITREPORT?.REPORT;
 
-		const pdfReport = await htmlToPDF.generatePdf({ content: htmlReport }, { format: 'A4' });
+		const pdfReport = await htmlToPDF.generatePdf(
+			{ content: htmlReport },
+			{ format: 'A4', args: ['--no-sandbox', '--disable-setuid-sandbox'] }
+		);
 
 		const creditReportResponse: { [key: string]: any } = {
 			loanly_recent_report_date: nowUnix,
