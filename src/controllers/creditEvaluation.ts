@@ -5,7 +5,7 @@ import { RequestHandler } from 'express';
 import { queryFilter } from 'helpers/filters';
 import { createMeta } from 'helpers/meta';
 import CreditEvaluation from 'models/creditEvaluation';
-import { cbcFormatDate } from './cbc';
+import { cbcFormatDate, cbcFormatMonths } from './cbc';
 
 export const getCreditEvaluations: RequestHandler = async (req, res, next) => {
 	try {
@@ -85,22 +85,21 @@ export const getSingleCreditEvaluation: RequestHandler = async (req, res, next) 
 };
 
 export const cbcReportToCreditEvaluation = (reportData: any) => {
+	// TRADELINES
 	let totalOpenTradelines = 0;
 	let totalMonthsOfOpenRevolvingCredits = 0;
-	let ageOfFile: Date | null = null;
-	let firstCreditAccount: string | null = null;
+	let ageOfFile: Date | undefined;
+	let firstCreditAccount: string | undefined;
 
-	const tradelines = reportData.CC_ATTRIB.CCTRADELINES.ITEM_TRADELINE.map((tradelineData: any) => {
+	const tradelines = reportData.CC_ATTRIB.CCTRADELINES.ITEM_TRADELINE.filter(
+		(tradelineData: any) => tradelineData.CREDITLIMIT !== '-1'
+	).map((tradelineData: any) => {
 		if (!ageOfFile || dayjs(cbcFormatDate(tradelineData.DATEOPENED)).diff(dayjs(ageOfFile)) < 0) {
 			ageOfFile = cbcFormatDate(tradelineData.DATEOPENED);
 			firstCreditAccount = tradelineData.FIRMNAME_ID;
 		}
 
-		if (
-			tradelineData.OPENIND === 'O' &&
-			cbcFormatDate(tradelineData.DATEOPENED) &&
-			tradelineData.CREDITLIMIT !== '-1'
-		) {
+		if (tradelineData.OPENIND === 'O' && cbcFormatDate(tradelineData.DATEOPENED)) {
 			totalOpenTradelines += 1;
 			totalMonthsOfOpenRevolvingCredits += dayjs().diff(dayjs(cbcFormatDate(tradelineData.DATEOPENED)), 'month');
 		}
@@ -117,9 +116,11 @@ export const cbcReportToCreditEvaluation = (reportData: any) => {
 		};
 	});
 
+	// INQUIRES
 	const lastTwelveMonths = reportData.CC_ATTRIB.CCINQUIRIES.ITEM_INQUIRY.filter((inquiryItem: { DATE: string }) => {
 		return dayjs().diff(dayjs(cbcFormatDate(inquiryItem.DATE)), 'year', true) <= 1;
 	});
+
 	const recentInquiries = [
 		{
 			type: 'XPN',
@@ -128,7 +129,37 @@ export const cbcReportToCreditEvaluation = (reportData: any) => {
 		},
 	];
 
+	// LOANS
+	const loans = reportData.CC_ATTRIB.CCTRADELINES.ITEM_TRADELINE.filter(
+		(tradelineData: any) => tradelineData.CREDITLIMIT === '-1'
+	).map((tradelineData: any) => {
+		const paydown75 = tradelineData.BALANCEPAYMENT - tradelineData.HIGHCREDIT * 0.75;
+		const paydown60 = tradelineData.BALANCEPAYMENT - tradelineData.HIGHCREDIT * 0.6;
+
+		return {
+			creditor: tradelineData.FIRMNAME_ID,
+			balance: parseFloat(tradelineData.BALANCEPAYMENT) ?? undefined,
+			payment: parseFloat(tradelineData.MONTHLYPAYMENT) ?? undefined,
+			limit: cbcFormatMonths(tradelineData.TERMS),
+			opened: cbcFormatDate(tradelineData.DATEOPENED),
+			reportDate: cbcFormatDate(tradelineData.DATEREPORTED),
+			accountType: tradelineData.OWNERSHIP.DESCRIPTION,
+			debitToCreditRatio: tradelineData.BALANCEPAYMENT / tradelineData.HIGHCREDIT,
+			paydown75: paydown75 < 0 ? 0 : paydown75,
+			paydown60: paydown60 < 0 ? 0 : paydown60,
+		};
+	});
+
 	const averageMonthsOfOpenRevolvingCredit = totalMonthsOfOpenRevolvingCredits / totalOpenTradelines;
+
+	// DEBT
+	const debtPayment = reportData.CC_ATTRIB.CCTRADELINES.ITEM_TRADELINE.reduce((prevValue: number, currValue: any) => {
+		if (currValue.OPENIND === 'O' && parseFloat(currValue.MONTHLYPAYMENT) > 0) {
+			prevValue += parseFloat(currValue.MONTHLYPAYMENT);
+		}
+
+		return prevValue;
+	}, 0);
 
 	return {
 		// reportDate: cbcFormatDate(),
@@ -147,9 +178,10 @@ export const cbcReportToCreditEvaluation = (reportData: any) => {
 		recentInquiries,
 		tradelines,
 		// businessTradelines: [{}].
-		// loans: [{}],
-		// debtDetails: {};
-		// income: {};
+		loans,
+		debtDetails: {
+			debtPayment,
+		},
 		// loanAffordabilityCalculator: {};
 	};
 };

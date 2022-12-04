@@ -8,28 +8,31 @@ type CreditEvaluationTradeline = {
 	opened: Date;
 	reportDate: Date;
 	accountType: string;
-	utilizationRate: string;
+	utilizationRate: number;
 };
 
 type CreditEvaluationLoan = {
 	creditor: string;
 	balance: number;
 	payment: number;
-	creditLimit: number;
+	hpb: number;
+	limit: number;
 	opened: Date;
 	reportDate: Date;
 	accountType: string;
 	debitToCreditRatio: string;
-	// paymentRatio: string;
+
+	paydown75: number;
+	paydown60: number;
 };
 
 type CreditEvaluationDebtDetails = {
 	debtPayment: number;
-	defferedStudentLoans: number;
-	rentPayment: number;
-	totalIndividualPayment: number;
-	totalSpousalPayment: number;
-	totalHouseholdPayment: number;
+	// defferedStudentLoans: number;
+	// rentPayment: number;
+	// totalIndividualPayment: number;
+	// totalSpousalPayment: number;
+	// totalHouseholdPayment: number;
 };
 
 type CreditEvaluationIncome = {
@@ -153,10 +156,49 @@ const creditEvaluationSchema: Schema = new Schema({
 				type: String,
 			},
 			utilizationRate: {
-				type: String,
+				type: Number,
 			},
 		},
 	],
+	loans: [
+		{
+			creditor: {
+				type: String,
+			},
+			balance: {
+				type: Number,
+			},
+			payment: {
+				type: Number,
+			},
+			limit: {
+				type: Number,
+			},
+			opened: {
+				type: Date,
+			},
+			reportDate: {
+				type: Date,
+			},
+			accountType: {
+				type: String,
+			},
+			debitToCreditRatio: {
+				type: Number,
+			},
+			paydown75: {
+				type: Number,
+			},
+			paydown60: {
+				type: Number,
+			},
+		},
+	],
+	debtDetails: {
+		debtPayment: {
+			type: Number,
+		},
+	},
 });
 
 const objectModel = model<ICreditEvaluation>('Credit Evaluation', creditEvaluationSchema);

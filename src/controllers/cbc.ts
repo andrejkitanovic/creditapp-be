@@ -248,8 +248,20 @@ export const cbcPullCreditReport = async (applicant: CBCApplicant) => {
 	return await axiosCbc.post('', xml);
 };
 
-export const cbcFormatDate = (key: string): Date | null => {
-	if (!key || key === '/') return null;
+export const cbcFormatMonths = (key: string): number | undefined => {
+	if (!key) return;
+
+	if (key === 'One month') {
+		return 1;
+	} else if (!isNaN(parseInt(key))) {
+		return parseInt(key);
+	}
+
+	return undefined
+};
+
+export const cbcFormatDate = (key: string): Date | undefined => {
+	if (!key || key === '/') return;
 
 	const dateParts = key.split('/');
 
@@ -280,5 +292,5 @@ export const cbcFormatDate = (key: string): Date | null => {
 		return date.toDate();
 	}
 
-	return null;
+	return;
 };
