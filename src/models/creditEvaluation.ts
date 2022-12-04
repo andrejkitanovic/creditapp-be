@@ -23,6 +23,28 @@ type CreditEvaluationLoan = {
 	// paymentRatio: string;
 };
 
+type CreditEvaluationDebtDetails = {
+	debtPayment: number;
+	defferedStudentLoans: number;
+	rentPayment: number;
+	totalIndividualPayment: number;
+	totalSpousalPayment: number;
+	totalHouseholdPayment: number;
+};
+
+type CreditEvaluationIncome = {
+	individual: {
+		monthly: number;
+		annual: number;
+		debtToIncome: number;
+	};
+	household: {
+		monthly: number;
+		annual: number;
+		debtToIncome: number;
+	};
+};
+
 interface ICreditEvaluation extends Document {
 	customer: string;
 	html: string;
@@ -31,8 +53,8 @@ interface ICreditEvaluation extends Document {
 	firstCreditAccount: string;
 	monitoringService: string;
 	state: string;
-	ageOfFile: string;
-	averageAgeOfOpenRevolvingCredit: string;
+	ageOfFile: Date;
+	averageMonthsOfOpenRevolvingCredit: number;
 	loanPackageAmount: number;
 	creditScores: {
 		type: 'XPN';
@@ -41,13 +63,14 @@ interface ICreditEvaluation extends Document {
 	recentInquiries: {
 		type: 'XPN';
 		lastSixMonths: number;
+		lastTwelveMonths: number;
 	}[];
 	// dregoatoryInformation: {}[];
 	tradelines: CreditEvaluationTradeline[];
 	businessTradelines: CreditEvaluationTradeline[];
 	loans: CreditEvaluationLoan[];
-	// debtDetails: {};
-	// income: {};
+	debtDetails: CreditEvaluationDebtDetails;
+	income: CreditEvaluationIncome;
 	// loanAffordabilityCalculator: {};
 }
 
@@ -73,10 +96,10 @@ const creditEvaluationSchema: Schema = new Schema({
 		type: String,
 	},
 	ageOfFile: {
-		type: String,
+		type: Date,
 	},
-	averageAgeOfOpenRevolvingCredit: {
-		type: String,
+	averageMonthsOfOpenRevolvingCredit: {
+		type: Number,
 	},
 	loanPackageAmount: {
 		type: Number,
@@ -97,6 +120,40 @@ const creditEvaluationSchema: Schema = new Schema({
 			type: {
 				type: String,
 				enum: ['XPN'],
+			},
+			lastSixMonths: {
+				type: Number,
+			},
+			lastTwelveMonths: {
+				type: Number,
+			},
+		},
+	],
+	tradelines: [
+		{
+			creditor: {
+				type: String,
+			},
+			balance: {
+				type: Number,
+			},
+			payment: {
+				type: Number,
+			},
+			creditLimit: {
+				type: Number,
+			},
+			opened: {
+				type: Date,
+			},
+			reportDate: {
+				type: Date,
+			},
+			accountType: {
+				type: String,
+			},
+			utilizationRate: {
+				type: String,
 			},
 		},
 	],

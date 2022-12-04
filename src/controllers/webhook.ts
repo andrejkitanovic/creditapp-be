@@ -5,6 +5,7 @@ import { RequestHandler } from 'express';
 import htmlToPDF from 'html-pdf-node';
 
 import { CBCApplicant, cbcPullCreditReport } from './cbc';
+import CreditEvaluation from 'models/creditEvaluation';
 import Customer from 'models/customer';
 import { absoluteFilePath } from 'utils/absoluteFilePath';
 import { cbcReportToCreditEvaluation } from './creditEvaluation';
@@ -15,6 +16,7 @@ export const postWebhookCustomer: RequestHandler = async (req, res, next) => {
 		const { hubspotId, firstName, lastName, address, social, email, city, state, zip, birthday, associatedBrand } =
 			req.body;
 
+		// Create customer
 		const customer = await Customer.create({
 			hubspotId,
 			firstName,
@@ -83,7 +85,15 @@ export const postWebhookCustomer: RequestHandler = async (req, res, next) => {
 			creditReportResponse.loanly_status = 'Credit Report Successful';
 
 			const reportData = jsonResponse.XML_INTERFACE.CREDITREPORT.BUREAU_TYPE;
-			await cbcReportToCreditEvaluation(customer._id, reportData, reportLink);
+
+			// Create Credit Evaluation
+			const creditEvaluationData = cbcReportToCreditEvaluation(reportData);
+			CreditEvaluation.create({
+				customer: customer._id,
+				...creditEvaluationData,
+				html: reportLink,
+				state,
+			});
 		} else {
 			if (htmlReport && jsonResponse.XML_INTERFACE.CREDITREPORT.BUREAU_TYPE?.NOHIT === 'True') {
 				creditReportResponse.message = 'No hit';

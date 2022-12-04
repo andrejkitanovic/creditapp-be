@@ -5,6 +5,7 @@ import { RequestHandler } from 'express';
 import { queryFilter } from 'helpers/filters';
 import { createMeta } from 'helpers/meta';
 import CreditEvaluation from 'models/creditEvaluation';
+import { cbcFormatDate } from './cbc';
 
 export const getCreditEvaluations: RequestHandler = async (req, res, next) => {
 	try {
@@ -83,47 +84,72 @@ export const getSingleCreditEvaluation: RequestHandler = async (req, res, next) 
 	}
 };
 
-export const cbcReportToCreditEvaluation = async (customerId: string, reportData: any, reportLink: string) => {
-	const tradelines = reportData.CC_ATTRIB.CCTRADELINES.ITEM_TRADELINE.map((tradelineData: any) => ({
-		creditor: tradelineData.FIRMNAME_ID,
-		balance: parseFloat(tradelineData.BALANCEPAYMENT) ?? undefined,
-		payment: parseFloat(tradelineData.MONTHLYPAYMENT) ?? undefined,
-		creditLimit: parseFloat(tradelineData.CREDITLIMIT) ?? undefined,
-		opened: tradelineData.DATEOPENED,
-		reportDate: tradelineData.DATEREPORTED,
-		accountType: tradelineData.OWNERSHIP.DESCRIPTION,
-		utilizationRate: tradelineData.BALANCEPAYMENT / tradelineData.CREDITLIMIT,
-	}));
+export const cbcReportToCreditEvaluation = (reportData: any) => {
+	let totalOpenTradelines = 0;
+	let totalMonthsOfOpenRevolvingCredits = 0;
+	let ageOfFile: Date | null = null;
+	let firstCreditAccount: string | null = null;
+
+	const tradelines = reportData.CC_ATTRIB.CCTRADELINES.ITEM_TRADELINE.map((tradelineData: any) => {
+		if (!ageOfFile || dayjs(cbcFormatDate(tradelineData.DATEOPENED)).diff(dayjs(ageOfFile)) < 0) {
+			ageOfFile = cbcFormatDate(tradelineData.DATEOPENED);
+			firstCreditAccount = tradelineData.FIRMNAME_ID;
+		}
+
+		if (
+			tradelineData.OPENIND === 'O' &&
+			cbcFormatDate(tradelineData.DATEOPENED) &&
+			tradelineData.CREDITLIMIT !== '-1'
+		) {
+			totalOpenTradelines += 1;
+			totalMonthsOfOpenRevolvingCredits += dayjs().diff(dayjs(cbcFormatDate(tradelineData.DATEOPENED)), 'month');
+		}
+
+		return {
+			creditor: tradelineData.FIRMNAME_ID,
+			balance: parseFloat(tradelineData.BALANCEPAYMENT) ?? undefined,
+			payment: parseFloat(tradelineData.MONTHLYPAYMENT) ?? undefined,
+			creditLimit: parseFloat(tradelineData.CREDITLIMIT) ?? undefined,
+			opened: cbcFormatDate(tradelineData.DATEOPENED),
+			reportDate: cbcFormatDate(tradelineData.DATEREPORTED),
+			accountType: tradelineData.OWNERSHIP.DESCRIPTION,
+			utilizationRate: tradelineData.BALANCEPAYMENT / tradelineData.CREDITLIMIT,
+		};
+	});
+
+	const lastTwelveMonths = reportData.CC_ATTRIB.CCINQUIRIES.ITEM_INQUIRY.filter((inquiryItem: { DATE: string }) => {
+		return dayjs().diff(dayjs(cbcFormatDate(inquiryItem.DATE)), 'year', true) <= 1;
+	});
 	const recentInquiries = [
 		{
 			type: 'XPN',
 			lastSixMonths: parseInt(reportData.CC_ATTRIB.CCSUMMARY.LAST_6MINQUIRIES) ?? 0,
-			lastTwelveMonths: reportData.CC_ATTRIB.CCINQUIRIES.ITEM_INQUIRY?.length ?? 0,
+			lastTwelveMonths: lastTwelveMonths.length ?? 0,
 		},
 	];
 
-	// await CreditEvaluation.create({
-	// 	customer: customerId,
-	// 	html: reportLink,
-	// 	reportDate: dayjs().toDate(),
-	// 	// firstCreditAccount: "",
-	// 	monitoringService: 'CBC',
-	// 	// state: "",
-	// 	// ageOfFile: "",
-	// 	// averageAgeOfOpenRevolvingCredit: "",
-	// 	// loanPackageAmount: 0,
-	// 	creditScores: [
-	// 		{
-	// 			type: 'XPN',
-	// 			score: reportData.SCORES.SCORE,
-	// 		},
-	// 	],
-	// 	recentInquiries,
-	// 	tradelines,
-	// 	// businessTradelines: [{}].
-	// 	// loans: [{}],
-	// 	// debtDetails: {};
-	// 	// income: {};
-	// 	// loanAffordabilityCalculator: {};
-	// });
+	const averageMonthsOfOpenRevolvingCredit = totalMonthsOfOpenRevolvingCredits / totalOpenTradelines;
+
+	return {
+		// reportDate: cbcFormatDate(),
+		firstCreditAccount,
+		monitoringService: 'CBC',
+		// state: "",
+		ageOfFile,
+		averageMonthsOfOpenRevolvingCredit,
+		// loanPackageAmount: 0,
+		creditScores: [
+			{
+				type: 'XPN',
+				score: parseInt(reportData.SCORES.SCORE) ?? 0,
+			},
+		],
+		recentInquiries,
+		tradelines,
+		// businessTradelines: [{}].
+		// loans: [{}],
+		// debtDetails: {};
+		// income: {};
+		// loanAffordabilityCalculator: {};
+	};
 };
