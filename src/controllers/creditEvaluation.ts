@@ -74,7 +74,7 @@ export const getSingleCreditEvaluation: RequestHandler = async (req, res, next) 
 	try {
 		const { id } = req.params;
 
-		const creditEvaluation = await CreditEvaluation.findById(id);
+		const creditEvaluation = await CreditEvaluation.findById(id).populate('customer');
 
 		res.json({
 			data: creditEvaluation,
