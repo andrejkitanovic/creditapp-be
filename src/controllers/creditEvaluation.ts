@@ -162,10 +162,9 @@ export const cbcReportToCreditEvaluation = (reportData: any) => {
 	}, 0);
 
 	return {
-		// reportDate: cbcFormatDate(),
+		reportDate: dayjs().toDate(),
 		firstCreditAccount,
 		monitoringService: 'CBC',
-		// state: "",
 		ageOfFile,
 		averageMonthsOfOpenRevolvingCredit,
 		// loanPackageAmount: 0,
