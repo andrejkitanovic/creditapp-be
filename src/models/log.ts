@@ -1,7 +1,7 @@
 import { Schema, model, Document } from 'mongoose';
 
 interface ILog extends Document {
-	method: 'POST';
+	method: 'POST' | 'GET' | 'PUT' | 'DELETE';
 	url: string;
 	body: string;
 }

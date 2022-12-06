@@ -9,7 +9,7 @@ export const getLogs: RequestHandler = async (req, res, next) => {
 		const { data: logs, count } = await queryFilter({
 			Model: Log,
 			query: req.query,
-			// searchFields: [],
+			searchFields: ['url', 'body'],
 		});
 
 		res.json({
