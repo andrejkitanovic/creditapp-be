@@ -11,13 +11,14 @@ interface IRoute {
 	method: 'get' | 'post' | 'put' | 'patch' | 'delete';
 	route: string;
 	roles?: RoleType[];
+	middlewares?: RequestHandler[];
 	permissions?: PermissionsType[];
 	validator?: ValidationChain[];
 	controller: RequestHandler;
 }
 
 const defineRoutes = (router: IRouter, routes: IRoute[]) => {
-	routes.forEach(({ method, route, roles, validator, controller }) => {
+	routes.forEach(({ method, route, roles, middlewares, validator, controller }) => {
 		const additionalRoutes = [];
 
 		if (roles) {
@@ -25,6 +26,9 @@ const defineRoutes = (router: IRouter, routes: IRoute[]) => {
 		}
 		if (validator) {
 			additionalRoutes.push(validator, validatorMiddleware);
+		}
+		if (middlewares) {
+			additionalRoutes.push(middlewares);
 		}
 
 		router[method](route, loggerMiddleware, ...additionalRoutes, controller);
