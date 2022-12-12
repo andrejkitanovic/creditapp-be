@@ -9,6 +9,7 @@ import CreditEvaluation from 'models/creditEvaluation';
 import Customer from 'models/customer';
 import { absoluteFilePath } from 'utils/absoluteFilePath';
 import { cbcReportToCreditEvaluation } from './creditEvaluation';
+import { dayjsUnix } from 'utils/dayjs';
 
 export const postWebhookCustomer: RequestHandler = async (req, res, next) => {
 	try {
@@ -16,24 +17,29 @@ export const postWebhookCustomer: RequestHandler = async (req, res, next) => {
 		const { hubspotId, firstName, lastName, address, social, email, city, state, zip, birthday, associatedBrand } =
 			req.body;
 
-		// Create customer
-		const customer = await Customer.create({
-			hubspotId,
-			firstName,
-			lastName,
-			address,
-			city,
-			state,
-			zip,
-			social,
-			email,
-			birthday,
-			associatedBrand,
-			personalInfo: {},
-			educationInfo: {},
-			employmentInfo: {},
-			assetInfo: {},
-		});
+		// Search if customer exists
+		let customer = await Customer.findOne({ email });
+
+		if (!customer) {
+			// Create customer
+			customer = await Customer.create({
+				hubspotId,
+				firstName,
+				lastName,
+				address,
+				city,
+				state,
+				zip,
+				social,
+				email,
+				birthday,
+				associatedBrand,
+				personalInfo: {},
+				educationInfo: {},
+				employmentInfo: {},
+				assetInfo: {},
+			});
+		}
 
 		const cbcApplicant: CBCApplicant = {
 			personalBusiness: 'personal',
@@ -41,7 +47,7 @@ export const postWebhookCustomer: RequestHandler = async (req, res, next) => {
 			middleName: '',
 			lastName,
 			email,
-			birthdate: dayjs(birthday).format('MM/DD/YYYY'),
+			birthdate: dayjsUnix(birthday).format('MM/DD/YYYY'),
 			ssn: social,
 			address: {
 				line: address,
@@ -92,6 +98,7 @@ export const postWebhookCustomer: RequestHandler = async (req, res, next) => {
 				customer: customer._id,
 				...creditEvaluationData,
 				html: reportLink,
+				pdf: reportPDFLink,
 				state,
 			});
 		} else {

@@ -257,7 +257,7 @@ export const cbcFormatMonths = (key: string): number | undefined => {
 		return parseInt(key);
 	}
 
-	return undefined
+	return undefined;
 };
 
 export const cbcFormatDate = (key: string): Date | undefined => {

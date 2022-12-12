@@ -51,6 +51,7 @@ type CreditEvaluationIncome = {
 interface ICreditEvaluation extends Document {
 	customer: string;
 	html: string;
+	pdf: string;
 
 	reportDate: Date;
 	firstCreditAccount: string;
@@ -77,129 +78,135 @@ interface ICreditEvaluation extends Document {
 	// loanAffordabilityCalculator: {};
 }
 
-const creditEvaluationSchema: Schema = new Schema({
-	customer: {
-		type: Schema.Types.ObjectId,
-		ref: 'Customer',
-		required: true,
-	},
-	html: {
-		type: String,
-	},
-	reportDate: {
-		type: Date,
-	},
-	firstCreditAccount: {
-		type: String,
-	},
-	monitoringService: {
-		type: String,
-	},
-	state: {
-		type: String,
-	},
-	ageOfFile: {
-		type: Date,
-	},
-	averageMonthsOfOpenRevolvingCredit: {
-		type: Number,
-	},
-	loanPackageAmount: {
-		type: Number,
-	},
-	creditScores: [
-		{
-			type: {
-				type: String,
-				enum: ['XPN'],
-			},
-			score: {
-				type: Number,
-			},
+const creditEvaluationSchema: Schema = new Schema(
+	{
+		customer: {
+			type: Schema.Types.ObjectId,
+			ref: 'Customer',
+			required: true,
 		},
-	],
-	recentInquiries: [
-		{
-			type: {
-				type: String,
-				enum: ['XPN'],
-			},
-			lastSixMonths: {
-				type: Number,
-			},
-			lastTwelveMonths: {
-				type: Number,
-			},
+		html: {
+			type: String,
 		},
-	],
-	tradelines: [
-		{
-			creditor: {
-				type: String,
-			},
-			balance: {
-				type: Number,
-			},
-			payment: {
-				type: Number,
-			},
-			creditLimit: {
-				type: Number,
-			},
-			opened: {
-				type: Date,
-			},
-			reportDate: {
-				type: Date,
-			},
-			accountType: {
-				type: String,
-			},
-			utilizationRate: {
-				type: Number,
-			},
+		pdf: {
+			type: String,
 		},
-	],
-	loans: [
-		{
-			creditor: {
-				type: String,
-			},
-			balance: {
-				type: Number,
-			},
-			payment: {
-				type: Number,
-			},
-			limit: {
-				type: Number,
-			},
-			opened: {
-				type: Date,
-			},
-			reportDate: {
-				type: Date,
-			},
-			accountType: {
-				type: String,
-			},
-			debitToCreditRatio: {
-				type: Number,
-			},
-			paydown75: {
-				type: Number,
-			},
-			paydown60: {
-				type: Number,
-			},
+		reportDate: {
+			type: Date,
 		},
-	],
-	debtDetails: {
-		debtPayment: {
+		firstCreditAccount: {
+			type: String,
+		},
+		monitoringService: {
+			type: String,
+		},
+		state: {
+			type: String,
+		},
+		ageOfFile: {
+			type: Date,
+		},
+		averageMonthsOfOpenRevolvingCredit: {
 			type: Number,
 		},
+		loanPackageAmount: {
+			type: Number,
+		},
+		creditScores: [
+			{
+				type: {
+					type: String,
+					enum: ['XPN'],
+				},
+				score: {
+					type: Number,
+				},
+			},
+		],
+		recentInquiries: [
+			{
+				type: {
+					type: String,
+					enum: ['XPN'],
+				},
+				lastSixMonths: {
+					type: Number,
+				},
+				lastTwelveMonths: {
+					type: Number,
+				},
+			},
+		],
+		tradelines: [
+			{
+				creditor: {
+					type: String,
+				},
+				balance: {
+					type: Number,
+				},
+				payment: {
+					type: Number,
+				},
+				creditLimit: {
+					type: Number,
+				},
+				opened: {
+					type: Date,
+				},
+				reportDate: {
+					type: Date,
+				},
+				accountType: {
+					type: String,
+				},
+				utilizationRate: {
+					type: Number,
+				},
+			},
+		],
+		loans: [
+			{
+				creditor: {
+					type: String,
+				},
+				balance: {
+					type: Number,
+				},
+				payment: {
+					type: Number,
+				},
+				limit: {
+					type: Number,
+				},
+				opened: {
+					type: Date,
+				},
+				reportDate: {
+					type: Date,
+				},
+				accountType: {
+					type: String,
+				},
+				debitToCreditRatio: {
+					type: Number,
+				},
+				paydown75: {
+					type: Number,
+				},
+				paydown60: {
+					type: Number,
+				},
+			},
+		],
+		debtDetails: {
+			debtPayment: {
+				type: Number,
+			},
+		},
 	},
-});
+	{ timestamps: true }
+);
 
 const objectModel = model<ICreditEvaluation>('Credit Evaluation', creditEvaluationSchema);
 
