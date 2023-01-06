@@ -113,13 +113,21 @@ export const cbcReportToCreditEvaluation = (reportData: any) => {
 				opened: cbcFormatDate(tradelineData.DATEOPENED),
 				reportDate: cbcFormatDate(tradelineData.DATEREPORTED),
 				accountType: tradelineData.OWNERSHIP.DESCRIPTION,
-				utilizationRate: tradelineData.BALANCEPAYMENT / tradelineData.CREDITLIMIT,
+				utilizationRate:
+					parseFloat(tradelineData.BALANCEPAYMENT) && parseFloat(tradelineData.CREDITLIMIT)
+						? parseFloat(tradelineData.BALANCEPAYMENT) / parseFloat(tradelineData.CREDITLIMIT)
+						: 0,
 			};
 		}) || [];
 
 	// INQUIRES
+	let inquiries = reportData.CC_ATTRIB.CCINQUIRIES.ITEM_INQUIRY;
+	if (Boolean(inquiries) && !Array.isArray(inquiries)) {
+		inquiries = [inquiries];
+	}
+
 	const lastTwelveMonths =
-		reportData.CC_ATTRIB.CCINQUIRIES.ITEM_INQUIRY?.filter((inquiryItem: { DATE: string }) => {
+		inquiries?.filter((inquiryItem: { DATE: string }) => {
 			return dayjs().diff(dayjs(cbcFormatDate(inquiryItem.DATE)), 'year', true) <= 1;
 		}) || [];
 
