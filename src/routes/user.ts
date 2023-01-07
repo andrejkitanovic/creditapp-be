@@ -56,8 +56,8 @@ defineRoutes(router, [
 	{
 		method: 'get',
 		route: '/unconfirmed/:id',
-		controller: getSingleUserController,
 		validator: getSingleUnconfirmedUserValidator,
+		controller: getSingleUserController,
 	},
 ]);
 

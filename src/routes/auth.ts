@@ -29,7 +29,7 @@ defineRoutes(router, [
 	},
 	{
 		method: 'post',
-		route: '/register',
+		route: '/register/:id',
 		validator: postRegisterValidator,
 		controller: postRegisterController,
 	},
