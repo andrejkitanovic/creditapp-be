@@ -56,8 +56,6 @@ defineRoutes(router, [
 	{
 		method: 'get',
 		route: '/unconfirmed/:id',
-		roles: ['user', 'admin'],
-		permissions: ['read:users'],
 		controller: getSingleUserController,
 		validator: getSingleUnconfirmedUserValidator,
 	},
