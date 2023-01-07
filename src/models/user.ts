@@ -16,6 +16,7 @@ interface IUser extends Document {
 	password: string;
 	phone?: string;
 	role: RolesEnum;
+	confirmed: boolean;
 	permissions: PermissionsType[];
 }
 

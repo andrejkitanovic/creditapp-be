@@ -1,11 +1,11 @@
 import { RequestHandler } from 'express';
 
-// import i18n from 'helpers/i18n';
+import i18n from 'helpers/i18n';
 import { queryFilter } from 'helpers/filters';
 import { createMeta } from 'helpers/meta';
 import User from 'models/user';
+import { sendEmailInvitation } from 'utils/mailer';
 import { hsCreateContact, hsGetSingleContact } from './hubspot';
-// import { sendEmailInvitation } from 'utils/mailer';
 
 export const getUsers: RequestHandler = async (req, res, next) => {
 	try {
@@ -33,11 +33,12 @@ export const postUser: RequestHandler = async (req, res, next) => {
 
 		const { total, results } = await hsGetSingleContact('email', email);
 
-		let hsUser;
+		let user, hsUser;
+
 		if (total) {
 			hsUser = results[0].properties;
 
-			await User.create({
+			user = await User.create({
 				hubspotId: hsUser.hs_object_id,
 				email,
 				role,
@@ -47,15 +48,17 @@ export const postUser: RequestHandler = async (req, res, next) => {
 		} else {
 			hsUser = await hsCreateContact({ properties: { email } });
 
-			await User.create({
+			user = await User.create({
 				hubspotId: hsUser.id,
 				email,
-				role
+				role,
 			});
 		}
 
+		await sendEmailInvitation({ userId: user._id, email });
+
 		res.json({
-			// message: i18n.__('CONTROLLER.USER.PUT_USER.CREATED'),
+			message: i18n.__('CONTROLLER.USER.POST_USER.CREATED'),
 		});
 	} catch (err) {
 		next(err);
@@ -75,7 +78,7 @@ export const putUser: RequestHandler = async (req, res, next) => {
 		});
 
 		res.json({
-			// message: i18n.__('CONTROLLER.USER.PUT_USER.UPDATED'),
+			message: i18n.__('CONTROLLER.USER.PUT_USER.UPDATED'),
 		});
 	} catch (err) {
 		next(err);
@@ -89,7 +92,7 @@ export const deleteUser: RequestHandler = async (req, res, next) => {
 		await User.findByIdAndDelete(id);
 
 		res.json({
-			// message: i18n.__('CONTROLLER.USER.DELETE_USER.DELETED'),
+			message: i18n.__('CONTROLLER.USER.DELETE_USER.DELETED'),
 		});
 	} catch (err) {
 		next(err);

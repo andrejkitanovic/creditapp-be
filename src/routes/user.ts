@@ -8,10 +8,10 @@ import {
 	deleteUser as deleteUserController,
 	getSingleUser as getSingleUserController,
 } from 'controllers/user';
-// import {
-// 	postInviteUser as postInviteUserValidator,
-// 	getSingleUnconfirmedUser as getSingleUnconfirmedUserValidator,
-// } from 'validators/user';
+import {
+	postUser as postUserValidator,
+	getSingleUnconfirmedUser as getSingleUnconfirmedUserValidator,
+} from 'validators/user';
 
 const router = Router();
 defineRoutes(router, [
@@ -27,7 +27,7 @@ defineRoutes(router, [
 		route: '/',
 		roles: ['admin'],
 		permissions: ['write:users'],
-		// validator: postUserValidator, // TODO | Validator missing
+		validator: postUserValidator,
 		controller: postUserController,
 	},
 	{
@@ -52,6 +52,14 @@ defineRoutes(router, [
 		roles: ['user', 'admin'],
 		permissions: ['read:users'],
 		controller: getSingleUserController,
+	},
+	{
+		method: 'get',
+		route: '/uncofirmed/:id',
+		roles: ['user', 'admin'],
+		permissions: ['read:users'],
+		controller: getSingleUserController,
+		validator: getSingleUnconfirmedUserValidator,
 	},
 ]);
 
