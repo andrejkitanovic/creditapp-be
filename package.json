@@ -16,7 +16,7 @@
 		"lint:fix": "eslint --fix ./src/**/*.ts",
 		"sync-sort-translations": "ts-node ./src/utils/locales/syncSortTranslations.ts",
 		"validate-translations": "ts-node src/utils/locales/translationsValidator.ts",
-		"copy-templates": "cp -r ./src/utils/mailer/templates ./dist/utils/mailer & cp -r ./src/utils/invoice/templates ./dist/utils/invoice"
+		"copy-templates": "cp -r ./src/utils/mailer/templates ./dist/utils/mailer"
 	},
 	"author": "Andrej Kitanovic",
 	"license": "ISC",
