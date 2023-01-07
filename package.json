@@ -8,15 +8,15 @@
 		"start:dev": "ts-node ./src/app.ts",
 		"start": "node ./dist/app.js",
 		"watch": "nodemon ./src/app.ts",
-		"build": "tsc",
-		"postinstall": "tsc",
+		"build": "tsc && npm run copy-templates",
 		"test": "jest --passWithNoTests",
 		"format:check": "prettier --check ./src/**/*.ts",
 		"format:write": "prettier --write ./src/**/*.ts",
 		"lint:check": "eslint ./src/**/*.ts",
 		"lint:fix": "eslint --fix ./src/**/*.ts",
 		"sync-sort-translations": "ts-node ./src/utils/locales/syncSortTranslations.ts",
-		"validate-translations": "ts-node src/utils/locales/translationsValidator.ts"
+		"validate-translations": "ts-node src/utils/locales/translationsValidator.ts",
+		"copy-templates": "cp -r ./src/utils/mailer/templates ./dist/utils/mailer & cp -r ./src/utils/invoice/templates ./dist/utils/invoice"
 	},
 	"author": "Andrej Kitanovic",
 	"license": "ISC",
