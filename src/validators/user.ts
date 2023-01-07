@@ -17,7 +17,7 @@ export const postUser = [
 		}),
 	body('role', i18n.__('VALIDATOR.ROLE.REQUIRED'))
 		.notEmpty()
-		.isIn(['portal-admin', 'organisation-owner', 'organisation-employee'])
+		.isIn(['admin', 'user'])
 		.withMessage(i18n.__('VALIDATOR.ROLE.ONE_OF')),
 ];
 
