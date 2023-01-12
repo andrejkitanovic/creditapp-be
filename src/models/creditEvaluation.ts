@@ -36,16 +36,17 @@ type CreditEvaluationDebtDetails = {
 };
 
 type CreditEvaluationIncome = {
-	individual: {
-		monthly: number;
-		annual: number;
-		debtToIncome: number;
-	};
-	household: {
-		monthly: number;
-		annual: number;
-		debtToIncome: number;
-	};
+	type: 'paystub' | 'self-employment' | 'retirement-income';
+	period?: string;
+	incomes: {
+		date: Date;
+		amount?: number;
+		ytd?: number;
+		grossRevenue?: number;
+		netProfit?: number;
+		source?: string;
+		monthlyBenefit?: number;
+	}[];
 };
 
 interface ICreditEvaluation extends Document {
@@ -74,7 +75,7 @@ interface ICreditEvaluation extends Document {
 	businessTradelines: CreditEvaluationTradeline[];
 	loans: CreditEvaluationLoan[];
 	debtDetails: CreditEvaluationDebtDetails;
-	income: CreditEvaluationIncome;
+	incomes: CreditEvaluationIncome[];
 	// loanAffordabilityCalculator: {};
 }
 
