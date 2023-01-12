@@ -84,6 +84,74 @@ export const getSingleCreditEvaluation: RequestHandler = async (req, res, next) 
 	}
 };
 
+const periodMultiplier = {
+	weekly: 52,
+	'bi-weekly': 26,
+	monthly: 12,
+	quarterly: 4,
+	'bi-monthly': 24,
+	annual: 1,
+};
+export const postCreditEvaluationIncome: RequestHandler = async (req, res, next) => {
+	try {
+		// const { id } = req.params;
+		const { type, period, incomes } = req.body;
+
+		const result: { type: 'paystub' | 'self-employment' | 'retirement-income'; period?: string; incomes: any[] } = {
+			type,
+			incomes: [],
+		};
+
+		switch (type) {
+			case 'paystub':
+				result.period = period;
+
+				result.incomes = incomes.map((income: { date: Date; amount: number; ytd: number }) => {
+					return {
+						date: income.date,
+						amount: income.amount,
+						ytd: income.ytd,
+						// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+						//@ts-expect-error
+						avgAnnual: income.amount * (periodMultiplier[period] ?? 1),
+					};
+				});
+				break;
+			case 'self-employment':
+				result.incomes = incomes.map((income: { date: Date; grossRevenue: number; netProfit: number }) => {
+					return {
+						date: income.date,
+						grossRevenue: income.grossRevenue,
+						netProfit: income.netProfit,
+						percentageOfProfit: income.netProfit / income.grossRevenue,
+						averageMonthlyGrossRevenue: income.grossRevenue / 12,
+						averageMonthlyNetProfit: income.netProfit / 12,
+					};
+				});
+				break;
+			case 'retirement-income':
+				result.incomes = incomes.map((income: { date: Date; source: string; monthlyBenefit: number }) => {
+					return {
+						date: income.date,
+						source: income.source,
+						monthlyBenefit: income.monthlyBenefit,
+					};
+				});
+				break;
+			default:
+				break;
+		}
+
+		res.json({
+			data: result,
+		});
+	} catch (err) {
+		next(err);
+	}
+};
+
+// Other Functions
+
 export const cbcReportToCreditEvaluation = (reportData: any) => {
 	// TRADELINES
 	let totalOpenTradelines = 0;
