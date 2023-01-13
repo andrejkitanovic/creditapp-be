@@ -122,16 +122,14 @@ export const postCreditEvaluationIncome: RequestHandler = async (req, res, next)
 					incomes.reduce((prevValue: number, income: { amount: number }) => {
 						return prevValue + income.amount;
 					}, 0) / incomes.length;
-				result.averageCheckAmountBasedOnYTD = incomes.reduce(
-					(prevValue: number, income: { date: Date; ytd: number }, index: number) => {
+				result.averageCheckAmountBasedOnYTD =
+					incomes.reduce((prevValue: number, income: { date: Date; ytd: number }, index: number) => {
 						const numberOfPeriodsToDate = Math.max(
 							(dayjs(income.date).diff(startOfYear, 'days') / 365) * (result.payStubs || 1),
 							index + 1
 						);
 						return prevValue + income.ytd / numberOfPeriodsToDate;
-					},
-					0
-				);
+					}, 0) / incomes.length;
 
 				result.incomes = incomes.map((income: { date: Date; amount: number; ytd: number }, index: number) => {
 					const numberOfPeriodsToDate = Math.max(
