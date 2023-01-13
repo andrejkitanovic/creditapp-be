@@ -171,10 +171,31 @@ export const postCreditEvaluationIncome: RequestHandler = async (req, res, next)
 				break;
 			case 'retirement-income':
 				result.incomes = incomes.map((income: { date: Date; source: string; monthlyBenefit: number }) => {
+					const monthDiff = Math.round(dayjs(income.date).diff(startOfYear, 'months', true));
+					const previousIncomesObject: { [key: string]: { yearIncome: number; months: number } } = {};
+
+					for (let i = 0; i < Math.max(monthDiff, 36); i++) {
+						const year = dayjs().subtract(i, 'months').format('YYYY');
+
+						if (previousIncomesObject[year]) {
+							previousIncomesObject[year].yearIncome += income.monthlyBenefit;
+							previousIncomesObject[year].months += 1;
+						} else {
+							previousIncomesObject[year] = {
+								yearIncome: income.monthlyBenefit,
+								months: 1,
+							};
+						}
+					}
+
 					return {
 						date: income.date,
 						source: income.source,
 						monthlyBenefit: income.monthlyBenefit,
+						previousIncomes: Object.keys(previousIncomesObject).map((key) => ({
+							year: key,
+							...previousIncomesObject[key],
+						})),
 					};
 				});
 				break;
