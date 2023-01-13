@@ -41,8 +41,3 @@ routing(app);
 app.use(errorMiddleware);
 
 connection(app);
-
-import { startOfYear } from 'utils/dayjs';
-import dayjs from 'dayjs';
-
-console.log(dayjs(new Date()).diff(startOfYear, "days"))
