@@ -1,5 +1,6 @@
 import dayjs from 'dayjs';
 
+export const startOfYear = dayjs().startOf("year")
 export const dayjsUnix = (date: number | string | undefined) => {
 	if (!date) return dayjs();
 

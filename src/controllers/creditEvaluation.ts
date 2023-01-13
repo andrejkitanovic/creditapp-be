@@ -5,6 +5,7 @@ import { RequestHandler } from 'express';
 import { queryFilter } from 'helpers/filters';
 import { createMeta } from 'helpers/meta';
 import CreditEvaluation from 'models/creditEvaluation';
+import { startOfYear } from 'utils/dayjs';
 import { cbcFormatDate, cbcFormatMonths } from './cbc';
 
 export const getCreditEvaluations: RequestHandler = async (req, res, next) => {
@@ -106,14 +107,32 @@ export const postCreditEvaluationIncome: RequestHandler = async (req, res, next)
 			case 'paystub':
 				result.period = period;
 
-				result.incomes = incomes.map((income: { date: Date; amount: number; ytd: number }) => {
+				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+				//@ts-expect-error
+				// eslint-disable-next-line no-case-declarations
+				const multiplier = periodMultiplier[period] ?? 1;
+
+				result.incomes = incomes.map((income: { date: Date; amount: number; ytd: number }, index: number) => {
+					const numberOfPeriodsToDate = Math.max(
+						(dayjs(income.date).diff(startOfYear, 'days') / 365) * multiplier,
+						index
+					);
+					const avgPerPeriod = income.ytd / numberOfPeriodsToDate;
+					const numberOfPeriodsRemaining = multiplier - numberOfPeriodsToDate;
+					// const amountOfPayRemaining = ;
+
 					return {
 						date: income.date,
 						amount: income.amount,
 						ytd: income.ytd,
-						// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-						//@ts-expect-error
-						avgAnnual: income.amount * (periodMultiplier[period] ?? 1),
+						avgAnnual: income.amount * multiplier,
+
+						numberOfPeriodsToDate,
+						avgPerPeriod,
+						avgAnnual2: avgPerPeriod * multiplier,
+						numberOfPeriodsRemaining,
+						// amountOfPayRemaining,
+						// endOfYearExpectedIncome:
 					};
 				});
 				break;
