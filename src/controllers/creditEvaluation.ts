@@ -140,20 +140,21 @@ export const postCreditEvaluationIncome: RequestHandler = async (req, res, next)
 					);
 					const avgPerPeriod = income.ytd / numberOfPeriodsToDate;
 					const numberOfPeriodsRemaining = (result.payStubs || 1) - numberOfPeriodsToDate;
-					// const amountOfPayRemaining = numberOfPeriodsRemaining *
+					const amountOfPayRemaining =
+						numberOfPeriodsRemaining *
+						(((result.averageCheckAmount || 0) + (result.averageCheckAmountBasedOnYTD || 0)) / 2);
 
 					return {
 						date: income.date,
 						amount: income.amount,
 						ytd: income.ytd,
 						avgAnnual: income.amount * (result.payStubs || 1),
-
 						numberOfPeriodsToDate,
 						avgPerPeriod,
 						avgAnnual2: avgPerPeriod * (result.payStubs || 1),
 						numberOfPeriodsRemaining,
-						// amountOfPayRemaining,
-						// endOfYearExpectedIncome:
+						amountOfPayRemaining,
+						endOfYearExpectedIncome: income.ytd + amountOfPayRemaining,
 					};
 				});
 
