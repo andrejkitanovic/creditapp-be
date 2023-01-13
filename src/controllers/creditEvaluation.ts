@@ -154,16 +154,20 @@ export const postCreditEvaluationIncome: RequestHandler = async (req, res, next)
 
 				break;
 			case 'self-employment':
-				result.incomes = incomes.map((income: { date: Date; grossRevenue: number; netProfit: number }) => {
-					return {
-						date: income.date,
-						grossRevenue: income.grossRevenue,
-						netProfit: income.netProfit,
-						percentageOfProfit: income.netProfit / income.grossRevenue,
-						averageMonthlyGrossRevenue: income.grossRevenue / 12,
-						averageMonthlyNetProfit: income.netProfit / 12,
-					};
-				});
+				result.incomes = incomes.map(
+					(income: { date: Date; grossRevenue: number; netProfit: number; annualWages: number }) => {
+						return {
+							date: income.date,
+							grossRevenue: income.grossRevenue,
+							netProfit: income.netProfit,
+							percentageOfProfit: income.netProfit / income.grossRevenue,
+							averageMonthlyGrossRevenue: income.grossRevenue / 12,
+							averageMonthlyNetProfit: income.netProfit / 12,
+							annualWages: income.annualWages,
+							mothlyWage: income.annualWages / 12,
+						};
+					}
+				);
 				break;
 			case 'retirement-income':
 				result.incomes = incomes.map((income: { date: Date; source: string; monthlyBenefit: number }) => {
