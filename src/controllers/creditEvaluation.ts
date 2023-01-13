@@ -193,7 +193,7 @@ export const postCreditEvaluationIncome: RequestHandler = async (req, res, next)
 						source: income.source,
 						monthlyBenefit: income.monthlyBenefit,
 						previousIncomes: Object.keys(previousIncomesObject).map((key) => ({
-							year: key,
+							year: parseInt(key),
 							...previousIncomesObject[key],
 						})),
 					};
