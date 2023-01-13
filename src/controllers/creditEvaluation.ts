@@ -124,13 +124,13 @@ export const postCreditEvaluationIncome: RequestHandler = async (req, res, next)
 					}, 0) / incomes.length;
 				result.averageCheckAmountBasedOnYTD =
 					incomes.reduce((prevValue: number, income: { date: Date; ytd: number }, index: number) => {
-						const dayDiff = Math.floor(dayjs(income.date).diff(startOfYear, 'days', true));
+						const dayDiff = Math.round(dayjs(income.date).diff(startOfYear, 'days', true));
 						const numberOfPeriodsToDate = Math.max((dayDiff / 365) * (result.payStubs || 1), index + 1);
 						return prevValue + income.ytd / numberOfPeriodsToDate;
 					}, 0) / incomes.length;
 
 				result.incomes = incomes.map((income: { date: Date; amount: number; ytd: number }, index: number) => {
-					const dayDiff = Math.floor(dayjs(income.date).diff(startOfYear, 'days', true));
+					const dayDiff = Math.round(dayjs(income.date).diff(startOfYear, 'days', true));
 					const numberOfPeriodsToDate = Math.max((dayDiff / 365) * (result.payStubs || 1), index + 1);
 					const avgPerPeriod = income.ytd / numberOfPeriodsToDate;
 					const numberOfPeriodsRemaining = (result.payStubs || 1) - numberOfPeriodsToDate;
