@@ -115,7 +115,7 @@ export const postCreditEvaluationIncome: RequestHandler = async (req, res, next)
 				result.incomes = incomes.map((income: { date: Date; amount: number; ytd: number }, index: number) => {
 					const numberOfPeriodsToDate = Math.max(
 						(dayjs(income.date).diff(startOfYear, 'days') / 365) * multiplier,
-						index
+						index + 1
 					);
 					const avgPerPeriod = income.ytd / numberOfPeriodsToDate;
 					const numberOfPeriodsRemaining = multiplier - numberOfPeriodsToDate;
