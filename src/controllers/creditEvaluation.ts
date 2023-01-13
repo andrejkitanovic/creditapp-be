@@ -98,7 +98,14 @@ export const postCreditEvaluationIncome: RequestHandler = async (req, res, next)
 		// const { id } = req.params;
 		const { type, period, incomes } = req.body;
 
-		const result: { type: 'paystub' | 'self-employment' | 'retirement-income'; period?: string; incomes: any[] } = {
+		const result: {
+			type: 'paystub' | 'self-employment' | 'retirement-income';
+			period?: string;
+			averageCheckAmount?: number;
+			averageCheckAmountBasedOnYTD?: number;
+			payStubs?: number;
+			incomes: any[];
+		} = {
 			type,
 			incomes: [],
 		};
@@ -109,32 +116,47 @@ export const postCreditEvaluationIncome: RequestHandler = async (req, res, next)
 
 				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 				//@ts-expect-error
-				// eslint-disable-next-line no-case-declarations
-				const multiplier = periodMultiplier[period] ?? 1;
+				result.payStubs = periodMultiplier[period];
+
+				result.averageCheckAmount =
+					incomes.reduce((prevValue: number, income: { amount: number }) => {
+						return prevValue + income.amount;
+					}, 0) / incomes.length;
+				result.averageCheckAmountBasedOnYTD = incomes.reduce(
+					(prevValue: number, income: { date: Date; ytd: number }, index: number) => {
+						const numberOfPeriodsToDate = Math.max(
+							(dayjs(income.date).diff(startOfYear, 'days') / 365) * (result.payStubs || 1),
+							index + 1
+						);
+						return prevValue + income.ytd / numberOfPeriodsToDate;
+					},
+					0
+				);
 
 				result.incomes = incomes.map((income: { date: Date; amount: number; ytd: number }, index: number) => {
 					const numberOfPeriodsToDate = Math.max(
-						(dayjs(income.date).diff(startOfYear, 'days') / 365) * multiplier,
+						(dayjs(income.date).diff(startOfYear, 'days') / 365) * (result.payStubs || 1),
 						index + 1
 					);
 					const avgPerPeriod = income.ytd / numberOfPeriodsToDate;
-					const numberOfPeriodsRemaining = multiplier - numberOfPeriodsToDate;
-					// const amountOfPayRemaining = ;
+					const numberOfPeriodsRemaining = (result.payStubs || 1) - numberOfPeriodsToDate;
+					// const amountOfPayRemaining = numberOfPeriodsRemaining *
 
 					return {
 						date: income.date,
 						amount: income.amount,
 						ytd: income.ytd,
-						avgAnnual: income.amount * multiplier,
+						avgAnnual: income.amount * (result.payStubs || 1),
 
 						numberOfPeriodsToDate,
 						avgPerPeriod,
-						avgAnnual2: avgPerPeriod * multiplier,
+						avgAnnual2: avgPerPeriod * (result.payStubs || 1),
 						numberOfPeriodsRemaining,
 						// amountOfPayRemaining,
 						// endOfYearExpectedIncome:
 					};
 				});
+
 				break;
 			case 'self-employment':
 				result.incomes = incomes.map((income: { date: Date; grossRevenue: number; netProfit: number }) => {
