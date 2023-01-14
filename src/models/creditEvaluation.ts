@@ -69,7 +69,7 @@ export type CreditEvaluationIncome = {
 	period?: string;
 	averageCheckAmount?: number;
 	averageCheckAmountBasedOnYTD?: number;
-	data: {
+	incomeSources: {
 		date: Date;
 		// PAYSTUB
 		amount?: number;
@@ -263,7 +263,7 @@ const creditEvaluationSchema: Schema = new Schema(
 				period: { type: String, enum: CreditEvaluationIncomePeriodsEnum },
 				averageCheckAmount: { type: Number },
 				averageCheckAmountBasedOnYTD: { type: Number },
-				data: [
+				incomeSources: [
 					{
 						date: { type: Date },
 						// PAYSTUB

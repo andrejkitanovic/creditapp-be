@@ -96,7 +96,7 @@ export const postCreditEvaluationIncome: RequestHandler = async (req, res, next)
 
 		const result: CreditEvaluationIncome = {
 			type,
-			data: [],
+			incomeSources: [],
 		};
 
 		switch (type) {
@@ -119,7 +119,7 @@ export const postCreditEvaluationIncome: RequestHandler = async (req, res, next)
 						return prevValue + income.ytd / numberOfPeriodsToDate;
 					}, 0) / incomes.length;
 
-				result.data = incomes.map((income: { date: Date; amount: number; ytd: number }, index: number) => {
+				result.incomeSources = incomes.map((income: { date: Date; amount: number; ytd: number }, index: number) => {
 					const year = dayjs(income.date).get('year');
 					const dayDiff = Math.round(dayjs(income.date).diff(startOfYear(year), 'days', true));
 					const numberOfPeriodsToDate = Math.max((dayDiff / 365) * (result.payStubs || 1), index + 1);
@@ -145,23 +145,40 @@ export const postCreditEvaluationIncome: RequestHandler = async (req, res, next)
 
 				break;
 			case CreditEvaluationIncomeTypeEnum.SELF_EMPLOYMENT:
-				result.data = incomes.map(
-					(income: { date: Date; grossRevenue: number; netProfit: number; annualWages: number }) => {
+				result.incomeSources = incomes.map(
+					(income: { date: Date; grossRevenue: number; netProfit: number; annualWages: number }, index: number) => {
+						const averageMonthlyGrossRevenue = income.grossRevenue / 12;
+						const averageMonthlyNetProfit = income.netProfit / 12;
+
+						let yearOverYearGrossGrowth, yearOverYearNetGrowth;
+
+						if (index !== 0) {
+							const previousIncome = incomes[index - 1];
+							const previousAverageMonthlyGrossRevenue = previousIncome.grossRevenue / 12;
+							const previousMonthlyNetProfit = income.netProfit / 12;
+
+							yearOverYearGrossGrowth = averageMonthlyGrossRevenue / previousAverageMonthlyGrossRevenue;
+							yearOverYearNetGrowth = averageMonthlyNetProfit / previousMonthlyNetProfit;
+						}
+
 						return {
 							date: income.date,
 							grossRevenue: income.grossRevenue,
 							netProfit: income.netProfit,
 							percentageOfProfit: income.netProfit / income.grossRevenue,
-							averageMonthlyGrossRevenue: income.grossRevenue / 12,
+							averageMonthlyGrossRevenue,
 							averageMonthlyNetProfit: income.netProfit / 12,
 							annualWages: income.annualWages,
 							mothlyWage: income.annualWages / 12,
+							yearOverYearGrossGrowth,
+							yearOverYearNetGrowth,
 						};
 					}
 				);
+
 				break;
 			case CreditEvaluationIncomeTypeEnum.RETIREMENT_INCOME:
-				result.data = incomes.map((income: { date: Date; source: string; monthlyBenefit: number }) => {
+				result.incomeSources = incomes.map((income: { date: Date; source: string; monthlyBenefit: number }) => {
 					const year = dayjs().get('year');
 					const monthDiff = Math.round(dayjs(income.date).diff(year, 'months', true));
 					const previousIncomesObject: { [key: string]: { yearIncome: number; months: number } } = {};
@@ -208,7 +225,7 @@ export const postCreditEvaluationIncome: RequestHandler = async (req, res, next)
 export const deleteCreditEvaluationIncome: RequestHandler = async (req, res, next) => {
 	try {
 		const { id, incomeId } = req.params;
-		console.log(id, incomeId);
+
 		await CreditEvaluation.findByIdAndUpdate(id, {
 			$pull: {
 				incomes: { _id: incomeId },
