@@ -92,7 +92,12 @@ export const getSingleCreditEvaluation: RequestHandler = async (req, res, next) 
 export const postCreditEvaluationIncome: RequestHandler = async (req, res, next) => {
 	try {
 		const { id } = req.params;
-		const { type, period, incomes } = req.body;
+		const { type, period } = req.body;
+		let { incomes } = req.body;
+
+		incomes = incomes.sort((incomeA: { date: Date }, incomeB: { date: Date }) =>
+			dayjs(incomeA.date).isAfter(dayjs(incomeB.date)) ? 1 : -1
+		);
 
 		const result: CreditEvaluationIncome = {
 			type,
