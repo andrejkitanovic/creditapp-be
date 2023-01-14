@@ -113,13 +113,15 @@ export const postCreditEvaluationIncome: RequestHandler = async (req, res, next)
 					}, 0) / incomes.length;
 				result.averageCheckAmountBasedOnYTD =
 					incomes.reduce((prevValue: number, income: { date: Date; ytd: number }, index: number) => {
-						const dayDiff = Math.round(dayjs(income.date).diff(startOfYear, 'days', true));
+						const year = dayjs(income.date).get('year');
+						const dayDiff = Math.round(dayjs(income.date).diff(startOfYear(year), 'days', true));
 						const numberOfPeriodsToDate = Math.max((dayDiff / 365) * (result.payStubs || 1), index + 1);
 						return prevValue + income.ytd / numberOfPeriodsToDate;
 					}, 0) / incomes.length;
 
 				result.data = incomes.map((income: { date: Date; amount: number; ytd: number }, index: number) => {
-					const dayDiff = Math.round(dayjs(income.date).diff(startOfYear, 'days', true));
+					const year = dayjs(income.date).get('year');
+					const dayDiff = Math.round(dayjs(income.date).diff(startOfYear(year), 'days', true));
 					const numberOfPeriodsToDate = Math.max((dayDiff / 365) * (result.payStubs || 1), index + 1);
 					const avgPerPeriod = income.ytd / numberOfPeriodsToDate;
 					const numberOfPeriodsRemaining = (result.payStubs || 1) - numberOfPeriodsToDate;
@@ -160,7 +162,8 @@ export const postCreditEvaluationIncome: RequestHandler = async (req, res, next)
 				break;
 			case CreditEvaluationIncomeTypeEnum.RETIREMENT_INCOME:
 				result.data = incomes.map((income: { date: Date; source: string; monthlyBenefit: number }) => {
-					const monthDiff = Math.round(dayjs(income.date).diff(startOfYear, 'months', true));
+					const year = dayjs(income.date).get('year');
+					const monthDiff = Math.round(dayjs(income.date).diff(year, 'months', true));
 					const previousIncomesObject: { [key: string]: { yearIncome: number; months: number } } = {};
 
 					for (let i = 0; i < Math.max(monthDiff, 36); i++) {
@@ -193,8 +196,8 @@ export const postCreditEvaluationIncome: RequestHandler = async (req, res, next)
 		}
 
 		await CreditEvaluation.findByIdAndUpdate(id, {
-			incomes: [result]
-		})
+			incomes: [result],
+		});
 
 		res.json({
 			// data: result,
