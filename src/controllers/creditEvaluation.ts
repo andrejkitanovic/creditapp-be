@@ -195,9 +195,7 @@ export const postCreditEvaluationIncome: RequestHandler = async (req, res, next)
 				break;
 		}
 
-		await CreditEvaluation.findByIdAndUpdate(id, {
-			incomes: [result],
-		});
+		await CreditEvaluation.findByIdAndUpdate(id, { $push: { incomes: result } });
 
 		res.json({
 			// data: result,
