@@ -86,7 +86,9 @@ export type CreditEvaluationIncome = {
 		netProfit?: number;
 		percentageOfProfit?: number;
 		averageMonthlyGrossRevenue?: number;
+		yearOverYearGrossGrowth?: number;
 		averageMonthlyNetProfit?: number;
+		yearOverYearNetGrowth?: number;
 		annualWages?: number;
 		mothlyWage?: number;
 		// RETIREMENT
@@ -281,7 +283,9 @@ const creditEvaluationSchema: Schema = new Schema(
 						netProfit: { type: Number },
 						percentageOfProfit: { type: Number },
 						averageMonthlyGrossRevenue: { type: Number },
+						yearOverYearGrossGrowth: { type: Number },
 						averageMonthlyNetProfit: { type: Number },
+						yearOverYearNetGrowth: { type: Number },
 						annualWages: { type: Number },
 						mothlyWage: { type: Number },
 						// RETIREMENT
