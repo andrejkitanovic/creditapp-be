@@ -208,9 +208,9 @@ export const postCreditEvaluationIncome: RequestHandler = async (req, res, next)
 export const deleteCreditEvaluationIncome: RequestHandler = async (req, res, next) => {
 	try {
 		const { id, incomeId } = req.params;
-
+		console.log(id, incomeId);
 		await CreditEvaluation.findByIdAndUpdate(id, {
-			$pullAll: {
+			$pull: {
 				incomes: [{ _id: incomeId }],
 			},
 		});
