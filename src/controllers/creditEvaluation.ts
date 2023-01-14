@@ -4,7 +4,11 @@ import { RequestHandler } from 'express';
 // import i18n from 'helpers/i18n';
 import { queryFilter } from 'helpers/filters';
 import { createMeta } from 'helpers/meta';
-import CreditEvaluation from 'models/creditEvaluation';
+import CreditEvaluation, {
+	CreditEvaluationIncome,
+	CreditEvaluationIncomePaystubsEnum,
+	CreditEvaluationIncomeTypeEnum,
+} from 'models/creditEvaluation';
 import { startOfYear } from 'utils/dayjs';
 import { cbcFormatDate, cbcFormatMonths } from './cbc';
 
@@ -85,38 +89,23 @@ export const getSingleCreditEvaluation: RequestHandler = async (req, res, next) 
 	}
 };
 
-const periodMultiplier = {
-	weekly: 52,
-	'bi-weekly': 26,
-	monthly: 12,
-	quarterly: 4,
-	'bi-monthly': 24,
-	annual: 1,
-};
 export const postCreditEvaluationIncome: RequestHandler = async (req, res, next) => {
 	try {
 		// const { id } = req.params;
 		const { type, period, incomes } = req.body;
 
-		const result: {
-			type: 'paystub' | 'self-employment' | 'retirement-income';
-			period?: string;
-			averageCheckAmount?: number;
-			averageCheckAmountBasedOnYTD?: number;
-			payStubs?: number;
-			incomes: any[];
-		} = {
+		const result: CreditEvaluationIncome = {
 			type,
-			incomes: [],
+			data: [],
 		};
 
 		switch (type) {
-			case 'paystub':
+			case CreditEvaluationIncomeTypeEnum.PAYSTUB:
 				result.period = period;
 
 				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-				//@ts-expect-error
-				result.payStubs = periodMultiplier[period];
+				// @ts-expect-error
+				result.payStubs = CreditEvaluationIncomePaystubsEnum[period];
 
 				result.averageCheckAmount =
 					incomes.reduce((prevValue: number, income: { amount: number }) => {
@@ -129,7 +118,7 @@ export const postCreditEvaluationIncome: RequestHandler = async (req, res, next)
 						return prevValue + income.ytd / numberOfPeriodsToDate;
 					}, 0) / incomes.length;
 
-				result.incomes = incomes.map((income: { date: Date; amount: number; ytd: number }, index: number) => {
+				result.data = incomes.map((income: { date: Date; amount: number; ytd: number }, index: number) => {
 					const dayDiff = Math.round(dayjs(income.date).diff(startOfYear, 'days', true));
 					const numberOfPeriodsToDate = Math.max((dayDiff / 365) * (result.payStubs || 1), index + 1);
 					const avgPerPeriod = income.ytd / numberOfPeriodsToDate;
@@ -142,10 +131,10 @@ export const postCreditEvaluationIncome: RequestHandler = async (req, res, next)
 						date: income.date,
 						amount: income.amount,
 						ytd: income.ytd,
-						avgAnnual: income.amount * (result.payStubs || 1),
+						averageAnnual: income.amount * (result.payStubs || 1),
 						numberOfPeriodsToDate,
 						avgPerPeriod,
-						avgAnnual2: avgPerPeriod * (result.payStubs || 1),
+						averageAnnual2: avgPerPeriod * (result.payStubs || 1),
 						numberOfPeriodsRemaining,
 						amountOfPayRemaining,
 						endOfYearExpectedIncome: income.ytd + amountOfPayRemaining,
@@ -153,8 +142,8 @@ export const postCreditEvaluationIncome: RequestHandler = async (req, res, next)
 				});
 
 				break;
-			case 'self-employment':
-				result.incomes = incomes.map(
+			case CreditEvaluationIncomeTypeEnum.SELF_EMPLOYMENT:
+				result.data = incomes.map(
 					(income: { date: Date; grossRevenue: number; netProfit: number; annualWages: number }) => {
 						return {
 							date: income.date,
@@ -169,8 +158,8 @@ export const postCreditEvaluationIncome: RequestHandler = async (req, res, next)
 					}
 				);
 				break;
-			case 'retirement-income':
-				result.incomes = incomes.map((income: { date: Date; source: string; monthlyBenefit: number }) => {
+			case CreditEvaluationIncomeTypeEnum.RETIREMENT_INCOME:
+				result.data = incomes.map((income: { date: Date; source: string; monthlyBenefit: number }) => {
 					const monthDiff = Math.round(dayjs(income.date).diff(startOfYear, 'months', true));
 					const previousIncomesObject: { [key: string]: { yearIncome: number; months: number } } = {};
 
