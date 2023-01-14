@@ -91,7 +91,7 @@ export const getSingleCreditEvaluation: RequestHandler = async (req, res, next) 
 
 export const postCreditEvaluationIncome: RequestHandler = async (req, res, next) => {
 	try {
-		// const { id } = req.params;
+		const { id } = req.params;
 		const { type, period, incomes } = req.body;
 
 		const result: CreditEvaluationIncome = {
@@ -192,8 +192,12 @@ export const postCreditEvaluationIncome: RequestHandler = async (req, res, next)
 				break;
 		}
 
+		await CreditEvaluation.findByIdAndUpdate(id, {
+			incomes: [result]
+		})
+
 		res.json({
-			data: result,
+			// data: result,
 		});
 	} catch (err) {
 		next(err);
