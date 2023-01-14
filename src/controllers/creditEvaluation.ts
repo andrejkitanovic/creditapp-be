@@ -211,7 +211,7 @@ export const deleteCreditEvaluationIncome: RequestHandler = async (req, res, nex
 		console.log(id, incomeId);
 		await CreditEvaluation.findByIdAndUpdate(id, {
 			$pull: {
-				incomes: [{ _id: incomeId }],
+				incomes: { _id: incomeId },
 			},
 		});
 
