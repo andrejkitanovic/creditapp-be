@@ -162,11 +162,11 @@ export const postCreditEvaluationIncome: RequestHandler = async (req, res, next)
 				break;
 			case CreditEvaluationIncomeTypeEnum.RETIREMENT_INCOME:
 				result.data = incomes.map((income: { date: Date; source: string; monthlyBenefit: number }) => {
-					const year = dayjs(income.date).get('year');
+					const year = dayjs().get('year');
 					const monthDiff = Math.round(dayjs(income.date).diff(year, 'months', true));
 					const previousIncomesObject: { [key: string]: { yearIncome: number; months: number } } = {};
 
-					for (let i = 0; i < Math.max(monthDiff, 36); i++) {
+					for (let i = 0; i < Math.min(monthDiff, 36); i++) {
 						const year = dayjs().subtract(i, 'months').format('YYYY');
 
 						if (previousIncomesObject[year]) {
@@ -196,6 +196,24 @@ export const postCreditEvaluationIncome: RequestHandler = async (req, res, next)
 		}
 
 		await CreditEvaluation.findByIdAndUpdate(id, { $push: { incomes: result } });
+
+		res.json({
+			// data: result,
+		});
+	} catch (err) {
+		next(err);
+	}
+};
+
+export const deleteCreditEvaluationIncome: RequestHandler = async (req, res, next) => {
+	try {
+		const { id, incomeId } = req.params;
+
+		await CreditEvaluation.findByIdAndUpdate(id, {
+			$pullAll: {
+				incomes: [{ _id: incomeId }],
+			},
+		});
 
 		res.json({
 			// data: result,
