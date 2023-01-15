@@ -306,15 +306,16 @@ export const cbcReportToCreditEvaluation = (reportData: any) => {
 	// TRADELINES
 	let totalOpenTradelines = 0;
 	let totalMonthsOfOpenRevolvingCredits = 0;
-	let ageOfFile: Date | undefined;
+	let firstTrade: Date | undefined;
 	let firstCreditAccount: string | undefined;
+	const ageOfFile = dayjs(cbcFormatDate(reportData.CC_ATTRIB.CCSUMMARY.OLDESTTRADE));
 
 	const tradelines =
 		reportData.CC_ATTRIB.CCTRADELINES.ITEM_TRADELINE?.filter(
 			(tradelineData: any) => tradelineData.CREDITLIMIT !== '-1'
 		).map((tradelineData: any) => {
-			if (!ageOfFile || dayjs(cbcFormatDate(tradelineData.DATEOPENED)).diff(dayjs(ageOfFile)) < 0) {
-				ageOfFile = cbcFormatDate(tradelineData.DATEOPENED);
+			if (!firstTrade || dayjs(cbcFormatDate(tradelineData.DATEOPENED)).diff(dayjs(firstTrade)) < 0) {
+				firstTrade = cbcFormatDate(tradelineData.DATEOPENED);
 				firstCreditAccount = tradelineData.FIRMNAME_ID;
 			}
 
@@ -324,6 +325,7 @@ export const cbcReportToCreditEvaluation = (reportData: any) => {
 			}
 
 			return {
+				status: tradelineData.CLOSEDIND.CODE === 'C' ? 'closed' : 'opened',
 				creditor: tradelineData.FIRMNAME_ID,
 				balance: parseFloat(tradelineData.BALANCEPAYMENT) ?? undefined,
 				payment: parseFloat(tradelineData.MONTHLYPAYMENT) ?? undefined,
@@ -366,6 +368,7 @@ export const cbcReportToCreditEvaluation = (reportData: any) => {
 			const paydown60 = tradelineData.BALANCEPAYMENT - tradelineData.HIGHCREDIT * 0.6;
 
 			return {
+				status: tradelineData.CLOSEDIND.CODE === 'C' ? 'closed' : 'opened',
 				creditor: tradelineData.FIRMNAME_ID,
 				balance: parseFloat(tradelineData.BALANCEPAYMENT) ?? undefined,
 				payment: parseFloat(tradelineData.MONTHLYPAYMENT) ?? undefined,

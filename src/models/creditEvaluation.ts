@@ -2,6 +2,7 @@ import { Schema, model, Document } from 'mongoose';
 
 // TRADELINES
 type CreditEvaluationTradeline = {
+	status: 'opened' | 'closed';
 	creditor: string;
 	balance: number;
 	payment: number;
@@ -14,6 +15,7 @@ type CreditEvaluationTradeline = {
 
 // LOANS
 type CreditEvaluationLoan = {
+	status: 'opened' | 'closed';
 	creditor: string;
 	balance: number;
 	payment: number;
@@ -193,6 +195,10 @@ const creditEvaluationSchema: Schema = new Schema(
 		],
 		tradelines: [
 			{
+				status: {
+					type: String,
+					enum: ['closed', 'opened'],
+				},
 				creditor: {
 					type: String,
 				},
@@ -221,6 +227,10 @@ const creditEvaluationSchema: Schema = new Schema(
 		],
 		loans: [
 			{
+				status: {
+					type: String,
+					enum: ['closed', 'opened'],
+				},
 				creditor: {
 					type: String,
 				},
