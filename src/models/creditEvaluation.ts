@@ -6,6 +6,7 @@ type CreditEvaluationTradeline = {
 	creditor: string;
 	balance: number;
 	payment: number;
+	hpb: number;
 	creditLimit: number;
 	opened: Date;
 	reportDate: Date;
