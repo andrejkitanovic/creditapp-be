@@ -9,7 +9,7 @@ import CreditEvaluation, {
 	CreditEvaluationIncomePaystubsEnum,
 	CreditEvaluationIncomeTypeEnum,
 } from 'models/creditEvaluation';
-import { startOfYear } from 'utils/dayjs';
+import { endOfYear, startOfYear } from 'utils/dayjs';
 import { cbcFormatDate, cbcFormatMonths } from './cbc';
 
 export const getCreditEvaluations: RequestHandler = async (req, res, next) => {
@@ -280,7 +280,7 @@ export const calculateSummaryOfIncomes = (creditEvaluationIncomes: CreditEvaluat
 					break;
 				case CreditEvaluationIncomeTypeEnum.RETIREMENT_INCOME:
 					// eslint-disable-next-line no-case-declarations
-					const monthDiff = Math.round(dayjs().diff(currentYear, 'months', true));
+					const monthDiff = Math.round(endOfYear(currentYear).diff(dayjs(), 'months', true));
 
 					summaryOfIncomes.incomeSources.push({
 						year: currentYear,
