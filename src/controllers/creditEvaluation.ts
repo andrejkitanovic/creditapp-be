@@ -82,7 +82,10 @@ export const getSingleCreditEvaluation: RequestHandler = async (req, res, next) 
 		const creditEvaluation = await CreditEvaluation.findById(id).populate('customer').lean();
 
 		res.json({
-			data: { ...creditEvaluation, summaryOfIncomes: calculateSummaryOfIncomes(creditEvaluation?.incomes || []) },
+			data: Boolean(creditEvaluation) && {
+				...creditEvaluation,
+				summaryOfIncomes: calculateSummaryOfIncomes(creditEvaluation?.incomes || []),
+			},
 		});
 	} catch (err) {
 		next(err);
