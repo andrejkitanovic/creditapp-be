@@ -249,10 +249,16 @@ export const deleteCreditEvaluationIncome: RequestHandler = async (req, res, nex
 
 export const calculateSummaryOfIncomes = (creditEvaluationIncomes: CreditEvaluationIncome[]) => {
 	const summaryOfIncomes: {
-		year: number;
-		eoyExpected: number;
-		incomeSource: CreditEvaluationIncomeTypeEnum;
-	}[] = [];
+		incomeSources: {
+			year: number;
+			eoyExpected: number;
+			type: CreditEvaluationIncomeTypeEnum;
+		}[];
+		total: number;
+	} = {
+		incomeSources: [],
+		total: 0,
+	};
 
 	const currentYear = dayjs().get('year');
 
@@ -264,10 +270,10 @@ export const calculateSummaryOfIncomes = (creditEvaluationIncomes: CreditEvaluat
 						break;
 					}
 
-					summaryOfIncomes.push({
+					summaryOfIncomes.incomeSources.push({
 						year: currentYear,
 						eoyExpected: incomeSource.endOfYearExpectedIncome || 0,
-						incomeSource: income.type,
+						type: income.type,
 					});
 					break;
 				case CreditEvaluationIncomeTypeEnum.SELF_EMPLOYMENT:
@@ -276,10 +282,10 @@ export const calculateSummaryOfIncomes = (creditEvaluationIncomes: CreditEvaluat
 					// eslint-disable-next-line no-case-declarations
 					const monthDiff = Math.round(dayjs().diff(currentYear, 'months', true));
 
-					summaryOfIncomes.push({
+					summaryOfIncomes.incomeSources.push({
 						year: currentYear,
 						eoyExpected: monthDiff * (incomeSource.monthlyBenefit || 0),
-						incomeSource: income.type,
+						type: income.type,
 					});
 					break;
 				default:
@@ -287,6 +293,13 @@ export const calculateSummaryOfIncomes = (creditEvaluationIncomes: CreditEvaluat
 			}
 		});
 	});
+
+	summaryOfIncomes.total = summaryOfIncomes.incomeSources.reduce(
+		(prevValue, incomeSource) => prevValue + incomeSource.eoyExpected,
+		0
+	);
+
+	return summaryOfIncomes;
 };
 
 export const cbcReportToCreditEvaluation = (reportData: any) => {
