@@ -32,12 +32,12 @@ type CreditEvaluationLoan = {
 
 // DEBTS
 type CreditEvaluationDebtDetails = {
-	debtPayment: number;
+	// debtPayment: number;
 	// defferedStudentLoans: number;
 	// rentPayment: number;
-	// totalIndividualPayment: number;
-	// totalSpousalPayment: number;
-	// totalHouseholdPayment: number;
+	// totalDebtPayment: number;
+	// spousalDebt: number;
+	// totalPayment: number;
 };
 
 // INCOMES
@@ -264,9 +264,9 @@ const creditEvaluationSchema: Schema = new Schema(
 			},
 		],
 		debtDetails: {
-			debtPayment: {
-				type: Number,
-			},
+			// debtPayment: {
+			// 	type: Number,
+			// },
 		},
 		incomes: [
 			{

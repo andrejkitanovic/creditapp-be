@@ -8,7 +8,9 @@ import CreditEvaluation, {
 	CreditEvaluationIncome,
 	CreditEvaluationIncomePaystubsEnum,
 	CreditEvaluationIncomeTypeEnum,
+	ICreditEvaluation,
 } from 'models/creditEvaluation';
+import { LeanDocument } from 'mongoose';
 import { endOfYear, startOfYear } from 'utils/dayjs';
 import { cbcFormatDate, cbcFormatMonths } from './cbc';
 
@@ -82,9 +84,10 @@ export const getSingleCreditEvaluation: RequestHandler = async (req, res, next) 
 		const creditEvaluation = await CreditEvaluation.findById(id).populate('customer').lean();
 
 		res.json({
-			data: Boolean(creditEvaluation) && {
+			data: creditEvaluation && {
 				...creditEvaluation,
-				summaryOfIncomes: calculateSummaryOfIncomes(creditEvaluation?.incomes || []),
+				summaryOfIncomes: calculateSummaryOfIncomes(creditEvaluation),
+				debtDetails: calculateDebtDetails(creditEvaluation),
 			},
 		});
 	} catch (err) {
@@ -248,9 +251,9 @@ export const deleteCreditEvaluationIncome: RequestHandler = async (req, res, nex
 	}
 };
 
-// Other Functions
+// Single Credit Evaluation Calculations
 
-export const calculateSummaryOfIncomes = (creditEvaluationIncomes: CreditEvaluationIncome[]) => {
+export const calculateSummaryOfIncomes = (creditEvaluation: LeanDocument<ICreditEvaluation>) => {
 	const summaryOfIncomes: {
 		incomeSources: {
 			year: number;
@@ -265,7 +268,7 @@ export const calculateSummaryOfIncomes = (creditEvaluationIncomes: CreditEvaluat
 
 	const currentYear = dayjs().get('year');
 
-	creditEvaluationIncomes.forEach((income) => {
+	creditEvaluation.incomes.forEach((income) => {
 		income.incomeSources.forEach((incomeSource) => {
 			switch (income.type) {
 				case CreditEvaluationIncomeTypeEnum.PAYSTUB:
@@ -304,6 +307,42 @@ export const calculateSummaryOfIncomes = (creditEvaluationIncomes: CreditEvaluat
 
 	return summaryOfIncomes;
 };
+
+export const calculateDebtDetails = (creditEvaluation: LeanDocument<ICreditEvaluation>) => {
+	const debtDetails: {
+		debtPayment: number;
+		defferedStudentLoans: number;
+		rentPayment: number;
+		totalDebtPayment: number;
+		spousalDebt: number;
+		totalPayment: number;
+	} = {
+		debtPayment: 0,
+		defferedStudentLoans: 0,
+		rentPayment: 0,
+		totalDebtPayment: 0,
+		spousalDebt: 0,
+		totalPayment: 0,
+	};
+
+	creditEvaluation.tradelines.forEach((tradeline) => {
+		if (tradeline.status === 'opened') {
+			debtDetails.debtPayment += tradeline.payment || 0;
+		}
+	});
+	creditEvaluation.loans.forEach((loan) => {
+		if (loan.status === 'opened') {
+			debtDetails.debtPayment += loan.payment || 0;
+		}
+	});
+
+	debtDetails.totalDebtPayment = debtDetails.debtPayment + debtDetails.defferedStudentLoans + debtDetails.rentPayment;
+	debtDetails.totalPayment = debtDetails.totalDebtPayment + debtDetails.spousalDebt;
+
+	return debtDetails;
+};
+
+// CBC Functions
 
 export const cbcReportToCreditEvaluation = (reportData: any) => {
 	// TRADELINES
