@@ -79,10 +79,10 @@ export const getSingleCreditEvaluation: RequestHandler = async (req, res, next) 
 	try {
 		const { id } = req.params;
 
-		const creditEvaluation = await CreditEvaluation.findById(id).populate('customer');
+		const creditEvaluation = await CreditEvaluation.findById(id).populate('customer').lean();
 
 		res.json({
-			data: creditEvaluation,
+			data: { ...creditEvaluation, summaryOfIncomes: calculateSummaryOfIncomes(creditEvaluation?.incomes) },
 		});
 	} catch (err) {
 		next(err);
@@ -246,6 +246,48 @@ export const deleteCreditEvaluationIncome: RequestHandler = async (req, res, nex
 };
 
 // Other Functions
+
+export const calculateSummaryOfIncomes = (creditEvaluationIncomes: CreditEvaluationIncome[]) => {
+	const summaryOfIncomes: {
+		year: number;
+		eoyExpected: number;
+		incomeSource: CreditEvaluationIncomeTypeEnum;
+	}[] = [];
+
+	const currentYear = dayjs().get('year');
+
+	creditEvaluationIncomes.forEach((income) => {
+		income.incomeSources.forEach((incomeSource) => {
+			switch (income.type) {
+				case CreditEvaluationIncomeTypeEnum.PAYSTUB:
+					if (dayjs(incomeSource.date).get('year') !== currentYear) {
+						break;
+					}
+
+					summaryOfIncomes.push({
+						year: currentYear,
+						eoyExpected: incomeSource.endOfYearExpectedIncome || 0,
+						incomeSource: income.type,
+					});
+					break;
+				case CreditEvaluationIncomeTypeEnum.SELF_EMPLOYMENT:
+					break;
+				case CreditEvaluationIncomeTypeEnum.RETIREMENT_INCOME:
+					// eslint-disable-next-line no-case-declarations
+					const monthDiff = Math.round(dayjs().diff(currentYear, 'months', true));
+
+					summaryOfIncomes.push({
+						year: currentYear,
+						eoyExpected: monthDiff * (incomeSource.monthlyBenefit || 0),
+						incomeSource: income.type,
+					});
+					break;
+				default:
+					break;
+			}
+		});
+	});
+};
 
 export const cbcReportToCreditEvaluation = (reportData: any) => {
 	// TRADELINES
