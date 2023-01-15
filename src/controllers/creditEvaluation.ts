@@ -317,24 +317,13 @@ export const calculateDebtDetails = (creditEvaluation: LeanDocument<ICreditEvalu
 		spousalDebt: number;
 		totalPayment: number;
 	} = {
-		debtPayment: 0,
 		defferedStudentLoans: 0,
 		rentPayment: 0,
 		totalDebtPayment: 0,
 		spousalDebt: 0,
 		totalPayment: 0,
+		...creditEvaluation.debtDetails,
 	};
-
-	creditEvaluation.tradelines.forEach((tradeline) => {
-		if (tradeline.status === 'opened') {
-			debtDetails.debtPayment += tradeline.payment || 0;
-		}
-	});
-	creditEvaluation.loans.forEach((loan) => {
-		if (loan.status === 'opened') {
-			debtDetails.debtPayment += loan.payment || 0;
-		}
-	});
 
 	debtDetails.totalDebtPayment = debtDetails.debtPayment + debtDetails.defferedStudentLoans + debtDetails.rentPayment;
 	debtDetails.totalPayment = debtDetails.totalDebtPayment + debtDetails.spousalDebt;
