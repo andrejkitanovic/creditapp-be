@@ -283,9 +283,11 @@ export const cbcFormatDate = (key: string): Date | undefined => {
 	} else if (dateParts.length === 3) {
 		let year = dateParts[2];
 
-		if (parseInt(year) <= dayjs().get('year')) {
-			year = `20${year}`;
-		} else year = `19${year}`;
+		if (year.length === 2) {
+			if (parseInt(year) <= dayjs().get('year')) {
+				year = `20${year}`;
+			} else year = `19${year}`;
+		}
 
 		date = date.set('month', parseInt(dateParts[0]) - 1);
 		date = date.set('date', parseInt(dateParts[1]));
