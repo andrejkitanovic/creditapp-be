@@ -179,10 +179,10 @@ const calculateLoanAffordability = (creditEvaluation: LeanDocument<ICreditEvalua
 			monthlyTotalWithDebt,
 
 			term60: calculatePV(rate / 100 / 12, 60, monthlyTotalWithDebt),
-			term72: calculatePV(rate / 100 / 12, 60, monthlyTotalWithDebt),
-			term84: calculatePV(rate / 100 / 12, 60, monthlyTotalWithDebt),
-			term120: calculatePV(rate / 100 / 12, 60, monthlyTotalWithDebt),
-			term144: calculatePV(rate / 100 / 12, 60, monthlyTotalWithDebt),
+			term72: calculatePV(rate / 100 / 12, 72, monthlyTotalWithDebt),
+			term84: calculatePV(rate / 100 / 12, 84, monthlyTotalWithDebt),
+			term120: calculatePV(rate / 100 / 12, 120, monthlyTotalWithDebt),
+			term144: calculatePV(rate / 100 / 12, 144, monthlyTotalWithDebt),
 		});
 	});
 
