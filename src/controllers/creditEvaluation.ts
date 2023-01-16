@@ -87,6 +87,7 @@ export const getSingleCreditEvaluation: RequestHandler = async (req, res, next) 
 			data: creditEvaluation && {
 				...creditEvaluation,
 				summaryOfIncomes: calculateSummaryOfIncomes(creditEvaluation),
+				incomesOverview: calculateIncomesOverview(creditEvaluation),
 				debtDetails: calculateDebtDetails(creditEvaluation),
 			},
 		});
@@ -306,6 +307,49 @@ export const calculateSummaryOfIncomes = (creditEvaluation: LeanDocument<ICredit
 	);
 
 	return summaryOfIncomes;
+};
+
+export const calculateIncomesOverview = (creditEvaluation: LeanDocument<ICreditEvaluation>) => {
+	const incomesOverview: { monthly: number; annual: number; dti: number }[] = [];
+
+	const previousYear = dayjs().subtract(1, 'year').get('year');
+	const previousYearIncome: { monthly: number; annual: number; dti: number } = {
+		monthly: 0,
+		annual: 0,
+		dti: 0,
+	};
+
+	creditEvaluation.incomes.forEach((income) => {
+		income.incomeSources.forEach((incomeSource) => {
+			switch (income.type) {
+				case CreditEvaluationIncomeTypeEnum.PAYSTUB:
+					if (dayjs(incomeSource.date).get('year') !== previousYear) {
+						break;
+					}
+
+					previousYearIncome.annual += incomeSource.endOfYearExpectedIncome || 0;
+					break;
+				case CreditEvaluationIncomeTypeEnum.SELF_EMPLOYMENT:
+					if (dayjs(incomeSource.date).get('year') !== previousYear) {
+						break;
+					}
+
+					previousYearIncome.annual += incomeSource.netProfit || 0;
+					break;
+				case CreditEvaluationIncomeTypeEnum.RETIREMENT_INCOME:
+					incomeSource.previousIncomes?.forEach((previousRetirementIncome) => {
+						if (previousRetirementIncome.year === previousYear) {
+							previousYearIncome.annual += previousRetirementIncome.yearIncome;
+						}
+					});
+					break;
+				default:
+					break;
+			}
+		});
+	});
+
+	return incomesOverview;
 };
 
 export const calculateDebtDetails = (creditEvaluation: LeanDocument<ICreditEvaluation>) => {
