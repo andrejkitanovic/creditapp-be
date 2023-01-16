@@ -143,7 +143,7 @@ const calculateIncomesOverview = (creditEvaluation: LeanDocument<ICreditEvaluati
 	return incomesOverview;
 };
 
-export const calculateLoanAffordability = (creditEvaluation: LeanDocument<ICreditEvaluation>) => {
+const calculateLoanAffordability = (creditEvaluation: LeanDocument<ICreditEvaluation>) => {
 	const loanAffordability: {
 		source: string;
 		rate: number;
@@ -163,9 +163,11 @@ export const calculateLoanAffordability = (creditEvaluation: LeanDocument<ICredi
 	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 	//@ts-expect-error
 	creditEvaluation.incomesOverview.forEach((incomeOverview) => {
+		const rate = 14;
 		const dti = 43;
 		const annualTotal = incomeOverview.annual * (dti / 100);
 		const monthlyTotal = annualTotal / 12;
+		const monthlyTotalWithDebt = monthlyTotal - (creditEvaluation.debtDetails.totalDebtPayment || 0);
 
 		loanAffordability.push({
 			source: incomeOverview.source,
@@ -174,15 +176,19 @@ export const calculateLoanAffordability = (creditEvaluation: LeanDocument<ICredi
 
 			annualTotal,
 			monthlyTotal,
-			monthlyTotalWithDebt: monthlyTotal - (creditEvaluation.debtDetails.totalDebtPayment || 0),
+			monthlyTotalWithDebt,
 
-			term60: 0,
-			term72: 0,
-			term84: 0,
-			term120: 0,
-			term144: 0,
+			term60: calculatePV(rate / 100 / 12, 60, monthlyTotalWithDebt),
+			term72: calculatePV(rate / 100 / 12, 60, monthlyTotalWithDebt),
+			term84: calculatePV(rate / 100 / 12, 60, monthlyTotalWithDebt),
+			term120: calculatePV(rate / 100 / 12, 60, monthlyTotalWithDebt),
+			term144: calculatePV(rate / 100 / 12, 60, monthlyTotalWithDebt),
 		});
 	});
 
 	return loanAffordability;
 };
+
+function calculatePV(rate: number, nper: number, pmt: number) {
+	return (pmt / rate) * (1 - Math.pow(1 + rate, -nper));
+}
