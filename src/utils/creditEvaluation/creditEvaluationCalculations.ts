@@ -135,10 +135,13 @@ const calculateIncomesOverview = (creditEvaluation: LeanDocument<ICreditEvaluati
 			}
 		});
 	});
-	previousYearIncome.monthly = previousYearIncome.annual / 12;
-	previousYearIncome.dti = (creditEvaluation.debtDetails.totalDebtPayment || 0) / previousYearIncome.monthly;
 
-	incomesOverview.push(previousYearIncome);
+	if (previousYearIncome.annual) {
+		previousYearIncome.monthly = previousYearIncome.annual / 12;
+		previousYearIncome.dti = (creditEvaluation.debtDetails.totalDebtPayment || 0) / previousYearIncome.monthly;
+
+		incomesOverview.push(previousYearIncome);
+	}
 
 	return incomesOverview;
 };
