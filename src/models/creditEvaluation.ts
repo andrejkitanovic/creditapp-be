@@ -206,6 +206,9 @@ const creditEvaluationSchema: Schema = new Schema(
 				payment: {
 					type: Number,
 				},
+				hpb: {
+					type: Number,
+				},
 				creditLimit: {
 					type: Number,
 				},
@@ -236,6 +239,9 @@ const creditEvaluationSchema: Schema = new Schema(
 					type: Number,
 				},
 				payment: {
+					type: Number,
+				},
+				hpb: {
 					type: Number,
 				},
 				limit: {
