@@ -315,9 +315,6 @@ export const cbcReportToCreditEvaluation = (reportData: any) => {
 		reportData.CC_ATTRIB.CCTRADELINES.ITEM_TRADELINE?.filter(
 			(tradelineData: any) => tradelineData.CREDITLIMIT === '-1'
 		).map((tradelineData: any) => {
-			const paydown75 = tradelineData.BALANCEPAYMENT - tradelineData.HIGHCREDIT * 0.75;
-			const paydown60 = tradelineData.BALANCEPAYMENT - tradelineData.HIGHCREDIT * 0.6;
-
 			return {
 				status: tradelineData.CLOSEDIND.CODE === 'C' ? 'closed' : 'opened',
 				creditor: tradelineData.FIRMNAME_ID,
@@ -329,8 +326,6 @@ export const cbcReportToCreditEvaluation = (reportData: any) => {
 				reportDate: cbcFormatDate(tradelineData.DATEREPORTED),
 				accountType: tradelineData.OWNERSHIP.DESCRIPTION,
 				debitToCreditRatio: tradelineData.BALANCEPAYMENT / tradelineData.HIGHCREDIT,
-				paydown75: paydown75 < 0 ? 0 : paydown75,
-				paydown60: paydown60 < 0 ? 0 : paydown60,
 			};
 		}) || [];
 

@@ -26,9 +26,6 @@ type CreditEvaluationLoan = {
 	reportDate: Date;
 	accountType: string;
 	debitToCreditRatio: string;
-
-	paydown75: number;
-	paydown60: number;
 };
 
 // DEBTS
@@ -254,12 +251,6 @@ const creditEvaluationSchema: Schema = new Schema(
 					type: String,
 				},
 				debitToCreditRatio: {
-					type: Number,
-				},
-				paydown75: {
-					type: Number,
-				},
-				paydown60: {
 					type: Number,
 				},
 			},
