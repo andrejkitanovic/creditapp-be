@@ -81,22 +81,13 @@ export const getSingleCreditEvaluation: RequestHandler = async (req, res, next) 
 	try {
 		const { id } = req.params;
 
-		let creditEvaluation: any = await CreditEvaluation.findById(id).populate('customer').lean();
+		const creditEvaluation: any = await CreditEvaluation.findById(id).populate('customer').lean();
 
 		if (creditEvaluation) {
-			creditEvaluation = {
-				...creditEvaluation,
-				summaryOfIncomes: calculateSummaryOfIncomes(creditEvaluation),
-				debtDetails: calculateDebtDetails(creditEvaluation),
-			};
-
-			creditEvaluation = {
-				incomesOverview: calculateIncomesOverview(creditEvaluation),
-			};
-
-			creditEvaluation = {
-				loanAffordability: [],
-			};
+			creditEvaluation.summaryOfIncomes = calculateSummaryOfIncomes(creditEvaluation);
+			creditEvaluation.debtDetails = calculateDebtDetails(creditEvaluation);
+			creditEvaluation.incomesOverview = calculateDebtDetails(creditEvaluation);
+			creditEvaluation.loanAffordability = [];
 		}
 
 		res.json({
