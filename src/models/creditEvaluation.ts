@@ -34,11 +34,11 @@ type CreditEvaluationLoan = {
 // DEBTS
 type CreditEvaluationDebtDetails = {
 	debtPayment: number;
-	// defferedStudentLoans: number;
-	// rentPayment: number;
-	// totalDebtPayment: number;
-	// spousalDebt: number;
-	// totalPayment: number;
+	defferedStudentLoans?: number;
+	rentPayment?: number;
+	totalDebtPayment?: number;
+	spousalDebt?: number;
+	totalPayment?: number;
 };
 
 // INCOMES

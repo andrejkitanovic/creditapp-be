@@ -81,14 +81,27 @@ export const getSingleCreditEvaluation: RequestHandler = async (req, res, next) 
 	try {
 		const { id } = req.params;
 
-		const creditEvaluation = await CreditEvaluation.findById(id).populate('customer').lean();
+		let creditEvaluation: any = await CreditEvaluation.findById(id).populate('customer').lean();
+
+		if (creditEvaluation) {
+			creditEvaluation = {
+				...creditEvaluation,
+				summaryOfIncomes: calculateSummaryOfIncomes(creditEvaluation),
+				debtDetails: calculateDebtDetails(creditEvaluation),
+			};
+
+			creditEvaluation = {
+				incomesOverview: calculateIncomesOverview(creditEvaluation),
+			};
+
+			creditEvaluation = {
+				loanAffordability: [],
+			};
+		}
 
 		res.json({
 			data: creditEvaluation && {
 				...creditEvaluation,
-				summaryOfIncomes: calculateSummaryOfIncomes(creditEvaluation),
-				incomesOverview: calculateIncomesOverview(creditEvaluation),
-				debtDetails: calculateDebtDetails(creditEvaluation),
 			},
 		});
 	} catch (err) {
@@ -287,7 +300,7 @@ export const calculateSummaryOfIncomes = (creditEvaluation: LeanDocument<ICredit
 					break;
 				case CreditEvaluationIncomeTypeEnum.RETIREMENT_INCOME:
 					// eslint-disable-next-line no-case-declarations
-					const monthDiff = Math.round(endOfYear(currentYear).diff(dayjs(), 'months', true));
+					const monthDiff = Math.floor(endOfYear(currentYear).diff(dayjs(), 'months', true));
 
 					summaryOfIncomes.incomeSources.push({
 						year: currentYear,
@@ -307,6 +320,29 @@ export const calculateSummaryOfIncomes = (creditEvaluation: LeanDocument<ICredit
 	);
 
 	return summaryOfIncomes;
+};
+
+export const calculateDebtDetails = (creditEvaluation: LeanDocument<ICreditEvaluation>) => {
+	const debtDetails: {
+		debtPayment: number;
+		defferedStudentLoans: number;
+		rentPayment: number;
+		totalDebtPayment: number;
+		spousalDebt: number;
+		totalPayment: number;
+	} = {
+		defferedStudentLoans: 0,
+		rentPayment: 0,
+		totalDebtPayment: 0,
+		spousalDebt: 0,
+		totalPayment: 0,
+		...creditEvaluation.debtDetails,
+	};
+
+	debtDetails.totalDebtPayment = debtDetails.debtPayment + debtDetails.defferedStudentLoans + debtDetails.rentPayment;
+	debtDetails.totalPayment = debtDetails.totalDebtPayment + debtDetails.spousalDebt;
+
+	return debtDetails;
 };
 
 export const calculateIncomesOverview = (creditEvaluation: LeanDocument<ICreditEvaluation>) => {
@@ -350,34 +386,16 @@ export const calculateIncomesOverview = (creditEvaluation: LeanDocument<ICreditE
 		});
 	});
 	previousYearIncome.monthly = previousYearIncome.annual / 12;
+	previousYearIncome.dti = (creditEvaluation.debtDetails.totalDebtPayment || 0) / previousYearIncome.monthly;
 
 	incomesOverview.push(previousYearIncome);
 
 	return incomesOverview;
 };
 
-export const calculateDebtDetails = (creditEvaluation: LeanDocument<ICreditEvaluation>) => {
-	const debtDetails: {
-		debtPayment: number;
-		defferedStudentLoans: number;
-		rentPayment: number;
-		totalDebtPayment: number;
-		spousalDebt: number;
-		totalPayment: number;
-	} = {
-		defferedStudentLoans: 0,
-		rentPayment: 0,
-		totalDebtPayment: 0,
-		spousalDebt: 0,
-		totalPayment: 0,
-		...creditEvaluation.debtDetails,
-	};
-
-	debtDetails.totalDebtPayment = debtDetails.debtPayment + debtDetails.defferedStudentLoans + debtDetails.rentPayment;
-	debtDetails.totalPayment = debtDetails.totalDebtPayment + debtDetails.spousalDebt;
-
-	return debtDetails;
-};
+// export const calculateLoanAffordabilityDetails = (creditEvaluation: LeanDocument<ICreditEvaluation>) => {
+// 	const loanAffordability = [];
+// };
 
 // CBC Functions
 
