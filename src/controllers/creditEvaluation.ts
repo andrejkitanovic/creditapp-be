@@ -310,10 +310,11 @@ export const calculateSummaryOfIncomes = (creditEvaluation: LeanDocument<ICredit
 };
 
 export const calculateIncomesOverview = (creditEvaluation: LeanDocument<ICreditEvaluation>) => {
-	const incomesOverview: { monthly: number; annual: number; dti: number }[] = [];
+	const incomesOverview: { source: string; monthly: number; annual: number; dti: number }[] = [];
 
 	const previousYear = dayjs().subtract(1, 'year').get('year');
-	const previousYearIncome: { monthly: number; annual: number; dti: number } = {
+	const previousYearIncome: { source: string; monthly: number; annual: number; dti: number } = {
+		source: 'Previous Year Income',
 		monthly: 0,
 		annual: 0,
 		dti: 0,
@@ -348,6 +349,9 @@ export const calculateIncomesOverview = (creditEvaluation: LeanDocument<ICreditE
 			}
 		});
 	});
+	previousYearIncome.monthly = previousYearIncome.annual / 12;
+
+	incomesOverview.push(previousYearIncome);
 
 	return incomesOverview;
 };
