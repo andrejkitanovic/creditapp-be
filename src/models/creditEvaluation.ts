@@ -122,6 +122,7 @@ interface ICreditEvaluation extends Document {
 		type: 'XPN';
 		lastSixMonths: number;
 		lastTwelveMonths: number;
+		subscriberNames: string[];
 	}[];
 	// dregoatoryInformation: {}[];
 	tradelines: CreditEvaluationTradeline[];
@@ -189,6 +190,7 @@ const creditEvaluationSchema: Schema = new Schema(
 				lastTwelveMonths: {
 					type: Number,
 				},
+				subscriberNames: [{ type: String }],
 			},
 		],
 		tradelines: [

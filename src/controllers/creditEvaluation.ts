@@ -302,11 +302,16 @@ export const cbcReportToCreditEvaluation = (reportData: any) => {
 			return dayjs().diff(dayjs(cbcFormatDate(inquiryItem.DATE)), 'year', true) <= 1;
 		}) || [];
 
+	const subscriberNames = inquiries?.map((inquiryItem: { SUBSCRNAME: string }) => {
+		return inquiryItem.SUBSCRNAME;
+	});
+
 	const recentInquiries = [
 		{
 			type: 'XPN',
 			lastSixMonths: parseInt(reportData.CC_ATTRIB.CCSUMMARY.LAST_6MINQUIRIES) ?? 0,
 			lastTwelveMonths: lastTwelveMonths.length ?? 0,
+			subscriberNames: subscriberNames ?? [],
 		},
 	];
 
