@@ -10,7 +10,7 @@ export const creditEvaluationCalculations = (creditEvaluation: LeanDocument<ICre
 	calculatedCreditEvaluation.summaryOfIncomes = calculateSummaryOfIncomes(calculatedCreditEvaluation);
 	calculatedCreditEvaluation.debtDetails = calculateDebtDetails(calculatedCreditEvaluation);
 	calculatedCreditEvaluation.incomesOverview = calculateIncomesOverview(calculatedCreditEvaluation);
-	calculatedCreditEvaluation.loanAffordability = [];
+	calculatedCreditEvaluation.loanAffordability = calculateLoanAffordability(calculatedCreditEvaluation);
 
 	return calculatedCreditEvaluation;
 };
@@ -143,7 +143,7 @@ const calculateIncomesOverview = (creditEvaluation: LeanDocument<ICreditEvaluati
 	return incomesOverview;
 };
 
-export const calculateLoanAffordabilityDetails = (creditEvaluation: LeanDocument<ICreditEvaluation>) => {
+export const calculateLoanAffordability = (creditEvaluation: LeanDocument<ICreditEvaluation>) => {
 	const loanAffordability: {
 		source: string;
 		rate: number;
@@ -151,7 +151,7 @@ export const calculateLoanAffordabilityDetails = (creditEvaluation: LeanDocument
 
 		annualTotal: number;
 		monthlyTotal: number;
-        monthlyTotalWithDebt: number;
+		monthlyTotalWithDebt: number;
 
 		term60: number;
 		term72: number;
@@ -174,7 +174,7 @@ export const calculateLoanAffordabilityDetails = (creditEvaluation: LeanDocument
 
 			annualTotal,
 			monthlyTotal,
-            monthlyTotalWithDebt: monthlyTotal - (creditEvaluation.debtDetails.totalDebtPayment || 0),
+			monthlyTotalWithDebt: monthlyTotal - (creditEvaluation.debtDetails.totalDebtPayment || 0),
 
 			term60: 0,
 			term72: 0,
