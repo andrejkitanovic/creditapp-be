@@ -86,14 +86,12 @@ export const getSingleCreditEvaluation: RequestHandler = async (req, res, next) 
 		if (creditEvaluation) {
 			creditEvaluation.summaryOfIncomes = calculateSummaryOfIncomes(creditEvaluation);
 			creditEvaluation.debtDetails = calculateDebtDetails(creditEvaluation);
-			creditEvaluation.incomesOverview = calculateDebtDetails(creditEvaluation);
+			creditEvaluation.incomesOverview = calculateIncomesOverview(creditEvaluation);
 			creditEvaluation.loanAffordability = [];
 		}
 
 		res.json({
-			data: creditEvaluation && {
-				...creditEvaluation,
-			},
+			data: creditEvaluation,
 		});
 	} catch (err) {
 		next(err);
