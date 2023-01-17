@@ -8,7 +8,9 @@ import CreditEvaluation, {
 	CreditEvaluationIncome,
 	CreditEvaluationIncomePaystubsEnum,
 	CreditEvaluationIncomeTypeEnum,
+	ICreditEvaluation,
 } from 'models/creditEvaluation';
+import { LeanDocument } from 'mongoose';
 import { creditEvaluationCalculations } from 'utils/creditEvaluation/creditEvaluationCalculations';
 import { startOfYear } from 'utils/dayjs';
 import { cbcFormatDate, cbcFormatMonths } from './cbc';
@@ -80,7 +82,9 @@ export const getSingleCreditEvaluation: RequestHandler = async (req, res, next) 
 	try {
 		const { id } = req.params;
 
-		let creditEvaluation: any = await CreditEvaluation.findById(id).populate('customer').lean();
+		let creditEvaluation = (await CreditEvaluation.findById(id)
+			.populate('customer')
+			.lean()) as LeanDocument<ICreditEvaluation>;
 
 		if (creditEvaluation) {
 			creditEvaluation = creditEvaluationCalculations(creditEvaluation);

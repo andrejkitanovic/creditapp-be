@@ -29,8 +29,8 @@ const calculateSummaryOfIncomes = (creditEvaluation: LeanDocument<ICreditEvaluat
 
 	const currentYear = dayjs().get('year');
 
-	creditEvaluation.incomes.forEach((income) => {
-		income.incomeSources.forEach((incomeSource) => {
+	creditEvaluation.incomes?.forEach((income) => {
+		income.incomeSources?.forEach((incomeSource) => {
 			switch (income.type) {
 				case CreditEvaluationIncomeTypeEnum.PAYSTUB:
 					if (dayjs(incomeSource.date).get('year') !== currentYear) {
@@ -93,8 +93,8 @@ const calculateIncomesOverview = (creditEvaluation: LeanDocument<ICreditEvaluati
 		dti: 0,
 	};
 
-	creditEvaluation.incomes.forEach((income) => {
-		income.incomeSources.forEach((incomeSource) => {
+	creditEvaluation.incomes?.forEach((income) => {
+		income.incomeSources?.forEach((incomeSource) => {
 			switch (income.type) {
 				case CreditEvaluationIncomeTypeEnum.PAYSTUB:
 					if (dayjs(incomeSource.date).get('year') !== previousYear) {
