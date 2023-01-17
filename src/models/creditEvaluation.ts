@@ -56,7 +56,7 @@ export enum CreditEvaluationIncomePaystubsEnum {
 // DEBTS
 export type CreditEvaluationDebtDetails = {
 	debtPayment: number;
-	defferedStudentLoans: number;
+	deferredStudentLoans: number;
 	rentPayment: number;
 	totalDebtPayment: number;
 	spousalDebt: number;
@@ -74,6 +74,14 @@ export type CreditEvaluationSummaryOfIncomes = {
 	total: number;
 };
 
+/*
+Current Income (from income table)
+Current Income Debt Adjusted (from income table, with a negative monthly. debt modifier)
+Current Income Student Loan Adjusted (from income table, with a negative monthly debt modifier)
+Household Income (A modified annual income amount)
+Household Income Debt Adjusted (A m modified annual income amount with a negative monthly debt modifier)
+Household Income Student Loan Adjusted (A m modified annual income amount with a negative monthly debt modifier)
+*/
 export enum CreditEvaluationIncomeOverviewEnum {
 	CURRENT_INCOME = 'current-income',
 	CURRENT_INCOME_DEBT_ADJUSTED = 'current-income-debt-adjusted',
@@ -108,43 +116,45 @@ export type CreditEvaluationLoanAffordability = {
 	term144: number;
 };
 
+export type CreditEvaluationIncomeSource = {
+	date: Date;
+	// PAYSTUB
+	amount?: number;
+	ytd?: number;
+	averageAnnual?: number;
+	numberOfPeriodsToDate?: number;
+	avgPerPeriod?: number;
+	averageAnnual2?: number;
+	numberOfPeriodsRemaining?: number;
+	amountOfPayRemaining?: number;
+	endOfYearExpectedIncome?: number;
+	// SELF EMPLOYMENT
+	grossRevenue?: number;
+	netProfit?: number;
+	percentageOfProfit?: number;
+	averageMonthlyGrossRevenue?: number;
+	yearOverYearGrossGrowth?: number;
+	averageMonthlyNetProfit?: number;
+	yearOverYearNetGrowth?: number;
+	annualWages?: number;
+	mothlyWage?: number;
+	// RETIREMENT
+	source?: string;
+	monthlyBenefit?: number;
+	previousIncomes?: {
+		year: number;
+		yearIncome: number;
+		months: number;
+	}[];
+};
+
 export type CreditEvaluationIncome = {
 	type: CreditEvaluationIncomeTypeEnum;
 	payStubs?: CreditEvaluationIncomePaystubsEnum;
 	period?: string;
 	averageCheckAmount?: number;
 	averageCheckAmountBasedOnYTD?: number;
-	incomeSources: {
-		date: Date;
-		// PAYSTUB
-		amount?: number;
-		ytd?: number;
-		averageAnnual?: number;
-		numberOfPeriodsToDate?: number;
-		avgPerPeriod?: number;
-		averageAnnual2?: number;
-		numberOfPeriodsRemaining?: number;
-		amountOfPayRemaining?: number;
-		endOfYearExpectedIncome?: number;
-		// SELF EMPLOYMENT
-		grossRevenue?: number;
-		netProfit?: number;
-		percentageOfProfit?: number;
-		averageMonthlyGrossRevenue?: number;
-		yearOverYearGrossGrowth?: number;
-		averageMonthlyNetProfit?: number;
-		yearOverYearNetGrowth?: number;
-		annualWages?: number;
-		mothlyWage?: number;
-		// RETIREMENT
-		source?: string;
-		monthlyBenefit?: number;
-		previousIncomes?: {
-			year: number;
-			yearIncome: number;
-			months: number;
-		}[];
-	}[];
+	incomeSources: CreditEvaluationIncomeSource[];
 };
 
 interface ICreditEvaluation extends Document {
@@ -169,7 +179,10 @@ interface ICreditEvaluation extends Document {
 		type: 'XPN';
 		lastSixMonths: number;
 		lastTwelveMonths: number;
-		subscriberNames: string[];
+		inquiries: {
+			name: string;
+			date: Date;
+		}[];
 	}[];
 	// Tradelines
 	tradelines: CreditEvaluationTradeline[];
@@ -244,7 +257,16 @@ const creditEvaluationSchema: Schema = new Schema(
 				lastTwelveMonths: {
 					type: Number,
 				},
-				subscriberNames: [{ type: String }],
+				inquiries: [
+					{
+						name: {
+							type: String,
+						},
+						date: {
+							type: Date,
+						},
+					},
+				],
 			},
 		],
 		tradelines: [
