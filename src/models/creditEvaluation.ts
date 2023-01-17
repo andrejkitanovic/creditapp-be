@@ -28,16 +28,6 @@ type CreditEvaluationLoan = {
 	debitToCreditRatio: string;
 };
 
-// DEBTS
-type CreditEvaluationDebtDetails = {
-	debtPayment: number;
-	defferedStudentLoans?: number;
-	rentPayment?: number;
-	totalDebtPayment?: number;
-	spousalDebt?: number;
-	totalPayment?: number;
-};
-
 // INCOMES
 export enum CreditEvaluationIncomeTypeEnum {
 	PAYSTUB = 'paystub',
@@ -62,6 +52,53 @@ export enum CreditEvaluationIncomePaystubsEnum {
 	'bi-monthly' = 24,
 	'annual' = 1,
 }
+
+// DEBTS
+export type CreditEvaluationDebtDetails = {
+	debtPayment: number;
+	defferedStudentLoans: number;
+	rentPayment: number;
+	totalDebtPayment: number;
+	spousalDebt: number;
+	totalPayment: number;
+	mortgagePayment: number;
+};
+
+// SUMMARY OF INCOMES
+export type CreditEvaluationSummaryOfIncomes = {
+	incomeSources: {
+		year: number;
+		eoyExpected: number;
+		type: CreditEvaluationIncomeTypeEnum;
+	}[];
+	total: number;
+};
+
+// INCOME OVERVIEW
+export type CreditEvaluationIncomeOverview = {
+	type: 'auto' | 'manual';
+	source: string;
+	monthly: number;
+	annual: number;
+	dti: number;
+};
+
+// LOAN AFFORDABILITY
+export type CreditEvaluationLoanAffordability = {
+	source: string;
+	rate: number;
+	dti: number;
+
+	annualTotal: number;
+	monthlyTotal: number;
+	monthlyTotalWithDebt: number;
+
+	term60: number;
+	term72: number;
+	term84: number;
+	term120: number;
+	term144: number;
+};
 
 export type CreditEvaluationIncome = {
 	type: CreditEvaluationIncomeTypeEnum;
@@ -104,9 +141,9 @@ export type CreditEvaluationIncome = {
 
 interface ICreditEvaluation extends Document {
 	customer: string;
+	// HTML and PDF
 	html: string;
 	pdf: string;
-
 	reportDate: Date;
 	firstCreditAccount: string;
 	monitoringService: string;
@@ -114,23 +151,32 @@ interface ICreditEvaluation extends Document {
 	ageOfFile: Date;
 	averageMonthsOfOpenRevolvingCredit: number;
 	loanPackageAmount: number;
+	// Credit Scores
 	creditScores: {
 		type: 'XPN';
 		score: number;
 	}[];
+	// Inquires
 	recentInquiries: {
 		type: 'XPN';
 		lastSixMonths: number;
 		lastTwelveMonths: number;
 		subscriberNames: string[];
 	}[];
-	// dregoatoryInformation: {}[];
+	// Tradelines
 	tradelines: CreditEvaluationTradeline[];
-	businessTradelines: CreditEvaluationTradeline[];
+	// Loans
 	loans: CreditEvaluationLoan[];
-	debtDetails: CreditEvaluationDebtDetails;
+	// Incomes
 	incomes: CreditEvaluationIncome[];
-	// loanAffordabilityCalculator: {};
+	// Debt Details
+	debtDetails: CreditEvaluationDebtDetails;
+	// Summary of Incomes
+	summaryOfIncomes: CreditEvaluationSummaryOfIncomes;
+	// Income Overview
+	incomesOverview: CreditEvaluationIncomeOverview[];
+	// Loan Affordability
+	loanAffordability: CreditEvaluationLoanAffordability[];
 }
 
 const creditEvaluationSchema: Schema = new Schema(

@@ -1,31 +1,28 @@
 import dayjs from 'dayjs';
 
-import { CreditEvaluationIncomeTypeEnum, ICreditEvaluation } from 'models/creditEvaluation';
+import {
+	CreditEvaluationDebtDetails,
+	CreditEvaluationIncomeOverview,
+	CreditEvaluationIncomeTypeEnum,
+	CreditEvaluationLoanAffordability,
+	CreditEvaluationSummaryOfIncomes,
+	ICreditEvaluation,
+} from 'models/creditEvaluation';
 import { LeanDocument } from 'mongoose';
 import { endOfYear } from 'utils/dayjs';
 
 export const creditEvaluationCalculations = (creditEvaluation: LeanDocument<ICreditEvaluation>) => {
-	const calculatedCreditEvaluation: any = creditEvaluation;
-
-	calculatedCreditEvaluation.summaryOfIncomes = calculateSummaryOfIncomes(calculatedCreditEvaluation);
-	calculatedCreditEvaluation.debtDetails = calculateDebtDetails(calculatedCreditEvaluation);
-	calculatedCreditEvaluation.incomesOverview = calculateIncomesOverview(calculatedCreditEvaluation);
-	calculatedCreditEvaluation.loanAffordability = calculateLoanAffordability(calculatedCreditEvaluation);
-
-	return calculatedCreditEvaluation;
+	creditEvaluation.summaryOfIncomes = calculateSummaryOfIncomes(creditEvaluation);
+	creditEvaluation.debtDetails = calculateDebtDetails(creditEvaluation);
+	creditEvaluation.incomesOverview = calculateIncomesOverview(creditEvaluation);
+	creditEvaluation.loanAffordability = calculateLoanAffordability(creditEvaluation);
+	return creditEvaluation;
 };
 
 // Single Credit Evaluation Calculations
 
 const calculateSummaryOfIncomes = (creditEvaluation: LeanDocument<ICreditEvaluation>) => {
-	const summaryOfIncomes: {
-		incomeSources: {
-			year: number;
-			eoyExpected: number;
-			type: CreditEvaluationIncomeTypeEnum;
-		}[];
-		total: number;
-	} = {
+	const summaryOfIncomes: CreditEvaluationSummaryOfIncomes = {
 		incomeSources: [],
 		total: 0,
 	};
@@ -73,33 +70,23 @@ const calculateSummaryOfIncomes = (creditEvaluation: LeanDocument<ICreditEvaluat
 };
 
 const calculateDebtDetails = (creditEvaluation: LeanDocument<ICreditEvaluation>) => {
-	const debtDetails: {
-		debtPayment: number;
-		defferedStudentLoans: number;
-		rentPayment: number;
-		totalDebtPayment: number;
-		spousalDebt: number;
-		totalPayment: number;
-	} = {
-		defferedStudentLoans: 0,
-		rentPayment: 0,
-		totalDebtPayment: 0,
-		spousalDebt: 0,
-		totalPayment: 0,
+	const debtDetails: CreditEvaluationDebtDetails = {
 		...creditEvaluation.debtDetails,
 	};
 
-	debtDetails.totalDebtPayment = debtDetails.debtPayment + debtDetails.defferedStudentLoans + debtDetails.rentPayment;
-	debtDetails.totalPayment = debtDetails.totalDebtPayment + debtDetails.spousalDebt;
+	debtDetails.totalDebtPayment =
+		(debtDetails.debtPayment || 0) + (debtDetails.defferedStudentLoans || 0) + (debtDetails.rentPayment || 0);
+	debtDetails.totalPayment = debtDetails.totalDebtPayment + (debtDetails.spousalDebt || 0);
 
 	return debtDetails;
 };
 
 const calculateIncomesOverview = (creditEvaluation: LeanDocument<ICreditEvaluation>) => {
-	const incomesOverview: { source: string; monthly: number; annual: number; dti: number }[] = [];
+	const incomesOverview: CreditEvaluationIncomeOverview[] = [];
 
 	const previousYear = dayjs().subtract(1, 'year').get('year');
-	const previousYearIncome: { source: string; monthly: number; annual: number; dti: number } = {
+	const previousYearIncome: CreditEvaluationIncomeOverview = {
+		type: 'auto',
 		source: 'Previous Year Income',
 		monthly: 0,
 		annual: 0,
@@ -147,24 +134,8 @@ const calculateIncomesOverview = (creditEvaluation: LeanDocument<ICreditEvaluati
 };
 
 const calculateLoanAffordability = (creditEvaluation: LeanDocument<ICreditEvaluation>) => {
-	const loanAffordability: {
-		source: string;
-		rate: number;
-		dti: number;
+	const loanAffordability: CreditEvaluationLoanAffordability[] = [];
 
-		annualTotal: number;
-		monthlyTotal: number;
-		monthlyTotalWithDebt: number;
-
-		term60: number;
-		term72: number;
-		term84: number;
-		term120: number;
-		term144: number;
-	}[] = [];
-
-	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-	//@ts-expect-error
 	creditEvaluation.incomesOverview.forEach((incomeOverview) => {
 		const rate = 14;
 		const dti = 43;
