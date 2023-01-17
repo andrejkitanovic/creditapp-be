@@ -74,10 +74,18 @@ export type CreditEvaluationSummaryOfIncomes = {
 	total: number;
 };
 
+export enum CreditEvaluationIncomeOverviewEnum {
+	CURRENT_INCOME = 'current-income',
+	CURRENT_INCOME_DEBT_ADJUSTED = 'current-income-debt-adjusted',
+	CURRENT_INCOME_STUDENT_LOAN_ADJUSTED = 'current-income-student-loan-adjusted',
+	HOUSEHOLD_INCOME = 'household-income',
+	HOUSEHOLD_INCOME_DEBT_ADJUSTED = 'household-income-debt-adjusted',
+	HOUSEHOLD_INCOME_STUDENT_LOAN_ADJUSTED = 'household-income-student-loan-adjusted',
+}
+
 // INCOME OVERVIEW
 export type CreditEvaluationIncomeOverview = {
-	type: 'auto' | 'manual';
-	source: string;
+	type: CreditEvaluationIncomeOverviewEnum;
 	monthly: number;
 	annual: number;
 	dti: number;
@@ -85,7 +93,7 @@ export type CreditEvaluationIncomeOverview = {
 
 // LOAN AFFORDABILITY
 export type CreditEvaluationLoanAffordability = {
-	source: string;
+	source: CreditEvaluationIncomeOverviewEnum;
 	rate: number;
 	dti: number;
 

@@ -3,6 +3,7 @@ import dayjs from 'dayjs';
 import {
 	CreditEvaluationDebtDetails,
 	CreditEvaluationIncomeOverview,
+	CreditEvaluationIncomeOverviewEnum,
 	CreditEvaluationIncomeTypeEnum,
 	CreditEvaluationLoanAffordability,
 	CreditEvaluationSummaryOfIncomes,
@@ -86,8 +87,7 @@ const calculateIncomesOverview = (creditEvaluation: LeanDocument<ICreditEvaluati
 
 	const previousYear = dayjs().subtract(1, 'year').get('year');
 	const previousYearIncome: CreditEvaluationIncomeOverview = {
-		type: 'auto',
-		source: 'Previous Year Income',
+		type: CreditEvaluationIncomeOverviewEnum.CURRENT_INCOME,
 		monthly: 0,
 		annual: 0,
 		dti: 0,
@@ -144,7 +144,7 @@ const calculateLoanAffordability = (creditEvaluation: LeanDocument<ICreditEvalua
 		const monthlyTotalWithDebt = monthlyTotal - (creditEvaluation.debtDetails.totalDebtPayment || 0);
 
 		loanAffordability.push({
-			source: incomeOverview.source,
+			source: incomeOverview.type,
 			rate: 14,
 			dti,
 
