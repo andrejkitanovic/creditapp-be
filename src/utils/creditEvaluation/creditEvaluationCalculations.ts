@@ -58,7 +58,7 @@ const calculateSummaryOfIncomes = (creditEvaluation: LeanDocument<ICreditEvaluat
 					});
 
 					incomeSource.previousIncomes?.forEach((previousIncome) => {
-						if (previousIncome.year >= last3Years) {
+						if (previousIncome.year >= last3Years && previousIncome.year < currentYear) {
 							summaryOfIncomes.incomeSources.push({
 								year: previousIncome.year,
 								eoyExpected: previousIncome.yearIncome,
