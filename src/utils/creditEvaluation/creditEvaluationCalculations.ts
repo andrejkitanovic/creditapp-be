@@ -29,17 +29,18 @@ const calculateSummaryOfIncomes = (creditEvaluation: LeanDocument<ICreditEvaluat
 	};
 
 	const currentYear = dayjs().get('year');
+	const last3Years = dayjs().subtract(3, 'year').get('year');
 
 	creditEvaluation.incomes?.forEach((income) => {
 		income.incomeSources?.forEach((incomeSource) => {
 			switch (income.type) {
 				case CreditEvaluationIncomeTypeEnum.PAYSTUB:
-					if (dayjs(incomeSource.date).get('year') !== currentYear) {
+					if (dayjs(incomeSource.date).get('year') < last3Years) {
 						break;
 					}
 
 					summaryOfIncomes.incomeSources.push({
-						year: currentYear,
+						year: dayjs(incomeSource.date).get('year'),
 						eoyExpected: incomeSource.endOfYearExpectedIncome || 0,
 						type: income.type,
 					});
@@ -55,6 +56,16 @@ const calculateSummaryOfIncomes = (creditEvaluation: LeanDocument<ICreditEvaluat
 						eoyExpected: monthDiff * (incomeSource.monthlyBenefit || 0),
 						type: income.type,
 					});
+
+					incomeSource.previousIncomes?.forEach((previousIncome) => {
+						if (previousIncome.year >= last3Years) {
+							summaryOfIncomes.incomeSources.push({
+								year: previousIncome.year,
+								eoyExpected: previousIncome.yearIncome,
+								type: income.type,
+							});
+						}
+					});
 					break;
 				default:
 					break;
@@ -62,10 +73,12 @@ const calculateSummaryOfIncomes = (creditEvaluation: LeanDocument<ICreditEvaluat
 		});
 	});
 
-	summaryOfIncomes.total = summaryOfIncomes.incomeSources.reduce(
-		(prevValue, incomeSource) => prevValue + incomeSource.eoyExpected,
-		0
-	);
+	summaryOfIncomes.total = summaryOfIncomes.incomeSources.reduce((prevValue, incomeSource) => {
+		if (incomeSource.year === currentYear) {
+			return prevValue + incomeSource.eoyExpected;
+		}
+		return prevValue;
+	}, 0);
 
 	return summaryOfIncomes;
 };
