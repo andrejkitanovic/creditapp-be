@@ -1,4 +1,5 @@
 import { Schema, model, Document } from 'mongoose';
+import { MongooseFindByReference } from 'mongoose-find-by-reference';
 
 // TRADELINES
 type CreditEvaluationTradeline = {
@@ -392,6 +393,7 @@ const creditEvaluationSchema: Schema = new Schema(
 	{ timestamps: true }
 );
 
+creditEvaluationSchema.plugin(MongooseFindByReference);
 const objectModel = model<ICreditEvaluation>('Credit Evaluation', creditEvaluationSchema);
 
 export { ICreditEvaluation };
