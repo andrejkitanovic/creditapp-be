@@ -21,7 +21,7 @@ export const getCreditEvaluations: RequestHandler = async (req, res, next) => {
 			Model: CreditEvaluation,
 			query: req.query,
 			populate: 'customer',
-			searchFields: ['customer.firstName', 'customer.lastName', 'customer.email'],
+			searchFields: ['customer.firstName', 'customer.lastName'],
 		});
 
 		res.json({

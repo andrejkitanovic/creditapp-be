@@ -84,7 +84,9 @@ interface IStatisticFilters {
 	field: string;
 }
 
-export const queryStatisticFilter = async ({ Model, query, defaultFilters, operator, field }: IStatisticFilters) => {
+export const queryStatisticFilter = async ({ Model, query, defaultFilters, 
+	// operator, field
+ }: IStatisticFilters) => {
 	const startDate: Date = query.from ?? dayjs().startOf('year').toDate();
 	const filter: string = query.filter ?? '';
 
