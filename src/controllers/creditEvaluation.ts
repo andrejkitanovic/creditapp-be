@@ -98,135 +98,139 @@ export const getSingleCreditEvaluation: RequestHandler = async (req, res, next) 
 	}
 };
 
+export const calculateIncomes = (type: CreditEvaluationIncomeTypeEnum, period: string, incomes: any[]) => {
+	incomes = incomes.sort((incomeA: { date: Date }, incomeB: { date: Date }) =>
+		dayjs(incomeA.date).isAfter(dayjs(incomeB.date)) ? 1 : -1
+	);
+
+	const result: CreditEvaluationIncome = {
+		type,
+		incomeSources: [],
+	};
+
+	switch (type) {
+		case CreditEvaluationIncomeTypeEnum.PAYSTUB:
+			result.period = period;
+
+			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			// @ts-expect-error
+			result.payStubs = CreditEvaluationIncomePaystubsEnum[period];
+
+			result.averageCheckAmount =
+				incomes.reduce((prevValue: number, income: { amount: number }) => {
+					return prevValue + income.amount;
+				}, 0) / incomes.length;
+			result.averageCheckAmountBasedOnYTD =
+				incomes.reduce((prevValue: number, income: { date: Date; ytd: number }, index: number) => {
+					const year = dayjs(income.date).get('year');
+					const dayDiff = Math.round(dayjs(income.date).diff(startOfYear(year), 'days', true));
+					const numberOfPeriodsToDate = Math.max((dayDiff / 365) * (result.payStubs || 1), index + 1);
+					return prevValue + income.ytd / numberOfPeriodsToDate;
+				}, 0) / incomes.length;
+
+			result.incomeSources = incomes.map((income: { date: Date; amount: number; ytd: number }, index: number) => {
+				const year = dayjs(income.date).get('year');
+				const dayDiff = Math.round(dayjs(income.date).diff(startOfYear(year), 'days', true));
+				const numberOfPeriodsToDate = Math.max((dayDiff / 365) * (result.payStubs || 1), index + 1);
+				const avgPerPeriod = income.ytd / numberOfPeriodsToDate;
+				const numberOfPeriodsRemaining = (result.payStubs || 1) - numberOfPeriodsToDate;
+				const amountOfPayRemaining =
+					numberOfPeriodsRemaining *
+					(((result.averageCheckAmount || 0) + (result.averageCheckAmountBasedOnYTD || 0)) / 2);
+
+				return {
+					date: income.date,
+					amount: income.amount,
+					ytd: income.ytd,
+					averageAnnual: income.amount * (result.payStubs || 1),
+					numberOfPeriodsToDate,
+					avgPerPeriod,
+					averageAnnual2: avgPerPeriod * (result.payStubs || 1),
+					numberOfPeriodsRemaining,
+					amountOfPayRemaining,
+					endOfYearExpectedIncome: income.ytd + amountOfPayRemaining,
+				};
+			});
+
+			break;
+		case CreditEvaluationIncomeTypeEnum.SELF_EMPLOYMENT:
+			result.incomeSources = incomes.map(
+				(income: { date: Date; grossRevenue: number; netProfit: number; annualWages: number }, index: number) => {
+					const averageMonthlyGrossRevenue = income.grossRevenue / 12;
+					const averageMonthlyNetProfit = income.netProfit / 12;
+
+					let yearOverYearGrossGrowth, yearOverYearNetGrowth;
+
+					if (index !== 0) {
+						const previousIncome = incomes[index - 1];
+						const previousAverageMonthlyGrossRevenue = previousIncome.grossRevenue / 12;
+						const previousMonthlyNetProfit = income.netProfit / 12;
+
+						yearOverYearGrossGrowth = averageMonthlyGrossRevenue / previousAverageMonthlyGrossRevenue;
+						yearOverYearNetGrowth = averageMonthlyNetProfit / previousMonthlyNetProfit;
+					}
+
+					return {
+						date: income.date,
+						grossRevenue: income.grossRevenue,
+						netProfit: income.netProfit,
+						percentageOfProfit: income.netProfit / income.grossRevenue,
+						averageMonthlyGrossRevenue,
+						averageMonthlyNetProfit: income.netProfit / 12,
+						annualWages: income.annualWages,
+						mothlyWage: income.annualWages / 12,
+						yearOverYearGrossGrowth,
+						yearOverYearNetGrowth,
+					};
+				}
+			);
+
+			break;
+		case CreditEvaluationIncomeTypeEnum.RETIREMENT_INCOME:
+			result.incomeSources = incomes.map((income: { date: Date; source: string; monthlyBenefit: number }) => {
+				const year = dayjs().get('year');
+				const monthDiff = Math.round(dayjs(income.date).diff(year, 'months', true));
+				const previousIncomesObject: { [key: string]: { yearIncome: number; months: number } } = {};
+
+				for (let i = 0; i < Math.min(monthDiff, 36); i++) {
+					const year = dayjs().subtract(i, 'months').format('YYYY');
+
+					if (previousIncomesObject[year]) {
+						previousIncomesObject[year].yearIncome += income.monthlyBenefit;
+						previousIncomesObject[year].months += 1;
+					} else {
+						previousIncomesObject[year] = {
+							yearIncome: income.monthlyBenefit,
+							months: 1,
+						};
+					}
+				}
+
+				return {
+					date: income.date,
+					source: income.source,
+					monthlyBenefit: income.monthlyBenefit,
+					previousIncomes: Object.keys(previousIncomesObject).map((key) => ({
+						year: parseInt(key),
+						...previousIncomesObject[key],
+					})),
+				};
+			});
+			break;
+		default:
+			break;
+	}
+};
+
 export const postCreditEvaluationIncome: RequestHandler = async (req, res, next) => {
 	try {
 		const { id } = req.params;
 		const { type, period } = req.body;
 		let { incomes } = req.body;
 
-		incomes = incomes.sort((incomeA: { date: Date }, incomeB: { date: Date }) =>
-			dayjs(incomeA.date).isAfter(dayjs(incomeB.date)) ? 1 : -1
-		);
+		incomes = calculateIncomes(type, period, incomes);
 
-		const result: CreditEvaluationIncome = {
-			type,
-			incomeSources: [],
-		};
-
-		switch (type) {
-			case CreditEvaluationIncomeTypeEnum.PAYSTUB:
-				result.period = period;
-
-				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-				// @ts-expect-error
-				result.payStubs = CreditEvaluationIncomePaystubsEnum[period];
-
-				result.averageCheckAmount =
-					incomes.reduce((prevValue: number, income: { amount: number }) => {
-						return prevValue + income.amount;
-					}, 0) / incomes.length;
-				result.averageCheckAmountBasedOnYTD =
-					incomes.reduce((prevValue: number, income: { date: Date; ytd: number }, index: number) => {
-						const year = dayjs(income.date).get('year');
-						const dayDiff = Math.round(dayjs(income.date).diff(startOfYear(year), 'days', true));
-						const numberOfPeriodsToDate = Math.max((dayDiff / 365) * (result.payStubs || 1), index + 1);
-						return prevValue + income.ytd / numberOfPeriodsToDate;
-					}, 0) / incomes.length;
-
-				result.incomeSources = incomes.map((income: { date: Date; amount: number; ytd: number }, index: number) => {
-					const year = dayjs(income.date).get('year');
-					const dayDiff = Math.round(dayjs(income.date).diff(startOfYear(year), 'days', true));
-					const numberOfPeriodsToDate = Math.max((dayDiff / 365) * (result.payStubs || 1), index + 1);
-					const avgPerPeriod = income.ytd / numberOfPeriodsToDate;
-					const numberOfPeriodsRemaining = (result.payStubs || 1) - numberOfPeriodsToDate;
-					const amountOfPayRemaining =
-						numberOfPeriodsRemaining *
-						(((result.averageCheckAmount || 0) + (result.averageCheckAmountBasedOnYTD || 0)) / 2);
-
-					return {
-						date: income.date,
-						amount: income.amount,
-						ytd: income.ytd,
-						averageAnnual: income.amount * (result.payStubs || 1),
-						numberOfPeriodsToDate,
-						avgPerPeriod,
-						averageAnnual2: avgPerPeriod * (result.payStubs || 1),
-						numberOfPeriodsRemaining,
-						amountOfPayRemaining,
-						endOfYearExpectedIncome: income.ytd + amountOfPayRemaining,
-					};
-				});
-
-				break;
-			case CreditEvaluationIncomeTypeEnum.SELF_EMPLOYMENT:
-				result.incomeSources = incomes.map(
-					(income: { date: Date; grossRevenue: number; netProfit: number; annualWages: number }, index: number) => {
-						const averageMonthlyGrossRevenue = income.grossRevenue / 12;
-						const averageMonthlyNetProfit = income.netProfit / 12;
-
-						let yearOverYearGrossGrowth, yearOverYearNetGrowth;
-
-						if (index !== 0) {
-							const previousIncome = incomes[index - 1];
-							const previousAverageMonthlyGrossRevenue = previousIncome.grossRevenue / 12;
-							const previousMonthlyNetProfit = income.netProfit / 12;
-
-							yearOverYearGrossGrowth = averageMonthlyGrossRevenue / previousAverageMonthlyGrossRevenue;
-							yearOverYearNetGrowth = averageMonthlyNetProfit / previousMonthlyNetProfit;
-						}
-
-						return {
-							date: income.date,
-							grossRevenue: income.grossRevenue,
-							netProfit: income.netProfit,
-							percentageOfProfit: income.netProfit / income.grossRevenue,
-							averageMonthlyGrossRevenue,
-							averageMonthlyNetProfit: income.netProfit / 12,
-							annualWages: income.annualWages,
-							mothlyWage: income.annualWages / 12,
-							yearOverYearGrossGrowth,
-							yearOverYearNetGrowth,
-						};
-					}
-				);
-
-				break;
-			case CreditEvaluationIncomeTypeEnum.RETIREMENT_INCOME:
-				result.incomeSources = incomes.map((income: { date: Date; source: string; monthlyBenefit: number }) => {
-					const year = dayjs().get('year');
-					const monthDiff = Math.round(dayjs(income.date).diff(year, 'months', true));
-					const previousIncomesObject: { [key: string]: { yearIncome: number; months: number } } = {};
-
-					for (let i = 0; i < Math.min(monthDiff, 36); i++) {
-						const year = dayjs().subtract(i, 'months').format('YYYY');
-
-						if (previousIncomesObject[year]) {
-							previousIncomesObject[year].yearIncome += income.monthlyBenefit;
-							previousIncomesObject[year].months += 1;
-						} else {
-							previousIncomesObject[year] = {
-								yearIncome: income.monthlyBenefit,
-								months: 1,
-							};
-						}
-					}
-
-					return {
-						date: income.date,
-						source: income.source,
-						monthlyBenefit: income.monthlyBenefit,
-						previousIncomes: Object.keys(previousIncomesObject).map((key) => ({
-							year: parseInt(key),
-							...previousIncomesObject[key],
-						})),
-					};
-				});
-				break;
-			default:
-				break;
-		}
-
-		await CreditEvaluation.findByIdAndUpdate(id, { $push: { incomes: result } });
+		await CreditEvaluation.findByIdAndUpdate(id, { $push: { incomes } });
 
 		res.json({
 			// data: result,
