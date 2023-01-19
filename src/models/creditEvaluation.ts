@@ -340,11 +340,6 @@ const creditEvaluationSchema: Schema = new Schema(
 				},
 			},
 		],
-		debtDetails: {
-			debtPayment: {
-				type: Number,
-			},
-		},
 		incomes: [
 			{
 				type: { type: String, enum: CreditEvaluationIncomeTypeEnum },
@@ -389,7 +384,81 @@ const creditEvaluationSchema: Schema = new Schema(
 				],
 			},
 		],
+		debtDetails: {
+			debtPayment: {
+				type: Number,
+				default: 0,
+			},
+			deferredStudentLoans: {
+				type: Number,
+				default: 0,
+			},
+			rentPayment: {
+				type: Number,
+				default: 0,
+			},
+			totalDebtPayment: {
+				type: Number,
+				default: 0,
+			},
+			spousalDebt: {
+				type: Number,
+				default: 0,
+			},
+			totalPayment: {
+				type: Number,
+				default: 0,
+			},
+			mortgagePayment: {
+				type: Number,
+				default: 0,
+			},
+		},
+		summaryOfIncomes: {
+			incomeSources: [
+				{
+					year: {
+						type: Number,
+					},
+					eoyExpected: {
+						type: Number,
+					},
+					type: { type: String, enum: CreditEvaluationIncomeTypeEnum },
+				},
+			],
+			total: {
+				type: Number,
+			},
+		},
+		// Income Overview
+		incomesOverview: [
+			{
+				type: { type: String, enum: CreditEvaluationIncomeOverviewEnum },
+				monthly: { type: Number },
+				annual: { type: Number },
+				dti: { type: Number },
+			},
+		],
+		// Loan Affordability
+		loanAffordability: [
+			{
+				source: { type: String, enum: CreditEvaluationIncomeOverviewEnum },
+				rate: { type: Number },
+				dti: { type: Number },
+
+				annualTotal: { type: Number },
+				monthlyTotal: { type: Number },
+				monthlyTotalWithDebt: { type: Number },
+
+				term60: { type: Number },
+				term72: { type: Number },
+				term84: { type: Number },
+				term120: { type: Number },
+				term144: { type: Number },
+			},
+		],
 	},
+
 	{ timestamps: true }
 );
 
