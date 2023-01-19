@@ -220,6 +220,8 @@ export const calculateIncomes = (type: CreditEvaluationIncomeTypeEnum, period: s
 		default:
 			break;
 	}
+
+	return result;
 };
 
 export const postCreditEvaluationIncome: RequestHandler = async (req, res, next) => {
