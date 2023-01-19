@@ -8,6 +8,7 @@ import {
 	deleteCreditEvaluation as deleteCreditEvaluationController,
 	getSingleCreditEvaluation as getSingleCreditEvaluationController,
 	postCreditEvaluationIncome as postCreditEvaluationIncomeController,
+	putCreditEvaluationIncome as putCreditEvaluationIncomeController,
 	deleteCreditEvaluationIncome as deleteCreditEvaluationIncomeController,
 } from 'controllers/creditEvaluation';
 // import {
@@ -62,6 +63,13 @@ defineRoutes(router, [
 		roles: ['user', 'admin'],
 		// permissions: ['read:customers'],
 		controller: postCreditEvaluationIncomeController,
+	},
+	{
+		method: 'put',
+		route: '/income/:id/:incomeId',
+		roles: ['user', 'admin'],
+		// permissions: ['read:customers'],
+		controller: putCreditEvaluationIncomeController,
 	},
 	{
 		method: 'delete',

@@ -242,6 +242,29 @@ export const postCreditEvaluationIncome: RequestHandler = async (req, res, next)
 	}
 };
 
+export const putCreditEvaluationIncome: RequestHandler = async (req, res, next) => {
+	try {
+		const { id, incomeId } = req.params;
+		const { type, period } = req.body;
+		let { incomes } = req.body;
+
+		incomes = calculateIncomes(type, period, incomes);
+
+		await CreditEvaluation.findByIdAndUpdate(id, {
+			$pull: {
+				incomes: { _id: incomeId },
+			},
+			$push: { incomes },
+		});
+
+		res.json({
+			// data: result,
+		});
+	} catch (err) {
+		next(err);
+	}
+};
+
 export const deleteCreditEvaluationIncome: RequestHandler = async (req, res, next) => {
 	try {
 		const { id, incomeId } = req.params;
