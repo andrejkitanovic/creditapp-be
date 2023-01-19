@@ -291,12 +291,10 @@ export const putCreditEvaluationDebt: RequestHandler = async (req, res, next) =>
 		const { deferredStudentLoans, rentPayment, spousalDebt, mortgagePayment } = req.body;
 
 		await CreditEvaluation.findByIdAndUpdate(id, {
-			debtDetails: {
-				deferredStudentLoans,
-				rentPayment,
-				spousalDebt,
-				mortgagePayment,
-			},
+			'debtDetails.deferredStudentLoans': deferredStudentLoans,
+			'debtDetails.rentPayment': rentPayment,
+			'debtDetails.spousalDebt': spousalDebt,
+			'debtDetails.mortgagePayment': mortgagePayment,
 		});
 
 		res.json({
