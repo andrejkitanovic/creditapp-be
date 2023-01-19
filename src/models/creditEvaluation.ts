@@ -60,6 +60,7 @@ export type CreditEvaluationDebtDetails = {
 	deferredStudentLoans: number;
 	rentPayment: number;
 	totalDebtPayment: number;
+	spouseIncome: number;
 	spousalDebt: number;
 	totalPayment: number;
 	mortgagePayment: number;
@@ -398,6 +399,10 @@ const creditEvaluationSchema: Schema = new Schema(
 				default: 0,
 			},
 			totalDebtPayment: {
+				type: Number,
+				default: 0,
+			},
+			spouseIncome: {
 				type: Number,
 				default: 0,
 			},
