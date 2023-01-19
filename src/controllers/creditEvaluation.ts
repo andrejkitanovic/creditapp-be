@@ -285,6 +285,29 @@ export const deleteCreditEvaluationIncome: RequestHandler = async (req, res, nex
 	}
 };
 
+export const postCreditEvaluationIncomeOverview: RequestHandler = async (req, res, next) => {
+	try {
+		const { id } = req.params;
+		const { type, annual } = req.body;
+
+		const incomeOverview = {
+			type,
+			annual,
+			monthly: annual / 12,
+		};
+
+		await CreditEvaluation.findByIdAndUpdate(id, {
+			$push: { incomesOverview: incomeOverview },
+		});
+
+		res.json({
+			// data: result,
+		});
+	} catch (err) {
+		next(err);
+	}
+};
+
 export const putCreditEvaluationDebt: RequestHandler = async (req, res, next) => {
 	try {
 		const { id } = req.params;
@@ -304,6 +327,7 @@ export const putCreditEvaluationDebt: RequestHandler = async (req, res, next) =>
 		next(err);
 	}
 };
+
 // CBC Functions
 
 export const cbcReportToCreditEvaluation = (reportData: any) => {

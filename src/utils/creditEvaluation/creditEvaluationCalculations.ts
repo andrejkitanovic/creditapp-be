@@ -96,7 +96,7 @@ const calculateDebtDetails = (creditEvaluation: LeanDocument<ICreditEvaluation>)
 };
 
 const calculateIncomesOverview = (creditEvaluation: LeanDocument<ICreditEvaluation>) => {
-	const incomesOverview: CreditEvaluationIncomeOverview[] = [
+	let incomesOverview: CreditEvaluationIncomeOverview[] = [
 		...(creditEvaluation.incomesOverview?.filter(
 			(incomeOverview) => incomeOverview.type !== CreditEvaluationIncomeOverviewEnum.CURRENT_INCOME
 		) || []),
@@ -142,10 +142,15 @@ const calculateIncomesOverview = (creditEvaluation: LeanDocument<ICreditEvaluati
 
 	if (previousYearIncome.annual) {
 		previousYearIncome.monthly = previousYearIncome.annual / 12;
-		previousYearIncome.dti = (creditEvaluation.debtDetails.totalDebtPayment || 0) / previousYearIncome.monthly;
 
 		incomesOverview.push(previousYearIncome);
 	}
+
+	// Calculate DTI
+	incomesOverview = incomesOverview.map((incomeOverview) => ({
+		...incomeOverview,
+		dti: (creditEvaluation.debtDetails.totalDebtPayment || 0) / incomeOverview.monthly,
+	}));
 
 	return incomesOverview;
 };
