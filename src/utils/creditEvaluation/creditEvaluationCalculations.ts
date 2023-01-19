@@ -97,9 +97,9 @@ const calculateDebtDetails = (creditEvaluation: LeanDocument<ICreditEvaluation>)
 
 const calculateIncomesOverview = (creditEvaluation: LeanDocument<ICreditEvaluation>) => {
 	const incomesOverview: CreditEvaluationIncomeOverview[] = [
-		...creditEvaluation.incomesOverview.filter(
+		...(creditEvaluation.incomesOverview?.filter(
 			(incomeOverview) => incomeOverview.type !== CreditEvaluationIncomeOverviewEnum.CURRENT_INCOME
-		),
+		) || []),
 	];
 
 	const previousYear = dayjs().subtract(1, 'year').get('year');
