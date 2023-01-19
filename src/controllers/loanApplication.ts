@@ -27,7 +27,7 @@ export const getLoanApplications: RequestHandler = async (req, res, next) => {
 export const postLoanApplication: RequestHandler = async (req, res, next) => {
 	try {
 		const {
-			creditEvalutionId,
+			creditEvaluation: creditEvaluationId,
 
 			lender,
 			loanAmount,
@@ -42,11 +42,11 @@ export const postLoanApplication: RequestHandler = async (req, res, next) => {
 			reasonCode,
 		} = req.body;
 
-		const customer = await CreditEvaluation.findById(creditEvalutionId).select('customer');
+		const creditEvaluation = await CreditEvaluation.findById(creditEvaluationId).select('customer');
 
 		await LoanApplication.create({
-			customer: customer?._id,
-			creditEvaluation: creditEvalutionId,
+			customer: creditEvaluation?.customer,
+			creditEvaluation: creditEvaluationId,
 
 			lender,
 			loanAmount,
