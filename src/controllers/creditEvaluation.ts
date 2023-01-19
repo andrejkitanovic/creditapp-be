@@ -254,6 +254,8 @@ export const putCreditEvaluationIncome: RequestHandler = async (req, res, next) 
 			$pull: {
 				incomes: { _id: incomeId },
 			},
+		});
+		await CreditEvaluation.findByIdAndUpdate(id, {
 			$push: { incomes },
 		});
 
