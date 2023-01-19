@@ -2,14 +2,14 @@ import { Router } from 'express';
 import defineRoutes from 'helpers/defineRoutes';
 
 import {
-	getDeals as getDealsController,
-	postDeal as postDealController,
-	putDeal as putDealController,
-	deleteDeal as deleteDealController,
-	getSingleDeal as getSingleDealController
-} from 'controllers/deal';
+	getLoanApplications as getLoanApplicationsController,
+	postLoanApplication as postLoanApplicationController,
+	putLoanApplication as putLoanApplicationController,
+	deleteLoanApplication as deleteLoanApplicationController,
+	getSingleLoanApplication as getSingleLoanApplicationController
+} from 'controllers/loanApplication';
 // import {
-// } from 'validators/deal';
+// } from 'validators/loanApplication';
 
 const router = Router();
 defineRoutes(router, [
@@ -18,38 +18,38 @@ defineRoutes(router, [
 		route: '/',
 		roles: ['user', 'admin'],
 		// permissions: ['read:distillation'],
-		controller: getDealsController,
+		controller: getLoanApplicationsController,
 	},
 	{
 		method: 'post',
 		route: '/',
 		roles: ['user', 'admin'],
 		// permissions: ['write:distillation'],
-		// validator: postDealValidator,
-		controller: postDealController,
+		// validator: postLoanApplicationValidator,
+		controller: postLoanApplicationController,
 	},
 	{
 		method: 'put',
 		route: '/:id',
 		roles: ['user', 'admin'],
 		// permissions: ['update:distillation'],
-		// validator: putDealValidator,
-		controller: putDealController,
+		// validator: putLoanApplicationValidator,
+		controller: putLoanApplicationController,
 	},
 	{
 		method: 'delete',
 		route: '/:id',
 		roles: ['user', 'admin'],
 		// permissions: ['delete:distillation'],
-		// validator: deleteDealValidator,
-		controller: deleteDealController,
+		// validator: deleteLoanApplicationValidator,
+		controller: deleteLoanApplicationController,
 	},
 	{
 		method: 'get',
 		route: '/:id',
 		roles: ['user', 'admin'],
 		// permissions: ['delete:distillation'],
-		controller: getSingleDealController,
+		controller: getSingleLoanApplicationController,
 	},
 ]);
 

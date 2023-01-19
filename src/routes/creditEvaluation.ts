@@ -14,10 +14,7 @@ import {
 	postCreditEvaluationIncomeOverview as postCreditEvaluationIncomeOverviewController,
 } from 'controllers/creditEvaluation';
 // import {
-// 	postCreditEvaluation as postCreditEvaluationValidator,
-// 	putCreditEvaluation as putCreditEvaluationValidator,
-// 	deleteCreditEvaluation as deleteCreditEvaluationValidator,
-// } from 'validators/distillation';
+// } from 'validators/creditEvaluation';
 
 const router = Router();
 defineRoutes(router, [

@@ -1,6 +1,6 @@
 import { Schema, model, Document } from 'mongoose';
 
-interface IDealLoanPackage extends Document {
+interface IDeal extends Document {
 	customer: string;
 	hubspotId?: string;
 
@@ -14,7 +14,7 @@ interface IDealLoanPackage extends Document {
 	totalAcceptedLoans: number;
 }
 
-const dealLoanPackageSchema: Schema = new Schema({
+const dealSchema: Schema = new Schema({
 	customer: {
 		type: Schema.Types.ObjectId,
 		ref: 'Customer',
@@ -23,7 +23,7 @@ const dealLoanPackageSchema: Schema = new Schema({
 	hubspotId: {
 		type: String,
 	},
-	
+
 	originalTotalAmount: {
 		type: Number,
 		required: true,
@@ -58,7 +58,7 @@ const dealLoanPackageSchema: Schema = new Schema({
 	},
 });
 
-const objectModel = model<IDealLoanPackage>('Deal Loan Package', dealLoanPackageSchema);
+const objectModel = model<IDeal>('Deal ', dealSchema);
 
-export { IDealLoanPackage };
+export { IDeal };
 export default objectModel;
