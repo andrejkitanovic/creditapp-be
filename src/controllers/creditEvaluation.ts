@@ -285,6 +285,27 @@ export const deleteCreditEvaluationIncome: RequestHandler = async (req, res, nex
 	}
 };
 
+export const putCreditEvaluationDebt: RequestHandler = async (req, res, next) => {
+	try {
+		const { id } = req.params;
+		const { deferredStudentLoans, rentPayment, spousalDebt, mortgagePayment } = req.body;
+
+		await CreditEvaluation.findByIdAndUpdate(id, {
+			debtDetails: {
+				deferredStudentLoans,
+				rentPayment,
+				spousalDebt,
+				mortgagePayment,
+			},
+		});
+
+		res.json({
+			// data: result,
+		});
+	} catch (err) {
+		next(err);
+	}
+};
 // CBC Functions
 
 export const cbcReportToCreditEvaluation = (reportData: any) => {
