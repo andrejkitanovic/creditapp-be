@@ -193,7 +193,7 @@ export const calculateIncomes = (type: CreditEvaluationIncomeTypeEnum, period: s
 				const yearDiff = Math.ceil(dayjs().diff(dayjs(income.date), 'year', true));
 				const previousIncomesObject: { [key: string]: { yearIncome: number; months: number } } = {};
 
-				for (let i = 1; i < Math.min(yearDiff, 4); i++) {
+				for (let i = 0; i < Math.min(yearDiff, 4); i++) {
 					const year = dayjs().subtract(i, 'year').get('year');
 
 					if (year === currentYear) {
