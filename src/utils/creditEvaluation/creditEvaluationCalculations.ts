@@ -10,7 +10,6 @@ import {
 	ICreditEvaluation,
 } from 'models/creditEvaluation';
 import { LeanDocument } from 'mongoose';
-import { endOfYear } from 'utils/dayjs';
 
 export const creditEvaluationCalculations = (creditEvaluation: LeanDocument<ICreditEvaluation>) => {
 	creditEvaluation.summaryOfIncomes = calculateSummaryOfIncomes(creditEvaluation);
@@ -48,12 +47,9 @@ const calculateSummaryOfIncomes = (creditEvaluation: LeanDocument<ICreditEvaluat
 				case CreditEvaluationIncomeTypeEnum.SELF_EMPLOYMENT:
 					break;
 				case CreditEvaluationIncomeTypeEnum.RETIREMENT_INCOME:
-					// eslint-disable-next-line no-case-declarations
-					const monthDiff = Math.floor(endOfYear(currentYear).diff(dayjs(), 'months', true));
-
 					summaryOfIncomes.incomeSources.push({
 						year: currentYear,
-						eoyExpected: monthDiff * (incomeSource.monthlyBenefit || 0),
+						eoyExpected: 12 * (incomeSource.monthlyBenefit || 0),
 						type: income.type,
 					});
 
