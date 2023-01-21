@@ -85,7 +85,7 @@ Household Income Debt Adjusted (A m modified annual income amount with a negativ
 Household Income Student Loan Adjusted (A m modified annual income amount with a negative monthly debt modifier)
 */
 export enum CreditEvaluationIncomeOverviewEnum {
-	CURRENT_INCOME = 'current-income',
+	INDIVIDUAL_INCOME = 'individual-income',
 	CURRENT_INCOME_DEBT_ADJUSTED = 'current-income-debt-adjusted',
 	CURRENT_INCOME_STUDENT_LOAN_ADJUSTED = 'current-income-student-loan-adjusted',
 	HOUSEHOLD_INCOME = 'household-income',

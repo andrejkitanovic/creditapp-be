@@ -95,7 +95,7 @@ const calculateIncomesOverview = (creditEvaluation: LeanDocument<ICreditEvaluati
 	const previousYear = dayjs().subtract(1, 'year').get('year');
 
 	const currentIncome: CreditEvaluationIncomeOverview = {
-		type: CreditEvaluationIncomeOverviewEnum.CURRENT_INCOME,
+		type: CreditEvaluationIncomeOverviewEnum.INDIVIDUAL_INCOME,
 		monthly: 0,
 		annual: 0,
 		dti: 0,
