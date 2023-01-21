@@ -408,7 +408,6 @@ const creditEvaluationSchema: Schema = new Schema(
 			},
 			spousalDebt: {
 				type: Number,
-				default: 0,
 			},
 			totalPayment: {
 				type: Number,

@@ -69,12 +69,10 @@ const calculateSummaryOfIncomes = (creditEvaluation: LeanDocument<ICreditEvaluat
 		});
 	});
 
-	summaryOfIncomes.total = summaryOfIncomes.incomeSources.reduce((prevValue, incomeSource) => {
-		if (incomeSource.year === currentYear) {
+	summaryOfIncomes.total =
+		summaryOfIncomes.incomeSources.reduce((prevValue, incomeSource) => {
 			return prevValue + incomeSource.eoyExpected;
-		}
-		return prevValue;
-	}, 0);
+		}, 0) / summaryOfIncomes.incomeSources?.length;
 
 	return summaryOfIncomes;
 };
@@ -92,14 +90,11 @@ const calculateDebtDetails = (creditEvaluation: LeanDocument<ICreditEvaluation>)
 };
 
 const calculateIncomesOverview = (creditEvaluation: LeanDocument<ICreditEvaluation>) => {
-	let incomesOverview: CreditEvaluationIncomeOverview[] = [
-		...(creditEvaluation.incomesOverview?.filter(
-			(incomeOverview) => incomeOverview.type !== CreditEvaluationIncomeOverviewEnum.CURRENT_INCOME
-		) || []),
-	];
+	let incomesOverview: CreditEvaluationIncomeOverview[] = [];
 
 	const previousYear = dayjs().subtract(1, 'year').get('year');
-	const previousYearIncome: CreditEvaluationIncomeOverview = {
+
+	const currentIncome: CreditEvaluationIncomeOverview = {
 		type: CreditEvaluationIncomeOverviewEnum.CURRENT_INCOME,
 		monthly: 0,
 		annual: 0,
@@ -114,19 +109,19 @@ const calculateIncomesOverview = (creditEvaluation: LeanDocument<ICreditEvaluati
 						break;
 					}
 
-					previousYearIncome.annual += incomeSource.endOfYearExpectedIncome || 0;
+					currentIncome.annual += incomeSource.endOfYearExpectedIncome || 0;
 					break;
 				case CreditEvaluationIncomeTypeEnum.SELF_EMPLOYMENT:
 					if (dayjs(incomeSource.date).get('year') !== previousYear) {
 						break;
 					}
 
-					previousYearIncome.annual += incomeSource.netProfit || 0;
+					currentIncome.annual += incomeSource.netProfit || 0;
 					break;
 				case CreditEvaluationIncomeTypeEnum.RETIREMENT_INCOME:
 					incomeSource.previousIncomes?.forEach((previousRetirementIncome) => {
 						if (previousRetirementIncome.year === previousYear) {
-							previousYearIncome.annual += previousRetirementIncome.yearIncome;
+							currentIncome.annual += previousRetirementIncome.yearIncome;
 						}
 					});
 					break;
@@ -136,15 +131,14 @@ const calculateIncomesOverview = (creditEvaluation: LeanDocument<ICreditEvaluati
 		});
 	});
 
-	if (previousYearIncome.annual) {
-		previousYearIncome.monthly = previousYearIncome.annual / 12;
-
-		incomesOverview.push(previousYearIncome);
+	if (currentIncome.annual) {
+		incomesOverview.push(currentIncome);
 	}
 
 	// Calculate DTI
 	incomesOverview = incomesOverview.map((incomeOverview) => ({
 		...incomeOverview,
+		monthly: incomeOverview.annual / 12,
 		dti: (creditEvaluation.debtDetails.totalDebtPayment || 0) / incomeOverview.monthly,
 	}));
 
