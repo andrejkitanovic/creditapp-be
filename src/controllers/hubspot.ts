@@ -4,9 +4,30 @@ import {
 	FilterGroup as ContactFilterGroup,
 } from '@hubspot/api-client/lib/codegen/crm/contacts';
 import { Filter as DealFilter, FilterGroup as DealFilterGroup } from '@hubspot/api-client/lib/codegen/crm/deals';
-import { ICustomer } from 'models/customer';
+import { RequestHandler } from 'express';
 
 const hubspotClient = new Client({ accessToken: process.env.HS_ACCESS_TOKEN });
+
+// Routes
+
+export const getHubspotLenders: RequestHandler = async (req, res, next) => {
+	try {
+		const { results: hsLenders } = await hubspotClient.crm.objects.basicApi.getPage('2-11419675', 100, undefined, [
+			'lender_name',
+		]);
+		const lenders =
+			hsLenders?.map((lender) => ({
+				id: lender.id,
+				...lender.properties,
+			})) ?? [];
+
+		res.json({
+			data: lenders,
+		});
+	} catch (err) {
+		next(err);
+	}
+};
 
 // CONTACTS
 export const hsGetAllContacts = async () => {
