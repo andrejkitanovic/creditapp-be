@@ -11,7 +11,7 @@ export const getLoanPackages: RequestHandler = async (req, res, next) => {
 			Model: LoanPackage,
 			query: req.query,
 			populate: 'customer',
-			// searchFields: ['firstName', 'lastName', 'middleName'],
+			searchFields: ['customer.firstName', 'customer.lastName'],
 		});
 
 		res.json({

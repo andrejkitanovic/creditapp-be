@@ -1,4 +1,5 @@
 import { Schema, model, Document } from 'mongoose';
+import { MongooseFindByReference } from 'mongoose-find-by-reference';
 
 interface ILoanPackage extends Document {
 	customer: string;
@@ -58,6 +59,7 @@ const loanPackageSchema: Schema = new Schema({
 	},
 });
 
+loanPackageSchema.plugin(MongooseFindByReference);
 const objectModel = model<ILoanPackage>('Loan Package', loanPackageSchema);
 
 export { ILoanPackage };
