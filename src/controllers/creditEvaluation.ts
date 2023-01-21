@@ -188,7 +188,7 @@ export const calculateIncomes = (type: CreditEvaluationIncomeTypeEnum, period: s
 			break;
 		case CreditEvaluationIncomeTypeEnum.RETIREMENT_INCOME:
 			result.incomeSources = incomes.map((income: { date: Date; source: string; monthlyBenefit: number }) => {
-				const monthDiff = Math.round(dayjs(income.date).diff(dayjs(), 'months', true));
+				const monthDiff = Math.round(dayjs().diff(dayjs(income.date), 'months', true));
 				const previousIncomesObject: { [key: string]: { yearIncome: number; months: number } } = {};
 
 				for (let i = 0; i < Math.min(monthDiff, 36); i++) {
