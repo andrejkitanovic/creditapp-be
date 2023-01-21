@@ -133,6 +133,28 @@ const calculateIncomesOverview = (creditEvaluation: LeanDocument<ICreditEvaluati
 
 	if (currentIncome.annual) {
 		incomesOverview.push(currentIncome);
+
+		if (creditEvaluation.debtDetails.deferredStudentLoans) {
+			incomesOverview.push({
+				...currentIncome,
+				type: CreditEvaluationIncomeOverviewEnum.INDIVIDUAL_INCOME_STUDENT_LOAN_ADJUSTED,
+				annual: currentIncome.annual - creditEvaluation.debtDetails.deferredStudentLoans * 12,
+			});
+		}
+		if (creditEvaluation.debtDetails.rentPayment) {
+			incomesOverview.push({
+				...currentIncome,
+				type: CreditEvaluationIncomeOverviewEnum.INDIVIDUAL_INCOME_RENT_ADJUSTED,
+				annual: currentIncome.annual - creditEvaluation.debtDetails.rentPayment * 12,
+			});
+		}
+		if (creditEvaluation.debtDetails.spouseIncome) {
+			incomesOverview.push({
+				...currentIncome,
+				type: CreditEvaluationIncomeOverviewEnum.HOUSEHOLD_INCOME,
+				annual: currentIncome.annual + creditEvaluation.debtDetails.spouseIncome,
+			});
+		}
 	}
 
 	// Calculate DTI

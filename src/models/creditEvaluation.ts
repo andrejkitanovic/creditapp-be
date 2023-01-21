@@ -86,11 +86,11 @@ Household Income Student Loan Adjusted (A m modified annual income amount with a
 */
 export enum CreditEvaluationIncomeOverviewEnum {
 	INDIVIDUAL_INCOME = 'individual-income',
-	CURRENT_INCOME_DEBT_ADJUSTED = 'current-income-debt-adjusted',
-	CURRENT_INCOME_STUDENT_LOAN_ADJUSTED = 'current-income-student-loan-adjusted',
+	INDIVIDUAL_INCOME_STUDENT_LOAN_ADJUSTED = 'individual-income-student-loan-adjusted',
+	INDIVIDUAL_INCOME_RENT_ADJUSTED = 'individual-income-rent-adjusted',
 	HOUSEHOLD_INCOME = 'household-income',
-	HOUSEHOLD_INCOME_DEBT_ADJUSTED = 'household-income-debt-adjusted',
-	HOUSEHOLD_INCOME_STUDENT_LOAN_ADJUSTED = 'household-income-student-loan-adjusted',
+	// HOUSEHOLD_INCOME_STUDENT_LOAN_ADJUSTED = 'household-income-student-loan-adjusted',
+	// HOUSEHOLD_INCOME_RENT_ADJUSTED = 'household-income-rent-adjusted',
 }
 
 // INCOME OVERVIEW

@@ -64,6 +64,7 @@ interface ILoanApplication extends Document {
 	originationFee: number;
 	reasonCode: string;
 	apr: number;
+	upToDate: boolean;
 }
 
 const loanApplicationSchema: Schema = new Schema({
@@ -133,6 +134,10 @@ const loanApplicationSchema: Schema = new Schema({
 	apr: {
 		type: Number,
 		required: true,
+	},
+	upToDate: {
+		type: Boolean,
+		default: false,
 	},
 });
 
