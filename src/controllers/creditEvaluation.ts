@@ -197,7 +197,7 @@ export const calculateIncomes = (type: CreditEvaluationIncomeTypeEnum, period: s
 					const year = dayjs().subtract(i, 'year').get('year');
 
 					if (year === currentYear) {
-						const monthDiff = Math.floor(dayjs().diff(dayjs(income.date), 'months', true));
+						const monthDiff = Math.floor(dayjs().diff(startOfYear(year), 'months', true));
 
 						previousIncomesObject[year] = {
 							yearIncome: income.monthlyBenefit * monthDiff,
