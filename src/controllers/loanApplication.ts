@@ -72,9 +72,33 @@ export const postLoanApplication: RequestHandler = async (req, res, next) => {
 export const putLoanApplication: RequestHandler = async (req, res, next) => {
 	try {
 		const { id } = req.params;
-		const { customer } = req.body;
+		const {
+			lender,
+			loanAmount,
+			monthlyPayment,
+			term,
+			creditInquiry,
+			applicationDate,
+			status,
+			accountType,
+			interestRate,
+			originationFee,
+			reasonCode,
+		} = req.body;
 
-		await LoanApplication.findByIdAndUpdate(id, { customer });
+		await LoanApplication.findByIdAndUpdate(id, {
+			lender,
+			loanAmount,
+			monthlyPayment,
+			term,
+			creditInquiry,
+			applicationDate,
+			status,
+			accountType,
+			interestRate,
+			originationFee,
+			reasonCode,
+		});
 
 		res.json({
 			// message: i18n.__('CONTROLLER.LOAN_APPLICATION.PUT_LOAN_APPLICATION.UPDATED'),
