@@ -2,14 +2,14 @@ import { Router } from 'express';
 import defineRoutes from 'helpers/defineRoutes';
 
 import {
-	getDeals as getDealsController,
-	postDeal as postDealController,
-	putDeal as putDealController,
-	deleteDeal as deleteDealController,
-	getSingleDeal as getSingleDealController
-} from 'controllers/deal';
+	getLoanPackages as getLoanPackagesController,
+	postLoanPackage as postLoanPackageController,
+	putLoanPackage as putLoanPackageController,
+	deleteLoanPackage as deleteLoanPackageController,
+	getSingleLoanPackage as getSingleLoanPackageController
+} from 'controllers/loanPackage';
 // import {
-// } from 'validators/deal';
+// } from 'validators/loanPackage';
 
 const router = Router();
 defineRoutes(router, [
@@ -18,38 +18,38 @@ defineRoutes(router, [
 		route: '/',
 		roles: ['user', 'admin'],
 		// permissions: ['read:distillation'],
-		controller: getDealsController,
+		controller: getLoanPackagesController,
 	},
 	{
 		method: 'post',
 		route: '/',
 		roles: ['user', 'admin'],
 		// permissions: ['write:distillation'],
-		// validator: postDealValidator,
-		controller: postDealController,
+		// validator: postLoanPackageValidator,
+		controller: postLoanPackageController,
 	},
 	{
 		method: 'put',
 		route: '/:id',
 		roles: ['user', 'admin'],
 		// permissions: ['update:distillation'],
-		// validator: putDealValidator,
-		controller: putDealController,
+		// validator: putLoanPackageValidator,
+		controller: putLoanPackageController,
 	},
 	{
 		method: 'delete',
 		route: '/:id',
 		roles: ['user', 'admin'],
 		// permissions: ['delete:distillation'],
-		// validator: deleteDealValidator,
-		controller: deleteDealController,
+		// validator: deleteLoanPackageValidator,
+		controller: deleteLoanPackageController,
 	},
 	{
 		method: 'get',
 		route: '/:id',
 		roles: ['user', 'admin'],
 		// permissions: ['delete:distillation'],
-		controller: getSingleDealController,
+		controller: getSingleLoanPackageController,
 	},
 ]);
 

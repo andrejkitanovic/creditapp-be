@@ -34,8 +34,8 @@
 			"description": "Customers API Calls"
 		},
 		{
-			"name": "Deals",
-			"description": "Deals API Calls"
+			"name": "Loan Packages",
+			"description": "Loan Packages API Calls"
 		},
 		{
 			"name": "Credit Evaluations",

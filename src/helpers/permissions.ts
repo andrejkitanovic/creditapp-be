@@ -14,10 +14,10 @@ enum Permissions {
 	CREDIT_EVALUATIONS_UPDATE = 'update:credit-evaluations',
 	CREDIT_EVALUATIONS_DELETE = 'delete:credit-evaluations',
 
-	DEALS_READ = 'read:deals',
-	DEALS_WRITE = 'write:deals',
-	DEALS_UPDATE = 'update:deals',
-	DEALS_DELETE = 'delete:deals',
+	LOAN_PACKAGES_READ = 'read:loan-packages',
+	LOAN_PACKAGES_WRITE = 'write:loan-packages',
+	LOAN_PACKAGES_UPDATE = 'update:loan-packages',
+	LOAN_PACKAGES_DELETE = 'delete:loan-packages',
 }
 
 export type PermissionsType = `${Permissions}`;

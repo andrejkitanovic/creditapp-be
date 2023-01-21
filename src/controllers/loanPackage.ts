@@ -3,19 +3,19 @@ import { RequestHandler } from 'express';
 // import i18n from 'helpers/i18n';
 import { queryFilter } from 'helpers/filters';
 import { createMeta } from 'helpers/meta';
-import Deal from 'models/deal';
+import LoanPackage from 'models/loanPackage';
 
-export const getDeals: RequestHandler = async (req, res, next) => {
+export const getLoanPackages: RequestHandler = async (req, res, next) => {
 	try {
-		const { data: deals, count } = await queryFilter({
-			Model: Deal,
+		const { data: loanPackages, count } = await queryFilter({
+			Model: LoanPackage,
 			query: req.query,
 			populate: 'customer',
 			// searchFields: ['firstName', 'lastName', 'middleName'],
 		});
 
 		res.json({
-			data: deals,
+			data: loanPackages,
 			meta: createMeta({ count }),
 		});
 	} catch (err) {
@@ -23,11 +23,11 @@ export const getDeals: RequestHandler = async (req, res, next) => {
 	}
 };
 
-export const postDeal: RequestHandler = async (req, res, next) => {
+export const postLoanPackage: RequestHandler = async (req, res, next) => {
 	try {
 		const { customer } = req.body;
 
-		await Deal.create({ customer });
+		await LoanPackage.create({ customer });
 
 		res.json({
 			// message: i18n.__('CONTROLLER.PARTNER.POST_PARTNER.ADDED'),
@@ -37,12 +37,12 @@ export const postDeal: RequestHandler = async (req, res, next) => {
 	}
 };
 
-export const putDeal: RequestHandler = async (req, res, next) => {
+export const putLoanPackage: RequestHandler = async (req, res, next) => {
 	try {
 		const { id } = req.params;
 		const { customer } = req.body;
 
-		await Deal.findByIdAndUpdate(id, { customer });
+		await LoanPackage.findByIdAndUpdate(id, { customer });
 
 		res.json({
 			// message: i18n.__('CONTROLLER.PARTNER.PUT_PARTNER.UPDATED'),
@@ -52,11 +52,11 @@ export const putDeal: RequestHandler = async (req, res, next) => {
 	}
 };
 
-export const deleteDeal: RequestHandler = async (req, res, next) => {
+export const deleteLoanPackage: RequestHandler = async (req, res, next) => {
 	try {
 		const { id } = req.params;
 
-		await Deal.findByIdAndDelete(id);
+		await LoanPackage.findByIdAndDelete(id);
 
 		res.json({
 			// message: i18n.__('CONTROLLER.PARTNER.DELETE_PARTNER.DELETED'),
@@ -66,14 +66,14 @@ export const deleteDeal: RequestHandler = async (req, res, next) => {
 	}
 };
 
-export const getSingleDeal: RequestHandler = async (req, res, next) => {
+export const getSingleLoanPackage: RequestHandler = async (req, res, next) => {
 	try {
 		const { id } = req.params;
 
-		const deal = await Deal.findById(id);
+		const loanPackage = await LoanPackage.findById(id);
 
 		res.json({
-			data: deal,
+			data: loanPackage,
 		});
 	} catch (err) {
 		next(err);
