@@ -313,6 +313,23 @@ export const postCreditEvaluationIncomeOverview: RequestHandler = async (req, re
 	}
 };
 
+export const deleteCreditEvaluationIncomeOverview: RequestHandler = async (req, res, next) => {
+	try {
+		const { id, incomeOverviewId } = req.params;
+
+		await CreditEvaluation.findByIdAndUpdate(id, {
+			$pull: {
+				incomesOverview: { _id: incomeOverviewId },
+			},
+		});
+		res.json({
+			// data: result,
+		});
+	} catch (err) {
+		next(err);
+	}
+};
+
 export const putCreditEvaluationDebt: RequestHandler = async (req, res, next) => {
 	try {
 		const { id } = req.params;
