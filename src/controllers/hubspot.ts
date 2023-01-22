@@ -3,7 +3,6 @@ import {
 	Filter as ContactFilter,
 	FilterGroup as ContactFilterGroup,
 } from '@hubspot/api-client/lib/codegen/crm/contacts';
-import { Filter as DealFilter, FilterGroup as DealFilterGroup } from '@hubspot/api-client/lib/codegen/crm/deals';
 import { RequestHandler } from 'express';
 
 const hubspotClient = new Client({ accessToken: process.env.HS_ACCESS_TOKEN });
@@ -30,10 +29,6 @@ export const getHubspotLenders: RequestHandler = async (req, res, next) => {
 };
 
 // CONTACTS
-export const hsGetAllContacts = async () => {
-	return await hubspotClient.crm.contacts.getAll();
-};
-
 export const hsGetSingleContact = async (property: string, value: string) => {
 	const filter: ContactFilter = { propertyName: property, operator: 'EQ', value };
 	const filterGroup: ContactFilterGroup = { filters: [filter] };
@@ -59,23 +54,31 @@ export const hsCreateContact = async (customer: any) => {
 };
 
 // DEALS
-export const hsGetAllDeals = async () => {
-	return await hubspotClient.crm.deals.getAll();
-};
+export const hsGetDealById = async (dealId: string) => {
+	const { properties } = await hubspotClient.crm.deals.basicApi.getById(dealId, [
+		'original_drilldown_1_for_deals',
+		'original_drilldown_2_for_deals',
+		'hs_analytics_source_data_2',
+		'hs_analytics_source',
+		"amount",
+		"amount_of_financing_requested",
+		"deal_apr",
+		"experian_credit_score",
+		"transunion_credit_score",
+		"equifax_credit_score",
+		"closedate",
+		"closed_lost_reason",
+		"createdate",
+		"dealname",
+		"hubspot_owner_id", // Deal Owner
+		"dealstage",
+		"invoice_amount",
+		"invoice_date",
+		"notes_last_updated", // Last Activity Date
+	]);
 
-export const hsGetSingleDeal = async (property: string, value: string) => {
-	const filter: DealFilter = { propertyName: property, operator: 'EQ', value };
-	const filterGroup: DealFilterGroup = { filters: [filter] };
-	const searchFilter = {
-		filterGroups: [filterGroup],
-		properties: ['dealname'],
-		limit: 1,
-		sorts: ['id'],
-		after: 0,
+	return {
+		id: dealId,
+		...properties,
 	};
-	return await hubspotClient.crm.deals.searchApi.doSearch(searchFilter);
-};
-
-export const hsCreateDeal = async (data: any) => {
-	return await hubspotClient.crm.deals.basicApi.create({ properties: data });
 };

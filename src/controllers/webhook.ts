@@ -10,6 +10,7 @@ import Customer from 'models/customer';
 import { absoluteFilePath } from 'utils/absoluteFilePath';
 import { cbcReportToCreditEvaluation } from './creditEvaluation';
 import { dayjsUnix } from 'utils/dayjs';
+import { hsGetDealById } from './hubspot';
 
 export const postWebhookCustomer: RequestHandler = async (req, res, next) => {
 	try {
@@ -17,6 +18,7 @@ export const postWebhookCustomer: RequestHandler = async (req, res, next) => {
 		const nowUnix = dayjs().unix();
 		const {
 			hubspotId,
+			dealId,
 			firstName,
 			lastName,
 			address,
@@ -137,7 +139,6 @@ export const postWebhookCustomer: RequestHandler = async (req, res, next) => {
 				reportDate: { $gte: dayjs().subtract(30, 'day').toDate() },
 			});
 
-
 			creditReportResponse.message = 'Successfully recalled user';
 			creditReportResponse.loanly_recent_report_date = dayjs(creditEvaluation?.reportDate).unix();
 			creditReportResponse.loanly_recent_report = creditEvaluation?.html;
@@ -145,11 +146,16 @@ export const postWebhookCustomer: RequestHandler = async (req, res, next) => {
 			creditReportResponse.loanly_status = 'Credit Report Recalled';
 		}
 
+		if (dealId) {
+			const deal = await hsGetDealById(dealId);
+			console.log(deal);
+		}
+
 		res.json({
 			...creditReportResponse,
 		});
 	} catch (err) {
-		console.log(err)
+		console.log(err);
 		next(err);
 	}
 };

@@ -3,16 +3,10 @@ import { MongooseFindByReference } from 'mongoose-find-by-reference';
 
 interface ILoanPackage extends Document {
 	customer: string;
+	creditEvaluation: string;
 	hubspotId?: string;
 
-	originalTotalAmount: number;
-	dateOfApplication: Date;
-	individualTotalDebtPayment: number;
-	householdTotalDebtPayment: number;
-	individualDebtToIncome: number;
-	householdDebtToIncome: number;
-	successFee: number;
-	totalAcceptedLoans: number;
+	amount: number;
 }
 
 const loanPackageSchema: Schema = new Schema({
@@ -21,41 +15,17 @@ const loanPackageSchema: Schema = new Schema({
 		ref: 'Customer',
 		required: true,
 	},
+	creditEvaluation: {
+		type: Schema.Types.ObjectId,
+		ref: 'Credit Evaluation',
+		required: true,
+	},
 	hubspotId: {
 		type: String,
 	},
 
-	originalTotalAmount: {
+	amount: {
 		type: Number,
-		required: true,
-	},
-	dateOfApplication: {
-		type: Date,
-		required: true,
-	},
-	individualTotalDebtPayment: {
-		type: Number,
-		required: true,
-	},
-	householdTotalDebtPayment: {
-		type: Number,
-		required: true,
-	},
-	individualDebtToIncome: {
-		type: Number,
-		required: true,
-	},
-	householdDebtToIncome: {
-		type: Number,
-		required: true,
-	},
-	successFee: {
-		type: Number,
-		required: true,
-	},
-	totalAcceptedLoans: {
-		type: Number,
-		required: true,
 	},
 });
 

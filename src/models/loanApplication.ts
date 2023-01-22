@@ -49,7 +49,7 @@ export enum LoanApplicationAccountType {
 interface ILoanApplication extends Document {
 	customer: string;
 	creditEvalution: string;
-	// hubspotId?: string;
+	hubspotId?: string;
 
 	lender: string;
 	loanAmount: number;
@@ -75,12 +75,12 @@ const loanApplicationSchema: Schema = new Schema({
 	},
 	creditEvaluation: {
 		type: Schema.Types.ObjectId,
-		ref: 'Customer',
+		ref: 'Credit Evaluation',
 		required: true,
 	},
-	// hubspotId: {
-	// 	type: String,
-	// },
+	hubspotId: {
+		type: String,
+	},
 
 	lender: {
 		type: String,
