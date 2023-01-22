@@ -2,15 +2,18 @@ import xmlToJson from 'xml2json';
 import dayjs from 'dayjs';
 import fs from 'fs';
 import { RequestHandler } from 'express';
-import htmlToPDF from 'html-pdf-node';
 
 import { CBCApplicant, cbcPullCreditReport } from './cbc';
+
+import LoanPackage from 'models/loanPackage';
 import CreditEvaluation from 'models/creditEvaluation';
 import Customer from 'models/customer';
+
 import { absoluteFilePath } from 'utils/absoluteFilePath';
 import { cbcReportToCreditEvaluation } from './creditEvaluation';
 import { dayjsUnix } from 'utils/dayjs';
 import { hsGetDealById } from './hubspot';
+import { htmlToPDF } from 'utils/htmlToPdf';
 
 export const postWebhookCustomer: RequestHandler = async (req, res, next) => {
 	try {
@@ -67,6 +70,7 @@ export const postWebhookCustomer: RequestHandler = async (req, res, next) => {
 			loanly_recent_report_date: nowUnix,
 		};
 
+		let creditEvaluation;
 		if (shouldPullCBC) {
 			const cbcApplicant: CBCApplicant = {
 				personalBusiness: 'personal',
@@ -90,22 +94,14 @@ export const postWebhookCustomer: RequestHandler = async (req, res, next) => {
 
 			const htmlReport = jsonResponse.XML_INTERFACE?.CREDITREPORT?.REPORT;
 
-			const pdfReport = await htmlToPDF.generatePdf(
-				{ content: htmlReport },
-				{ format: 'A4', args: ['--no-sandbox', '--disable-setuid-sandbox'] }
-			);
-
 			if (htmlReport && jsonResponse.XML_INTERFACE.CREDITREPORT.BUREAU_TYPE?.NOHIT !== 'True') {
 				const reportName = `./uploads/${hubspotId}-${nowUnix}_credit-report.html`;
-				fs.writeFile(reportName, htmlReport, (err) => {
-					next(err);
-				});
+				fs.writeFileSync(reportName, htmlReport);
 				const reportLink = absoluteFilePath(req, reportName);
 
+				const pdfReport = await htmlToPDF(reportName);
 				const reportPDFName = reportName.replace('html', 'pdf');
-				fs.writeFile(reportPDFName, pdfReport as unknown as Buffer, (err) => {
-					next(err);
-				});
+				fs.writeFileSync(reportPDFName, pdfReport);
 				const reportPDFLink = absoluteFilePath(req, reportPDFName);
 
 				creditReportResponse.message = 'Successfully created user';
@@ -117,13 +113,33 @@ export const postWebhookCustomer: RequestHandler = async (req, res, next) => {
 
 				// Create Credit Evaluation
 				const creditEvaluationData = cbcReportToCreditEvaluation(reportData);
-				CreditEvaluation.create({
+				creditEvaluation = await CreditEvaluation.create({
 					customer: customer._id,
 					...creditEvaluationData,
 					html: reportLink,
 					pdf: reportPDFLink,
 					state,
 				});
+
+				let loanPackage;
+				if (dealId) {
+					const deal = await hsGetDealById(dealId);
+
+					if (deal) {
+						loanPackage = await LoanPackage.create({
+							customer: customer._id,
+							creditEvaluation: creditEvaluation?._id,
+							hubspotId: deal?.id,
+							amount: deal?.amount,
+						});
+					}
+				}
+
+				creditReportResponse.loanly_credit_evaluation = `https://app.loanly.ai/credit-evaluations/${creditEvaluation?._id}`;
+
+				if (loanPackage) {
+					creditReportResponse.loanly_loan_package = `https://app.loanly.ai/loan-packages/${loanPackage?._id}`;
+				}
 			} else {
 				if (htmlReport && jsonResponse.XML_INTERFACE.CREDITREPORT.BUREAU_TYPE?.NOHIT === 'True') {
 					creditReportResponse.message = 'No hit';
@@ -134,7 +150,7 @@ export const postWebhookCustomer: RequestHandler = async (req, res, next) => {
 				creditReportResponse.loanly_status = 'Credit Report Error';
 			}
 		} else {
-			const creditEvaluation = await CreditEvaluation.findOne({
+			creditEvaluation = await CreditEvaluation.findOne({
 				customer: customer._id,
 				reportDate: { $gte: dayjs().subtract(30, 'day').toDate() },
 			});
@@ -143,12 +159,15 @@ export const postWebhookCustomer: RequestHandler = async (req, res, next) => {
 			creditReportResponse.loanly_recent_report_date = dayjs(creditEvaluation?.reportDate).unix();
 			creditReportResponse.loanly_recent_report = creditEvaluation?.html;
 			creditReportResponse.loanly_recent_report_pdf = creditEvaluation?.pdf;
-			creditReportResponse.loanly_status = 'Credit Report Recalled';
-		}
 
-		if (dealId) {
-			const deal = await hsGetDealById(dealId);
-			console.log(deal);
+			creditReportResponse.loanly_credit_evaluation = `https://app.loanly.ai/credit-evaluations/${creditEvaluation?._id}`;
+
+			const loanPackage = await LoanPackage.findOne({ creditEvaluation: creditEvaluation?._id || '' });
+			if (loanPackage) {
+				creditReportResponse.loanly_loan_package = `https://app.loanly.ai/loan-packages/${loanPackage?._id}`;
+			}
+
+			creditReportResponse.loanly_status = 'Credit Report Recalled';
 		}
 
 		res.json({

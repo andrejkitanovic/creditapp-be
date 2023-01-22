@@ -54,27 +54,27 @@ export const hsCreateContact = async (customer: any) => {
 };
 
 // DEALS
-export const hsGetDealById = async (dealId: string) => {
+export const hsGetDealById = async (dealId: string): Promise<{ [key: string]: string }> => {
 	const { properties } = await hubspotClient.crm.deals.basicApi.getById(dealId, [
 		'original_drilldown_1_for_deals',
 		'original_drilldown_2_for_deals',
 		'hs_analytics_source_data_2',
 		'hs_analytics_source',
-		"amount",
-		"amount_of_financing_requested",
-		"deal_apr",
-		"experian_credit_score",
-		"transunion_credit_score",
-		"equifax_credit_score",
-		"closedate",
-		"closed_lost_reason",
-		"createdate",
-		"dealname",
-		"hubspot_owner_id", // Deal Owner
-		"dealstage",
-		"invoice_amount",
-		"invoice_date",
-		"notes_last_updated", // Last Activity Date
+		'amount',
+		'amount_of_financing_requested',
+		'deal_apr',
+		'experian_credit_score',
+		'transunion_credit_score',
+		'equifax_credit_score',
+		'closedate',
+		'closed_lost_reason',
+		'createdate',
+		'dealname',
+		'hubspot_owner_id', // Deal Owner
+		'dealstage',
+		'invoice_amount',
+		'invoice_date',
+		'notes_last_updated', // Last Activity Date
 	]);
 
 	return {
