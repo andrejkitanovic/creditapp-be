@@ -152,7 +152,10 @@ const calculateIncomesOverview = (creditEvaluation: LeanDocument<ICreditEvaluati
 			incomesOverview.push({
 				...currentIncome,
 				type: CreditEvaluationIncomeOverviewEnum.HOUSEHOLD_INCOME,
-				annual: currentIncome.annual + creditEvaluation.debtDetails.spouseIncome,
+				annual:
+					currentIncome.annual +
+					creditEvaluation.debtDetails.spouseIncome * 12 -
+					(creditEvaluation.debtDetails.spousalDebt || 0) * 12,
 			});
 		}
 	}
