@@ -10,7 +10,7 @@ export const getLoanPackages: RequestHandler = async (req, res, next) => {
 		const { data: loanPackages, count } = await queryFilter({
 			Model: LoanPackage,
 			query: req.query,
-			populate: 'customer',
+			populate: 'customer creditEvaluation',
 			searchFields: ['customer.firstName', 'customer.lastName'],
 		});
 
