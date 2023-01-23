@@ -51,6 +51,17 @@ export const queryFilter = async ({ Model, query, populate, searchFields, defaul
 	const search: { [x: string]: any }[] | any = [];
 
 	if (q && searchFields) {
+		if (q.includes(' ')) {
+			q.split(' ').filter(singleQ => Boolean(singleQ)).forEach((singleQ) => {
+				searchFields.forEach((field) => {
+					search.push({ [field]: { $regex: new RegExp(singleQ, 'i') } });
+				});
+			});
+		} else {
+			searchFields.forEach((field) => {
+				search.push({ [field]: { $regex: new RegExp(q, 'i') } });
+			});
+		}
 		searchFields.forEach((field) => {
 			search.push({ [field]: { $regex: new RegExp(q, 'i') } });
 		});
@@ -84,9 +95,12 @@ interface IStatisticFilters {
 	field: string;
 }
 
-export const queryStatisticFilter = async ({ Model, query, defaultFilters, 
-	// operator, field
- }: IStatisticFilters) => {
+export const queryStatisticFilter = async ({
+	Model,
+	query,
+	defaultFilters,
+}: // operator, field
+IStatisticFilters) => {
 	const startDate: Date = query.from ?? dayjs().startOf('year').toDate();
 	const filter: string = query.filter ?? '';
 
