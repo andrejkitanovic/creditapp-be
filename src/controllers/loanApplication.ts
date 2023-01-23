@@ -108,6 +108,23 @@ export const putLoanApplication: RequestHandler = async (req, res, next) => {
 	}
 };
 
+export const putLoanApplicationStatus: RequestHandler = async (req, res, next) => {
+	try {
+		const { id } = req.params;
+		const { status } = req.body;
+
+		await LoanApplication.findByIdAndUpdate(id, {
+			status,
+		});
+
+		res.json({
+			// message: i18n.__('CONTROLLER.LOAN_APPLICATION.PUT_LOAN_APPLICATION.UPDATED'),
+		});
+	} catch (err) {
+		next(err);
+	}
+};
+
 export const deleteLoanApplication: RequestHandler = async (req, res, next) => {
 	try {
 		const { id } = req.params;

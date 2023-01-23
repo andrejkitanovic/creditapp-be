@@ -5,8 +5,9 @@ import {
 	getLoanApplications as getLoanApplicationsController,
 	postLoanApplication as postLoanApplicationController,
 	putLoanApplication as putLoanApplicationController,
+	putLoanApplicationStatus as putLoanApplicationStatusController,
 	deleteLoanApplication as deleteLoanApplicationController,
-	getSingleLoanApplication as getSingleLoanApplicationController
+	getSingleLoanApplication as getSingleLoanApplicationController,
 } from 'controllers/loanApplication';
 // import {
 // } from 'validators/loanApplication';
@@ -35,6 +36,14 @@ defineRoutes(router, [
 		// permissions: ['update:distillation'],
 		// validator: putLoanApplicationValidator,
 		controller: putLoanApplicationController,
+	},
+	{
+		method: 'put',
+		route: '/status/:id',
+		roles: ['user', 'admin'],
+		// permissions: ['update:distillation'],
+		// validator: putLoanApplicationValidator,
+		controller: putLoanApplicationStatusController,
 	},
 	{
 		method: 'delete',
