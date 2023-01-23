@@ -98,6 +98,7 @@ export const putLoanApplication: RequestHandler = async (req, res, next) => {
 			interestRate,
 			originationFee,
 			reasonCode,
+			upToDate: false,
 		});
 
 		res.json({
@@ -115,7 +116,7 @@ export const putLoanApplicationStatus: RequestHandler = async (req, res, next) =
 
 		await LoanApplication.findByIdAndUpdate(id, {
 			status,
-			$set: { upToDate: false },
+			upToDate: false,
 		});
 
 		res.json({
