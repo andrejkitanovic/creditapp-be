@@ -8,6 +8,7 @@ import {
 	putCustomer as putCustomerController,
 	deleteCustomer as deleteCustomerController,
 	getSingleCustomer as getSingleCustomerController,
+	putCustomerSyncHubspot as putCustomerSyncHubspotController,
 } from 'controllers/customer';
 // import {
 // 	postCustomer as postCustomerValidator,
@@ -61,6 +62,14 @@ defineRoutes(router, [
 		// roles: ['user', 'admin'],
 		// permissions: ['read:customers'],
 		controller: getSingleCustomerController,
+	},
+	{
+		method: 'put',
+		route: '/hubspot/:id',
+		roles: ['user', 'admin'],
+		permissions: ['update:customers'],
+		// validator: putCustomerValidator,
+		controller: putCustomerSyncHubspotController,
 	},
 ]);
 

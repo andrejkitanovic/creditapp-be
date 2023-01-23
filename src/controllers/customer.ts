@@ -7,7 +7,7 @@ import Customer from 'models/customer';
 import CreditEvaluation from 'models/creditEvaluation';
 import LoanPackage from 'models/loanPackage';
 
-import { hsGetSingleContact, hsCreateContact } from './hubspot';
+import { hsGetSingleContact, hsCreateContact, hsGetContactById } from './hubspot';
 
 export const getCustomers: RequestHandler = async (req, res, next) => {
 	try {
@@ -188,6 +188,65 @@ export const getSingleCustomer: RequestHandler = async (req, res, next) => {
 		res.json({
 			data: customer,
 		});
+	} catch (err) {
+		next(err);
+	}
+};
+
+export const putCustomerSyncHubspot: RequestHandler = async (req, res, next) => {
+	try {
+		const { id } = req.params;
+
+		const customer = await Customer.findById(id);
+		const contact = await hsGetContactById(customer?.hubspotId as string);
+
+		await Customer.findByIdAndUpdate(id, {
+			firstName: customer?.firstName || contact?.firstName,
+			lastName: customer?.lastName || contact?.lastName,
+			address: customer?.address || contact?.address,
+			city: customer?.city || contact?.city,
+			state: customer?.state || contact?.state,
+			zip: customer?.zip || contact?.zip,
+			phone: customer?.phone || contact?.mobilephone,
+			// birthday: customer?.birthday || contact?.date_of_birth,
+			referralPartner: customer?.referralPartner || contact?.referred_by,
+			personalInfo: {
+				placeOfBirth: customer?.personalInfo?.placeOfBirth || contact?.birth_city,
+				mothersMaidenName: customer?.personalInfo?.mothersMaidenName || contact?.mother_s_maiden_name,
+				nameOfPet: customer?.personalInfo?.nameOfPet || contact?.favorite_pet_s_name,
+			},
+			educationInfo: {
+				collegeAttended: customer?.educationInfo?.collegeAttended || contact?.college_university_attended,
+				fieldOfStudy: customer?.educationInfo?.fieldOfStudy || contact?.field_of_study,
+				degree: customer?.educationInfo?.degree || contact?.degree,
+				// graduatedDate: customer?.educationInfo?.graduatedDate || contact?.graduation_date,
+				monthlyHomeCost: customer?.educationInfo?.monthlyHomeCost || contact?.monthly_housing_payment,
+				personalMonthlyIncome: customer?.educationInfo?.personalMonthlyIncome || contact?.monthly_housing_payment,
+				householdAnnualIncome: customer?.educationInfo?.householdAnnualIncome || contact?.monthly_gross_income,
+				creditUnion: customer?.educationInfo?.creditUnion || contact?.credit_union_login,
+				militaryStatus: customer?.educationInfo?.militaryStatus || contact?.military_status,
+				bankRoutingNumber: customer?.educationInfo?.bankRoutingNumber || contact?.routing_number,
+				bankAccountNumber: customer?.educationInfo?.bankAccountNumber || contact?.account_number,
+				bankruptcy: customer?.educationInfo?.bankruptcy || contact?.judgements_liens_bankruptcy_,
+			},
+			employmentInfo: {
+				employerName: customer?.employmentInfo?.employerName || contact?.employer,
+				employerPhone: customer?.employmentInfo?.employerPhone || contact?.employer_phone_number,
+				startDate: customer?.employmentInfo?.startDate || contact?.start_date_with_employer,
+				jobTitle: customer?.employmentInfo?.jobTitle || contact?.jobtitle,
+			},
+			assetInfo: {
+				retirementBalance: customer?.assetInfo?.retirementBalance || contact?.retirement_account_balance,
+				avmValue: customer?.assetInfo?.avmValue || contact?.calculated_real_estate_value,
+				marketValue: customer?.assetInfo?.marketValue || contact?.market_value_in_response_com,
+				zillowValue: customer?.assetInfo?.zillowValue || contact?.zillow_value,
+				estimatedEquity: customer?.assetInfo?.estimatedEquity || contact?.calculated_equity,
+				estimatedValue: customer?.assetInfo?.estimatedValue || contact?.estimated_property_value,
+				// realEquity: customer?.assetInfo?.realEquity || contact?.calculated_equity,
+			},
+		});
+
+		res.json({});
 	} catch (err) {
 		next(err);
 	}
