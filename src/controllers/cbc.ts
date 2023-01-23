@@ -271,7 +271,7 @@ export const cbcFormatDate = (key: string): Date | undefined => {
 		let year = dateParts[1];
 
 		if (year.length === 2) {
-			if (parseInt(year) <= dayjs().get('year')) {
+			if (parseInt(year) <= parseInt(dayjs().format('YY'))) {
 				year = `20${year}`;
 			} else year = `19${year}`;
 		}
@@ -284,7 +284,7 @@ export const cbcFormatDate = (key: string): Date | undefined => {
 		let year = dateParts[2];
 
 		if (year.length === 2) {
-			if (parseInt(year) <= dayjs().get('year')) {
+			if (parseInt(year) <= parseInt(dayjs().format('YY'))) {
 				year = `20${year}`;
 			} else year = `19${year}`;
 		}
