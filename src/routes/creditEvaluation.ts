@@ -11,6 +11,7 @@ import {
 	putCreditEvaluationIncome as putCreditEvaluationIncomeController,
 	putCreditEvaluationDebt as putCreditEvaluationDebtController,
 	deleteCreditEvaluationIncome as deleteCreditEvaluationIncomeController,
+	putCreditEvaluationLoanApplicationsToHubspot as putCreditEvaluationLoanApplicationsToHubspotController
 } from 'controllers/creditEvaluation';
 // import {
 // } from 'validators/creditEvaluation';
@@ -76,13 +77,19 @@ defineRoutes(router, [
 		// permissions: ['read:customers'],
 		controller: putCreditEvaluationDebtController,
 	},
-
 	{
 		method: 'delete',
 		route: '/income/:id/:incomeId',
 		roles: ['user', 'admin'],
 		// permissions: ['read:customers'],
 		controller: deleteCreditEvaluationIncomeController,
+	},
+	{
+		method: 'put',
+		route: '/loan-applications/hubspot/:id',
+		roles: ['user', 'admin'],
+		// permissions: ['read:customers'],
+		controller: putCreditEvaluationLoanApplicationsToHubspotController,
 	},
 ]);
 

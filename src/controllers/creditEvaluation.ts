@@ -4,12 +4,15 @@ import { RequestHandler } from 'express';
 // import i18n from 'helpers/i18n';
 import { queryFilter } from 'helpers/filters';
 import { createMeta } from 'helpers/meta';
+
 import CreditEvaluation, {
 	CreditEvaluationIncome,
 	CreditEvaluationIncomePaystubsEnum,
 	CreditEvaluationIncomeTypeEnum,
 	ICreditEvaluation,
 } from 'models/creditEvaluation';
+import LoanApplication from 'models/loanApplication';
+
 import { LeanDocument } from 'mongoose';
 import { creditEvaluationCalculations } from 'utils/creditEvaluation/creditEvaluationCalculations';
 import { startOfYear } from 'utils/dayjs';
@@ -305,6 +308,26 @@ export const putCreditEvaluationDebt: RequestHandler = async (req, res, next) =>
 
 		res.json({
 			// data: result,
+		});
+	} catch (err) {
+		next(err);
+	}
+};
+
+export const putCreditEvaluationLoanApplicationsToHubspot: RequestHandler = async (req, res, next) => {
+	try {
+		const { id } = req.params;
+
+		const loanApplications = await LoanApplication.find({ creditEvalution: id });
+
+		for await (const loanApplication of loanApplications) {
+			await LoanApplication.findByIdAndUpdate(loanApplication._id, {
+				upToDate: true,
+			});
+		}
+
+		res.json({
+			//
 		});
 	} catch (err) {
 		next(err);
