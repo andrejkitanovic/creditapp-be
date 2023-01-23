@@ -185,6 +185,7 @@ export const hsGetLenderById = async (lenderId: string): Promise<{ [key: string]
 export const hsCreateLoan = async (loanApplication: LeanDocument<ILoanApplication>) => {
 	const { id } = await hubspotClient.crm.objects.basicApi.create('2-11419916', {
 		properties: {
+			loan_name: `${loanApplication.lender} | Loan #${loanApplication._id}`,
 			amount: loanApplication.loanAmount?.toString(),
 
 			monthly_payment: loanApplication.monthlyPayment?.toString(),
@@ -207,6 +208,7 @@ export const hsCreateLoan = async (loanApplication: LeanDocument<ILoanApplicatio
 export const hsUpdateLoan = async (loanApplication: LeanDocument<ILoanApplication>) => {
 	const { id } = await hubspotClient.crm.objects.basicApi.update('2-11419916', loanApplication.hubspotId ?? '', {
 		properties: {
+			loan_name: `${loanApplication.lender} | Loan #${loanApplication._id}`,
 			amount: loanApplication.loanAmount?.toString(),
 
 			monthly_payment: loanApplication.monthlyPayment?.toString(),
