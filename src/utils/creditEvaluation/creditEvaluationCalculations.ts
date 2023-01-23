@@ -167,7 +167,7 @@ const calculateIncomesOverview = (creditEvaluation: LeanDocument<ICreditEvaluati
 	incomesOverview = incomesOverview.map((incomeOverview) => ({
 		...incomeOverview,
 		monthly: incomeOverview.annual / 12,
-		dti: (creditEvaluation.debtDetails.totalDebtPayment || 0) / incomeOverview.annual / 12,
+		dti: (creditEvaluation.debtDetails.totalDebtPayment || 0) / (incomeOverview.annual / 12),
 	}));
 
 	return incomesOverview;
