@@ -115,7 +115,7 @@ export const putLoanApplicationStatus: RequestHandler = async (req, res, next) =
 
 		await LoanApplication.findByIdAndUpdate(id, {
 			status,
-			upToDate: false,
+			$set: { upToDate: false },
 		});
 
 		res.json({
