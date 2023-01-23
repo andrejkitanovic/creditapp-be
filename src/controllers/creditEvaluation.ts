@@ -17,6 +17,7 @@ import { LeanDocument } from 'mongoose';
 import { creditEvaluationCalculations } from 'utils/creditEvaluation/creditEvaluationCalculations';
 import { startOfYear } from 'utils/dayjs';
 import { cbcFormatDate, cbcFormatMonths } from './cbc';
+import { hsCreateLoan, hsUpdateLoan } from './hubspot';
 
 export const getCreditEvaluations: RequestHandler = async (req, res, next) => {
 	try {
@@ -321,9 +322,20 @@ export const putCreditEvaluationLoanApplicationsToHubspot: RequestHandler = asyn
 		const loanApplications = await LoanApplication.find({ creditEvalution: id });
 
 		for await (const loanApplication of loanApplications) {
-			await LoanApplication.findByIdAndUpdate(loanApplication._id, {
-				upToDate: true,
-			});
+			if (!loanApplication.hubspotId) {
+				const hubspotId = await hsCreateLoan(loanApplication);
+
+				await LoanApplication.findByIdAndUpdate(loanApplication._id, {
+					hubspotId,
+					upToDate: true,
+				});
+			} else {
+				await hsUpdateLoan(loanApplication);
+
+				await LoanApplication.findByIdAndUpdate(loanApplication._id, {
+					upToDate: true,
+				});
+			}
 		}
 
 		res.json({

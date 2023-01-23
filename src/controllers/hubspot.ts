@@ -4,6 +4,8 @@ import {
 	FilterGroup as ContactFilterGroup,
 } from '@hubspot/api-client/lib/codegen/crm/contacts';
 import { RequestHandler } from 'express';
+import { ILoanApplication } from 'models/loanApplication';
+import { LeanDocument } from 'mongoose';
 
 const hubspotClient = new Client({ accessToken: process.env.HS_ACCESS_TOKEN });
 
@@ -177,4 +179,49 @@ export const hsGetLenderById = async (lenderId: string): Promise<{ [key: string]
 		id: lenderId,
 		...properties,
 	};
+};
+
+// LOANS
+export const hsCreateLoan = async (loanApplication: LeanDocument<ILoanApplication>) => {
+	const { id } = await hubspotClient.crm.objects.basicApi.create('2-11419916', {
+		properties: {
+			amount: loanApplication.loanAmount?.toString(),
+
+			monthly_payment: loanApplication.monthlyPayment?.toString(),
+			term___months: loanApplication.term?.toString(),
+			// : loanApplication.creditInquiry,
+			// application_date: loanApplication.applicationDate,
+			// loan_stage: loanApplication.status,
+			// : loanApplication.accountType,
+			interest_rate: loanApplication.interestRate?.toString(),
+			// : loanApplication.loanWeightFactor?.toString(),
+			origination_fee: loanApplication.originationFee?.toString(),
+			// : loanApplication.reasonCode?.toString(),
+			loan_apr: loanApplication.apr?.toString(),
+		},
+	});
+
+	return id;
+};
+
+export const hsUpdateLoan = async (loanApplication: LeanDocument<ILoanApplication>) => {
+	const { id } = await hubspotClient.crm.objects.basicApi.update('2-11419916', loanApplication.hubspotId ?? '', {
+		properties: {
+			amount: loanApplication.loanAmount?.toString(),
+
+			monthly_payment: loanApplication.monthlyPayment?.toString(),
+			term___months: loanApplication.term?.toString(),
+			// : loanApplication.creditInquiry,
+			// application_date: loanApplication.applicationDate,
+			// loan_stage: loanApplication.status,
+			// : loanApplication.accountType,
+			interest_rate: loanApplication.interestRate?.toString(),
+			// : loanApplication.loanWeightFactor?.toString(),
+			origination_fee: loanApplication.originationFee?.toString(),
+			// : loanApplication.reasonCode?.toString(),
+			loan_apr: loanApplication.apr?.toString(),
+		},
+	});
+
+	return id;
 };
