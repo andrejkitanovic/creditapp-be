@@ -74,108 +74,111 @@ interface ICustomer extends Document {
 	creditEvaluation?: string;
 }
 
-const customerSchema: Schema = new Schema({
-	hubspotId: {
-		type: String,
-	},
-	firstName: {
-		type: String,
-		required: true,
-	},
-	lastName: {
-		type: String,
-		required: true,
-	},
-	middleName: String,
-	address: {
-		type: String,
-	},
-	city: {
-		type: String,
-	},
-	state: {
-		type: String,
-	},
-	zip: {
-		type: String,
-	},
-	phone: String,
-	social: {
-		type: String,
-	},
-	email: {
-		type: String,
-		required: true,
-	},
-	birthday: {
-		type: Date,
-		required: true,
-	},
-	referralPartner: String,
-	associatedBrand: {
-		type: String,
-	},
-	personalInfo: {
-		placeOfBirth: String,
-		bornInDifferentCountry: Boolean,
-		USResident: Boolean,
-		loanEmail: String,
-		mothersMaidenName: String,
-		highSchoolMascot: String,
-		highSchoolCity: String,
-		nameOfStreet: String,
-		nameOfPet: String,
-	},
-	educationInfo: {
-		collegeAttended: String,
-		fieldOfStudy: String,
-		degree: String,
-		graduatedDate: Date,
-		driversLicenseId: String,
-		driversLicenseIssueDate: Date,
-		driversLicenseExpireDate: Date,
-		rentOrOwn: {
+const customerSchema: Schema = new Schema(
+	{
+		hubspotId: {
 			type: String,
-			enum: ['rent', 'own'],
 		},
-		monthlyHomeCost: Number,
-		moveInDate: Date,
-		personalMonthlyIncome: Number,
-		householdAnnualIncome: Number,
-		creditUnion: String,
-		personalBank: String,
-		militaryStatus: String,
-		fraudAlerts: Boolean,
-		numberOfFraudAlerts: Number,
-		maritialStatus: String,
-		creditRepairBefore: Boolean,
-		bankRoutingNumber: String,
-		bankAccountNumber: String,
-		bankruptcy: Boolean,
-		previoiusFinanceCompany: Boolean,
+		firstName: {
+			type: String,
+			required: true,
+		},
+		lastName: {
+			type: String,
+			required: true,
+		},
+		middleName: String,
+		address: {
+			type: String,
+		},
+		city: {
+			type: String,
+		},
+		state: {
+			type: String,
+		},
+		zip: {
+			type: String,
+		},
+		phone: String,
+		social: {
+			type: String,
+		},
+		email: {
+			type: String,
+			required: true,
+		},
+		birthday: {
+			type: Date,
+			required: true,
+		},
+		referralPartner: String,
+		associatedBrand: {
+			type: String,
+		},
+		personalInfo: {
+			placeOfBirth: String,
+			bornInDifferentCountry: Boolean,
+			USResident: Boolean,
+			loanEmail: String,
+			mothersMaidenName: String,
+			highSchoolMascot: String,
+			highSchoolCity: String,
+			nameOfStreet: String,
+			nameOfPet: String,
+		},
+		educationInfo: {
+			collegeAttended: String,
+			fieldOfStudy: String,
+			degree: String,
+			graduatedDate: Date,
+			driversLicenseId: String,
+			driversLicenseIssueDate: Date,
+			driversLicenseExpireDate: Date,
+			rentOrOwn: {
+				type: String,
+				enum: ['rent', 'own'],
+			},
+			monthlyHomeCost: Number,
+			moveInDate: Date,
+			personalMonthlyIncome: Number,
+			householdAnnualIncome: Number,
+			creditUnion: String,
+			personalBank: String,
+			militaryStatus: String,
+			fraudAlerts: Boolean,
+			numberOfFraudAlerts: Number,
+			maritialStatus: String,
+			creditRepairBefore: Boolean,
+			bankRoutingNumber: String,
+			bankAccountNumber: String,
+			bankruptcy: Boolean,
+			previoiusFinanceCompany: Boolean,
+		},
+		employmentInfo: {
+			employerName: String,
+			employerPhone: String,
+			employerAddress: String,
+			startDate: Date,
+			jobTitle: String,
+			earnIncomeYearRound: Number,
+		},
+		assetInfo: {
+			bankBalance: Number,
+			investmentBalance: Number,
+			cryptoBalance: Number,
+			retirementBalance: Number,
+			avmValue: Number,
+			marketValue: Number,
+			zillowValue: Number,
+			estimatedEquity: Number,
+			estimatedValue: Number,
+			realEquity: Number,
+		},
+		creditEvaluation: String,
 	},
-	employmentInfo: {
-		employerName: String,
-		employerPhone: String,
-		employerAddress: String,
-		startDate: Date,
-		jobTitle: String,
-		earnIncomeYearRound: Number,
-	},
-	assetInfo: {
-		bankBalance: Number,
-		investmentBalance: Number,
-		cryptoBalance: Number,
-		retirementBalance: Number,
-		avmValue: Number,
-		marketValue: Number,
-		zillowValue: Number,
-		estimatedEquity: Number,
-		estimatedValue: Number,
-		realEquity: Number,
-	},
-	creditEvaluation: String
-});
+	{ timestamps: true }
+);
 
 const objectModel = model<ICustomer>('Customer', customerSchema);
 
