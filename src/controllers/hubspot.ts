@@ -168,3 +168,13 @@ export const hsGetDealById = async (dealId: string): Promise<{ [key: string]: st
 		...properties,
 	};
 };
+
+// LENDERS
+export const hsGetLenderById = async (lenderId: string): Promise<{ [key: string]: string }> => {
+	const { properties } = await hubspotClient.crm.objects.basicApi.getById('2-11419675', lenderId, ['lender_name']);
+
+	return {
+		id: lenderId,
+		...properties,
+	};
+};

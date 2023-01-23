@@ -5,6 +5,7 @@ import { queryFilter } from 'helpers/filters';
 import { createMeta } from 'helpers/meta';
 import CreditEvaluation from 'models/creditEvaluation';
 import LoanApplication from 'models/loanApplication';
+import { hsGetLenderById } from './hubspot';
 
 export const getLoanApplications: RequestHandler = async (req, res, next) => {
 	try {
@@ -29,7 +30,7 @@ export const postLoanApplication: RequestHandler = async (req, res, next) => {
 		const {
 			creditEvaluation: creditEvaluationId,
 
-			lender,
+			lenderId,
 			loanAmount,
 			monthlyPayment,
 			term,
@@ -42,13 +43,16 @@ export const postLoanApplication: RequestHandler = async (req, res, next) => {
 			reasonCode,
 		} = req.body;
 
+		const lender = await hsGetLenderById(lenderId);
+
 		const creditEvaluation = await CreditEvaluation.findById(creditEvaluationId).select('customer');
 
 		await LoanApplication.create({
 			customer: creditEvaluation?.customer,
 			creditEvaluation: creditEvaluationId,
 
-			lender,
+			lenderId,
+			lender: lender?.lender_name,
 			loanAmount,
 			monthlyPayment,
 			term,
@@ -73,7 +77,7 @@ export const putLoanApplication: RequestHandler = async (req, res, next) => {
 	try {
 		const { id } = req.params;
 		const {
-			lender,
+			lenderId,
 			loanAmount,
 			monthlyPayment,
 			term,
@@ -86,8 +90,11 @@ export const putLoanApplication: RequestHandler = async (req, res, next) => {
 			reasonCode,
 		} = req.body;
 
+		const lender = await hsGetLenderById(lenderId);
+
 		await LoanApplication.findByIdAndUpdate(id, {
-			lender,
+			lenderId,
+			lender: lender?.lender_name,
 			loanAmount,
 			monthlyPayment,
 			term,

@@ -51,6 +51,7 @@ interface ILoanApplication extends Document {
 	creditEvalution: string;
 	hubspotId?: string;
 
+	lenderId: string;
 	lender: string;
 	loanAmount: number;
 	monthlyPayment: number;
@@ -82,6 +83,10 @@ const loanApplicationSchema: Schema = new Schema({
 		type: String,
 	},
 
+	lenderId: {
+		type: String,
+		required: true,
+	},
 	lender: {
 		type: String,
 		required: true,
