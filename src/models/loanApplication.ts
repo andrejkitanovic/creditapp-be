@@ -1,5 +1,6 @@
 import { Schema, model, Document } from 'mongoose';
 import { CBCRequestTypeEnum } from 'controllers/cbc';
+import { calculateAPR, calculateLoanWeightFactor } from 'utils/loans/loansCalculations';
 
 export enum LoanApplicationStatus {
 	APPLICATION_PENDING_SUBMISSION = 'application-pending-submission',
@@ -51,6 +52,7 @@ interface ILoanApplication extends Document {
 	creditEvalution: string;
 	hubspotId?: string;
 
+	loanName: string;
 	lenderId: string;
 	lender: string;
 	loanAmount: number;
@@ -63,8 +65,8 @@ interface ILoanApplication extends Document {
 	interestRate: number;
 	loanWeightFactor: number;
 	originationFee: number;
-	reasonCode: string;
 	apr: number;
+	reasonCode: string;
 	upToDate: boolean;
 }
 
@@ -83,6 +85,9 @@ const loanApplicationSchema: Schema = new Schema({
 		type: String,
 	},
 
+	loanName: {
+		type: String,
+	},
 	lenderId: {
 		type: String,
 		required: true,
@@ -132,12 +137,12 @@ const loanApplicationSchema: Schema = new Schema({
 		type: Number,
 		required: true,
 	},
-	reasonCode: {
-		type: String,
-		required: true,
-	},
 	apr: {
 		type: Number,
+		required: true,
+	},
+	reasonCode: {
+		type: String,
 		required: true,
 	},
 	upToDate: {
@@ -146,38 +151,8 @@ const loanApplicationSchema: Schema = new Schema({
 	},
 });
 
-const calculateAPR = (loanAmount: number, term: number, interestRate: number, originationFee: number) => {
-	/* 
-	loanAmount 	= the amount borrowed
-	term	= number of monthly payments e.g. 30 years = 360
-	interestRate	= the base percentage rate of the loan. A 5.25% Annual Rate should be passed in as 0.0525 NOT 5.25
-	originationFee		= the loan closing costs e.g. origination fee, broker fees, etc.
-	*/
-
-	const rate = interestRate / 12;
-	const totalmonthlypayment =
-		((loanAmount + originationFee) * rate * Math.pow(1 + rate, term)) / (Math.pow(1 + rate, term) - 1);
-	let testrate = rate;
-	let iteration = 1;
-	let testresult = 0;
-
-	// Iterate until result = 0
-	let diff = testrate;
-	while (iteration <= 100) {
-		testresult =
-			(testrate * Math.pow(1 + testrate, term)) / (Math.pow(1 + testrate, term) - 1) - totalmonthlypayment / loanAmount;
-		if (Math.abs(testresult) < 0.0000001) break;
-		if (testresult < 0) testrate += diff;
-		else testrate -= diff;
-		diff = diff / 2;
-		iteration++;
-	}
-	testrate = testrate * 12;
-	return testrate.toFixed(6);
-};
-
 loanApplicationSchema.pre('validate', function (next) {
-	this.loanWeightFactor = this.loanAmount * this.interestRate;
+	this.loanWeightFactor = calculateLoanWeightFactor(this.loanAmount, this.interestRate);
 	this.apr = calculateAPR(this.loanAmount, this.term, this.interestRate, this.originationFee);
 	next();
 });

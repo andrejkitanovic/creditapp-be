@@ -1,12 +1,19 @@
 import { Schema, model, Document } from 'mongoose';
 import { MongooseFindByReference } from 'mongoose-find-by-reference';
+import { calculateAPR, calculateLoanWeightFactor } from 'utils/loans/loansCalculations';
 
 interface ILoanPackage extends Document {
 	customer: string;
 	creditEvaluation: string;
 	hubspotId?: string;
 
-	amount: number;
+	loanAmount: number;
+	monthlyPayment: number;
+	term: number;
+	interestRate: number;
+	loanWeightFactor: number;
+	originationFee: number;
+	apr: number;
 }
 
 const loanPackageSchema: Schema = new Schema({
@@ -24,11 +31,41 @@ const loanPackageSchema: Schema = new Schema({
 		type: String,
 	},
 
-	amount: {
+	loanAmount: {
 		type: Number,
+		required: true,
+	},
+	monthlyPayment: {
+		type: Number,
+		required: true,
+	},
+	term: {
+		type: Number,
+		required: true,
+	},
+	interestRate: {
+		type: Number,
+		required: true,
+	},
+	loanWeightFactor: {
+		type: Number,
+		required: true,
+	},
+	originationFee: {
+		type: Number,
+		required: true,
+	},
+	apr: {
+		type: Number,
+		required: true,
 	},
 });
 
+loanPackageSchema.pre('validate', function (next) {
+	this.loanWeightFactor = calculateLoanWeightFactor(this.loanAmount, this.interestRate);
+	this.apr = calculateAPR(this.loanAmount, this.term, this.interestRate, this.originationFee);
+	next();
+});
 loanPackageSchema.plugin(MongooseFindByReference);
 const objectModel = model<ILoanPackage>('Loan Package', loanPackageSchema);
 

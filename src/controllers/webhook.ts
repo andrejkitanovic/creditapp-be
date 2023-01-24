@@ -130,7 +130,11 @@ export const postWebhookCustomer: RequestHandler = async (req, res, next) => {
 							customer: customer._id,
 							creditEvaluation: creditEvaluation?._id,
 							hubspotId: deal?.id,
-							amount: deal?.amount,
+							loanAmount: deal?.amount,
+							monthlyPayment: deal?.monthly_payment,
+							term: deal?.term_months,
+							interestRate: deal?.interest_rate,
+							originationFee: deal?.origination_fee,
 						});
 					}
 				}
