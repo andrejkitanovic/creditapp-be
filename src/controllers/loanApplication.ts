@@ -5,7 +5,7 @@ import { queryFilter } from 'helpers/filters';
 import { createMeta } from 'helpers/meta';
 import CreditEvaluation from 'models/creditEvaluation';
 import LoanApplication from 'models/loanApplication';
-import { hsGetLenderById } from './hubspot';
+import { hsDeleteLoan, hsGetLenderById } from './hubspot';
 
 export const getLoanApplications: RequestHandler = async (req, res, next) => {
 	try {
@@ -137,6 +137,13 @@ export const putLoanApplicationStatus: RequestHandler = async (req, res, next) =
 export const deleteLoanApplication: RequestHandler = async (req, res, next) => {
 	try {
 		const { id } = req.params;
+
+		const loanApplication = await LoanApplication.findById(id);
+
+		// Delete from hubspot
+		if (loanApplication?.hubspotId) {
+			await hsDeleteLoan(loanApplication.hubspotId);
+		}
 
 		await LoanApplication.findByIdAndDelete(id);
 

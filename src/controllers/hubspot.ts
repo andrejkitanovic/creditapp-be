@@ -144,11 +144,12 @@ export const hsCreateContact = async (customer: any) => {
 // DEALS
 export const hsGetDealById = async (dealId: string): Promise<{ [key: string]: string }> => {
 	const { properties } = await hubspotClient.crm.deals.basicApi.getById(dealId, [
+		'dealname',
 		'amount',
 		'monthly_payment',
 		'term_months',
 		'interest_rate',
-		'origination_fee'
+		'origination_fee',
 	]);
 
 	return {
@@ -212,4 +213,10 @@ export const hsUpdateLoan = async (loanApplication: LeanDocument<ILoanApplicatio
 	});
 
 	return id;
+};
+
+export const hsDeleteLoan = async (loanApplicationId: string) => {
+	await hubspotClient.crm.objects.basicApi.archive('2-11419916', loanApplicationId);
+
+	return;
 };

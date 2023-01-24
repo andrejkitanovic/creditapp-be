@@ -7,6 +7,7 @@ interface ILoanPackage extends Document {
 	creditEvaluation: string;
 	hubspotId?: string;
 
+	name: string;
 	loanAmount: number;
 	monthlyPayment: number;
 	term: number;
@@ -31,6 +32,10 @@ const loanPackageSchema: Schema = new Schema({
 		type: String,
 	},
 
+	name: {
+		type: String,
+		required: true,
+	},
 	loanAmount: {
 		type: Number,
 		// required: true,

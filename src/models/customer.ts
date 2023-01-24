@@ -13,8 +13,9 @@ interface ICustomer extends Document {
 	social?: string; // TO CHECK
 	email: string;
 	birthday: Date;
-	referralPartner?: string;
 	associatedBrand?: string;
+	referralSource?: string;
+	leadSource?: string;
 	personalInfo: {
 		placeOfBirth?: string;
 		bornInDifferentCountry?: boolean;
@@ -111,8 +112,13 @@ const customerSchema: Schema = new Schema(
 			type: Date,
 			required: true,
 		},
-		referralPartner: String,
 		associatedBrand: {
+			type: String,
+		},
+		referralSource: {
+			type: String,
+		},
+		leadSource: {
 			type: String,
 		},
 		personalInfo: {

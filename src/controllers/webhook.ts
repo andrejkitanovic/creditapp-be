@@ -33,6 +33,8 @@ export const postWebhookCustomer: RequestHandler = async (req, res, next) => {
 			birthday,
 			associatedBrand,
 			sendForce,
+			referralSource,
+			leadSource,
 		} = req.body;
 
 		// Search if customer exists
@@ -52,6 +54,8 @@ export const postWebhookCustomer: RequestHandler = async (req, res, next) => {
 				email,
 				birthday,
 				associatedBrand,
+				referralSource,
+				leadSource,
 				personalInfo: {},
 				educationInfo: {},
 				employmentInfo: {},
@@ -130,6 +134,7 @@ export const postWebhookCustomer: RequestHandler = async (req, res, next) => {
 							customer: customer._id,
 							creditEvaluation: creditEvaluation?._id,
 							hubspotId: deal?.id,
+							name: deal?.dealname,
 							loanAmount: deal?.amount,
 							monthlyPayment: deal?.monthly_payment,
 							term: deal?.term_months,
