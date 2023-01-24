@@ -3,6 +3,7 @@ import { RequestHandler } from 'express';
 // import i18n from 'helpers/i18n';
 import { queryFilter } from 'helpers/filters';
 import { createMeta } from 'helpers/meta';
+import LoanApplication from 'models/loanApplication';
 import LoanPackage from 'models/loanPackage';
 
 export const getLoanPackages: RequestHandler = async (req, res, next) => {
@@ -14,8 +15,17 @@ export const getLoanPackages: RequestHandler = async (req, res, next) => {
 			searchFields: ['customer.firstName', 'customer.lastName'],
 		});
 
+		const populatedLoanPackages = [];
+
+		for await (const loanPackage of loanPackages) {
+			populatedLoanPackages.push({
+				...loanPackage._doc,
+				loanApplications: (await LoanApplication.find({ creditEvaluation: loanPackage.creditEvaluation._id })) || [],
+			});
+		}
+
 		res.json({
-			data: loanPackages,
+			data: populatedLoanPackages,
 			meta: createMeta({ count }),
 		});
 	} catch (err) {
