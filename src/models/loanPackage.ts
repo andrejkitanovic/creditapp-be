@@ -33,31 +33,31 @@ const loanPackageSchema: Schema = new Schema({
 
 	loanAmount: {
 		type: Number,
-		required: true,
+		// required: true,
 	},
 	monthlyPayment: {
 		type: Number,
-		required: true,
+		// required: true,
 	},
 	term: {
 		type: Number,
-		required: true,
+		// required: true,
 	},
 	interestRate: {
 		type: Number,
-		required: true,
+		// required: true,
 	},
 	loanWeightFactor: {
 		type: Number,
-		required: true,
+		// required: true,
 	},
 	originationFee: {
 		type: Number,
-		required: true,
+		// required: true,
 	},
 	apr: {
 		type: Number,
-		required: true,
+		// required: true,
 	},
 });
 

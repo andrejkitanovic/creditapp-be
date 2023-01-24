@@ -1,4 +1,12 @@
-export const calculateAPR = (loanAmount: number, term: number, interestRate: number, originationFee: number) => {
+export const calculateAPR = (
+	loanAmount: number | undefined,
+	term: number | undefined,
+	interestRate: number | undefined,
+	originationFee: number | undefined
+) => {
+	if (loanAmount === undefined || term === undefined || interestRate === undefined || originationFee === undefined)
+		return null;
+
 	/* 
 	loanAmount 	= the amount borrowed
 	term	= number of monthly payments e.g. 30 years = 360
@@ -28,4 +36,8 @@ export const calculateAPR = (loanAmount: number, term: number, interestRate: num
 	return testrate.toFixed(6);
 };
 
-export const calculateLoanWeightFactor = (loanAmount: number, interestRate: number) => loanAmount * interestRate;
+export const calculateLoanWeightFactor = (loanAmount: number | undefined, interestRate: number | undefined) => {
+	if (loanAmount === undefined || interestRate === undefined) return null;
+
+	return loanAmount * interestRate;
+};
