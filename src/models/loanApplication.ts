@@ -49,7 +49,7 @@ export enum LoanApplicationAccountType {
 
 interface ILoanApplication extends Document {
 	customer: string;
-	creditEvalution: string;
+	creditEvaluation: string;
 	hubspotId?: string;
 
 	name: string;

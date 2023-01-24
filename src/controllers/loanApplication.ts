@@ -53,7 +53,7 @@ export const postLoanApplication: RequestHandler = async (req, res, next) => {
 
 		const customer = creditEvaluation?.customer as unknown as LeanDocument<ICustomer>;
 		await LoanApplication.create({
-			customer: creditEvaluation?.customer,
+			customer: customer._id,
 			creditEvaluation: creditEvaluationId,
 
 			name: `${lender?.lender_name} | ${customer.firstName} ${customer.lastName} | ${
@@ -101,7 +101,7 @@ export const putLoanApplication: RequestHandler = async (req, res, next) => {
 		const loanApplication = await LoanApplication.findById(id);
 
 		const lender = await hsGetLenderById(lenderId);
-		const creditEvaluation = await CreditEvaluation.findById(loanApplication?.creditEvalution)
+		const creditEvaluation = await CreditEvaluation.findById(loanApplication?.creditEvaluation)
 			.select('customer')
 			.populate('customer');
 
