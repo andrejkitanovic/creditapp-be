@@ -1,4 +1,5 @@
 import { Client } from '@hubspot/api-client';
+import { SimplePublicObject } from '@hubspot/api-client/lib/codegen/crm/companies';
 import {
 	Filter as ContactFilter,
 	FilterGroup as ContactFilterGroup,
@@ -138,11 +139,14 @@ export const hsGetSingleContact = async (property: string, value: string) => {
 	} catch (err) {
 		console.log(err);
 
-		return null;
+		return {
+			results: [],
+			total: 0,
+		};
 	}
 };
 
-export const hsCreateContact = async (customer: any) => {
+export const hsCreateContact = async (customer: any): Promise<Record<string, never> | SimplePublicObject> => {
 	try {
 		return await hubspotClient.crm.contacts.basicApi.create({
 			properties: {

@@ -239,7 +239,6 @@ export const putCustomerSyncHubspot: RequestHandler = async (req, res, next) => 
 				fieldOfStudy: customer?.educationInfo?.fieldOfStudy || contact?.field_of_study,
 				degree: customer?.educationInfo?.degree || contact?.degree,
 				// graduatedDate: customer?.educationInfo?.graduatedDate || contact?.graduation_date,
-				
 			},
 			employmentInfo: {
 				employerName: customer?.employmentInfo?.employerName || contact?.employer,
