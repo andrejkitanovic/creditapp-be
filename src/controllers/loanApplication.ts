@@ -47,14 +47,18 @@ export const postLoanApplication: RequestHandler = async (req, res, next) => {
 
 		const lender = await hsGetLenderById(lenderId);
 
-		const creditEvaluation = await CreditEvaluation.findById(creditEvaluationId).select('customer');
+		const creditEvaluation = await CreditEvaluation.findById(creditEvaluationId)
+			.select('customer')
+			.populate('customer');
 
 		const customer = creditEvaluation?.customer as unknown as LeanDocument<ICustomer>;
 		await LoanApplication.create({
 			customer: creditEvaluation?.customer,
 			creditEvaluation: creditEvaluationId,
 
-			name: `${lender?.lender_name} | ${customer.firstName} ${customer.lastName} | ${customer.referralSource} | ${customer.leadSource}`,
+			name: `${lender?.lender_name} | ${customer.firstName} ${customer.lastName} | ${
+				customer.referralSource ?? 'None'
+			} | ${customer.leadSource ?? 'None'}`,
 			lenderId,
 			lender: lender?.lender_name,
 			loanAmount,
@@ -97,7 +101,9 @@ export const putLoanApplication: RequestHandler = async (req, res, next) => {
 		const loanApplication = await LoanApplication.findById(id);
 
 		const lender = await hsGetLenderById(lenderId);
-		const creditEvaluation = await CreditEvaluation.findById(loanApplication?.creditEvalution).select('customer');
+		const creditEvaluation = await CreditEvaluation.findById(loanApplication?.creditEvalution)
+			.select('customer')
+			.populate('customer');
 
 		const customer = creditEvaluation?.customer as unknown as LeanDocument<ICustomer>;
 		await LoanApplication.findByIdAndUpdate(id, {
