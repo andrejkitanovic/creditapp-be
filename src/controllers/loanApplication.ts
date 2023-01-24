@@ -107,7 +107,9 @@ export const putLoanApplication: RequestHandler = async (req, res, next) => {
 
 		const customer = creditEvaluation?.customer as unknown as LeanDocument<ICustomer>;
 		await LoanApplication.findByIdAndUpdate(id, {
-			name: `${lender?.lender_name} | ${customer.firstName} ${customer.lastName} | ${customer.referralSource} | ${customer.leadSource}`,
+			name: `${lender?.lender_name} | ${customer.firstName} ${customer.lastName} | ${
+				customer.referralSource ?? 'None'
+			} | ${customer.leadSource ?? 'None'}`,
 			lenderId,
 			lender: lender?.lender_name,
 			loanAmount,
