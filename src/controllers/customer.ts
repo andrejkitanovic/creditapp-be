@@ -5,6 +5,7 @@ import { createMeta } from 'helpers/meta';
 
 import Customer from 'models/customer';
 import CreditEvaluation from 'models/creditEvaluation';
+import LoanApplication from 'models/loanApplication';
 import LoanPackage from 'models/loanPackage';
 
 import { hsGetSingleContact, hsCreateContact, hsGetContactById } from './hubspot';
@@ -168,8 +169,13 @@ export const deleteCustomer: RequestHandler = async (req, res, next) => {
 		const { id } = req.params;
 
 		await Customer.findByIdAndDelete(id);
-		await CreditEvaluation.findOneAndDelete({ customer: id });
-		await LoanPackage.findOneAndDelete({ customer: id });
+
+		const creditEvaluations = await CreditEvaluation.find({ customer: id });
+		for await (const creditEvaluation of creditEvaluations) {
+			await LoanApplication.remove({ creditEvaluation: creditEvaluation?._id });
+		}
+		await CreditEvaluation.remove({ customer: id });
+		await LoanPackage.remove({ customer: id });
 
 		res.json({
 			// message: i18n.__('CONTROLLER.PARTNER.DELETE_PARTNER.DELETED'),
