@@ -25,12 +25,6 @@ interface ICustomer extends Document {
 		highSchoolCity?: string;
 		nameOfStreet?: string;
 		nameOfPet?: string;
-	};
-	educationInfo: {
-		collegeAttended?: string;
-		fieldOfStudy?: string;
-		degree?: string;
-		graduatedDate?: Date;
 		driversLicenseId?: string;
 		driversLicenseIssueDate?: Date;
 		driversLicenseExpireDate?: Date;
@@ -50,6 +44,12 @@ interface ICustomer extends Document {
 		bankAccountNumber?: string;
 		bankruptcy?: boolean;
 		previoiusFinanceCompany?: boolean;
+	};
+	educationInfo: {
+		collegeAttended?: string;
+		fieldOfStudy?: string;
+		degree?: string;
+		graduatedDate?: Date;
 	};
 	employmentInfo: {
 		employerName?: string;
@@ -125,12 +125,6 @@ const customerSchema: Schema = new Schema(
 			highSchoolCity: String,
 			nameOfStreet: String,
 			nameOfPet: String,
-		},
-		educationInfo: {
-			collegeAttended: String,
-			fieldOfStudy: String,
-			degree: String,
-			graduatedDate: Date,
 			driversLicenseId: String,
 			driversLicenseIssueDate: Date,
 			driversLicenseExpireDate: Date,
@@ -153,6 +147,12 @@ const customerSchema: Schema = new Schema(
 			bankAccountNumber: String,
 			bankruptcy: Boolean,
 			previoiusFinanceCompany: Boolean,
+		},
+		educationInfo: {
+			collegeAttended: String,
+			fieldOfStudy: String,
+			degree: String,
+			graduatedDate: Date,
 		},
 		employmentInfo: {
 			employerName: String,
