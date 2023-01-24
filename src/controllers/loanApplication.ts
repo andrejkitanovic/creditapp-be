@@ -4,7 +4,9 @@ import { RequestHandler } from 'express';
 import { queryFilter } from 'helpers/filters';
 import { createMeta } from 'helpers/meta';
 import CreditEvaluation from 'models/creditEvaluation';
+import { ICustomer } from 'models/customer';
 import LoanApplication from 'models/loanApplication';
+import { LeanDocument } from 'mongoose';
 import { hsDeleteLoan, hsGetLenderById } from './hubspot';
 
 export const getLoanApplications: RequestHandler = async (req, res, next) => {
@@ -47,10 +49,12 @@ export const postLoanApplication: RequestHandler = async (req, res, next) => {
 
 		const creditEvaluation = await CreditEvaluation.findById(creditEvaluationId).select('customer');
 
+		const customer = creditEvaluation?.customer as unknown as LeanDocument<ICustomer>;
 		await LoanApplication.create({
 			customer: creditEvaluation?.customer,
 			creditEvaluation: creditEvaluationId,
 
+			name: `${lender?.lender_name} | ${customer.firstName} ${customer.lastName} | ${customer.referralSource} | ${customer.leadSource}`,
 			lenderId,
 			lender: lender?.lender_name,
 			loanAmount,
@@ -90,9 +94,14 @@ export const putLoanApplication: RequestHandler = async (req, res, next) => {
 			reasonCode,
 		} = req.body;
 
-		const lender = await hsGetLenderById(lenderId);
+		const loanApplication = await LoanApplication.findById(id);
 
+		const lender = await hsGetLenderById(lenderId);
+		const creditEvaluation = await CreditEvaluation.findById(loanApplication?.creditEvalution).select('customer');
+
+		const customer = creditEvaluation?.customer as unknown as LeanDocument<ICustomer>;
 		await LoanApplication.findByIdAndUpdate(id, {
+			name: `${lender?.lender_name} | ${customer.firstName} ${customer.lastName} | ${customer.referralSource} | ${customer.leadSource}`,
 			lenderId,
 			lender: lender?.lender_name,
 			loanAmount,

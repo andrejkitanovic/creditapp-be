@@ -319,7 +319,7 @@ export const putCreditEvaluationLoanApplicationsToHubspot: RequestHandler = asyn
 	try {
 		const { id } = req.params;
 
-		const loanApplications = await LoanApplication.find({ creditEvalution: id });
+		const loanApplications = await LoanApplication.find({ creditEvalution: id }).populate('customer');
 
 		for await (const loanApplication of loanApplications) {
 			if (!loanApplication.hubspotId) {
