@@ -14,6 +14,7 @@ interface ILoanPackage extends Document {
 	interestRate: number;
 	loanWeightFactor: number;
 	originationFee: number;
+	totalOriginationFee: number;
 	apr: number;
 }
 
@@ -60,6 +61,9 @@ const loanPackageSchema: Schema = new Schema({
 		type: Number,
 		// required: true,
 	},
+	totalOriginationFee: {
+		type: Number,
+	},
 	apr: {
 		type: Number,
 		// required: true,
@@ -69,6 +73,10 @@ const loanPackageSchema: Schema = new Schema({
 loanPackageSchema.pre('validate', function (next) {
 	this.loanWeightFactor = calculateLoanWeightFactor(this.loanAmount, this.interestRate);
 	this.apr = calculateAPR(this.loanAmount, this.term, this.interestRate, this.originationFee);
+
+	if (this.originationFee) {
+		this.totalOriginationFee = this.loanAmount * (this.originationFee / 100);
+	}
 	next();
 });
 loanPackageSchema.plugin(MongooseFindByReference);
