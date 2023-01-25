@@ -39,6 +39,7 @@ const calculateSummaryOfIncomes = (creditEvaluation: LeanDocument<ICreditEvaluat
 					}
 
 					summaryOfIncomes.incomeSources.push({
+						startDate: dayjs(incomeSource.date).toDate(),
 						year: dayjs(incomeSource.date).get('year'),
 						eoyExpected: incomeSource.endOfYearExpectedIncome || 0,
 						type: income.type,
@@ -48,6 +49,7 @@ const calculateSummaryOfIncomes = (creditEvaluation: LeanDocument<ICreditEvaluat
 					break;
 				case CreditEvaluationIncomeTypeEnum.RETIREMENT_INCOME:
 					summaryOfIncomes.incomeSources.push({
+						startDate: dayjs(incomeSource.date).toDate(),
 						year: currentYear,
 						eoyExpected: 12 * (incomeSource.monthlyBenefit || 0),
 						type: income.type,
@@ -56,6 +58,7 @@ const calculateSummaryOfIncomes = (creditEvaluation: LeanDocument<ICreditEvaluat
 					incomeSource.previousIncomes?.forEach((previousIncome) => {
 						if (previousIncome.year >= last3Years && previousIncome.year < currentYear) {
 							summaryOfIncomes.incomeSources.push({
+								startDate: dayjs(incomeSource.date).toDate(),
 								year: previousIncome.year,
 								eoyExpected: previousIncome.yearIncome,
 								type: income.type,
@@ -67,6 +70,21 @@ const calculateSummaryOfIncomes = (creditEvaluation: LeanDocument<ICreditEvaluat
 					break;
 			}
 		});
+	});
+
+	summaryOfIncomes.incomeSources = summaryOfIncomes.incomeSources.filter((incomeSource) => {
+		if (incomeSource.type === CreditEvaluationIncomeTypeEnum.PAYSTUB) {
+			return !summaryOfIncomes.incomeSources.some((comparedIncomeSource) => {
+				if (
+					comparedIncomeSource.type === CreditEvaluationIncomeTypeEnum.PAYSTUB &&
+					comparedIncomeSource.year === incomeSource.year
+				) {
+					return dayjs(comparedIncomeSource.startDate).isAfter(dayjs(incomeSource.startDate));
+				}
+			});
+		}
+
+		return true;
 	});
 
 	summaryOfIncomes.total =
@@ -144,24 +162,24 @@ const calculateIncomesOverview = (creditEvaluation: LeanDocument<ICreditEvaluati
 
 		if (creditEvaluation.debtDetails.deferredStudentLoans) {
 			incomesOverview.push({
-				...currentYearIncome,
+				...priorYearIncome,
 				type: CreditEvaluationIncomeOverviewEnum.INDIVIDUAL_INCOME_STUDENT_LOAN_ADJUSTED,
-				annual: currentYearIncome.annual - creditEvaluation.debtDetails.deferredStudentLoans * 12,
+				annual: priorYearIncome.annual - creditEvaluation.debtDetails.deferredStudentLoans * 12,
 			});
 		}
 		if (creditEvaluation.debtDetails.rentPayment) {
 			incomesOverview.push({
-				...currentYearIncome,
+				...priorYearIncome,
 				type: CreditEvaluationIncomeOverviewEnum.INDIVIDUAL_INCOME_RENT_ADJUSTED,
-				annual: currentYearIncome.annual - creditEvaluation.debtDetails.rentPayment * 12,
+				annual: priorYearIncome.annual - creditEvaluation.debtDetails.rentPayment * 12,
 			});
 		}
 		if (creditEvaluation.debtDetails.spouseIncome) {
 			incomesOverview.push({
-				...currentYearIncome,
+				...priorYearIncome,
 				type: CreditEvaluationIncomeOverviewEnum.HOUSEHOLD_INCOME,
 				annual:
-					currentYearIncome.annual +
+					priorYearIncome.annual +
 					creditEvaluation.debtDetails.spouseIncome * 12 -
 					(creditEvaluation.debtDetails.spousalDebt || 0) * 12,
 			});
