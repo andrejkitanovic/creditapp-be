@@ -98,6 +98,8 @@ export const postWebhookCustomer: RequestHandler = async (req, res, next) => {
 
 			const htmlReport = jsonResponse.XML_INTERFACE?.CREDITREPORT?.REPORT;
 
+			creditReportResponse.loanly_customer = `https://app.loanly.ai/customers/${customer?._id}`;
+
 			if (htmlReport && jsonResponse.XML_INTERFACE.CREDITREPORT.BUREAU_TYPE?.NOHIT !== 'True') {
 				const reportName = `./uploads/${hubspotId}-${nowUnix}_credit-report.html`;
 				fs.writeFileSync(reportName, htmlReport);
