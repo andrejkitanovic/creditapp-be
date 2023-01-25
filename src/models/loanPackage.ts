@@ -70,6 +70,32 @@ const loanPackageSchema: Schema = new Schema({
 	},
 });
 
+loanPackageSchema.pre('findOneAndUpdate', async function (next) {
+	//@ts-expect-error
+	let rawObject = await this.findOne({ _id: this._conditions._id }).lean().clone();
+	rawObject = {
+		...rawObject,
+		//@ts-expect-error
+		...this._update,
+	};
+
+	//@ts-expect-error
+	this._update.loanWeightFactor = calculateLoanWeightFactor(rawObject.loanAmount, rawObject.interestRate);
+	//@ts-expect-error
+	this._update.apr = calculateAPR(
+		rawObject.loanAmount,
+		rawObject.term,
+		rawObject.interestRate,
+		rawObject.originationFee
+	);
+
+	if (rawObject.originationFee) {
+		//@ts-expect-error
+		this._update.totalOriginationFee = rawObject.loanAmount * (rawObject.originationFee / 100);
+	}
+
+	next();
+});
 loanPackageSchema.pre('validate', function (next) {
 	this.loanWeightFactor = calculateLoanWeightFactor(this.loanAmount, this.interestRate);
 	this.apr = calculateAPR(this.loanAmount, this.term, this.interestRate, this.originationFee);

@@ -116,7 +116,6 @@ export const calculateIncomes = (type: CreditEvaluationIncomeTypeEnum, period: s
 		case CreditEvaluationIncomeTypeEnum.PAYSTUB:
 			result.period = period;
 
-			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 			// @ts-expect-error
 			result.payStubs = CreditEvaluationIncomePaystubsEnum[period];
 
