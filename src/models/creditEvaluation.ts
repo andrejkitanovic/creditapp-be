@@ -85,12 +85,14 @@ Household Income Debt Adjusted (A m modified annual income amount with a negativ
 Household Income Student Loan Adjusted (A m modified annual income amount with a negative monthly debt modifier)
 */
 export enum CreditEvaluationIncomeOverviewEnum {
-	INDIVIDUAL_INCOME = 'individual-income',
+	INDIVIDUAL_INCOME_CURRENT_YEAR = 'individual-income-current-year',
+	INDIVIDUAL_INCOME_PRIOR_YEAR = 'individual-income-prior-year',
+	INDIVIDUAL_INCOME_2_YEAR_AVERAGE = 'individual-income-2-year-average',
+	INDIVIDUAL_INCOME_3_YEAR_AVERAGE = 'individual-income-3-year-average',
 	INDIVIDUAL_INCOME_STUDENT_LOAN_ADJUSTED = 'individual-income-student-loan-adjusted',
 	INDIVIDUAL_INCOME_RENT_ADJUSTED = 'individual-income-rent-adjusted',
-	HOUSEHOLD_INCOME = 'household-income',
-	// HOUSEHOLD_INCOME_STUDENT_LOAN_ADJUSTED = 'household-income-student-loan-adjusted',
-	// HOUSEHOLD_INCOME_RENT_ADJUSTED = 'household-income-rent-adjusted',
+	INDIVIDUAL_INCOME_HALF_MORTGAGE = 'individual-income-half-mortgage',
+	HOUSEHOLD_INCOME = 'household-income'
 }
 
 // INCOME OVERVIEW

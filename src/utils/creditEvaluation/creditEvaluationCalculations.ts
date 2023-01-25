@@ -95,70 +95,89 @@ const calculateDebtDetails = (creditEvaluation: LeanDocument<ICreditEvaluation>)
 const calculateIncomesOverview = (creditEvaluation: LeanDocument<ICreditEvaluation>) => {
 	let incomesOverview: CreditEvaluationIncomeOverview[] = [];
 
+	const currentYear = dayjs().get('year');
 	const previousYear = dayjs().subtract(1, 'year').get('year');
+	const before2Years = dayjs().subtract(2, 'year').get('year');
 
-	const currentIncome: CreditEvaluationIncomeOverview = {
-		type: CreditEvaluationIncomeOverviewEnum.INDIVIDUAL_INCOME,
+	const currentYearIncome: CreditEvaluationIncomeOverview = {
+		type: CreditEvaluationIncomeOverviewEnum.INDIVIDUAL_INCOME_CURRENT_YEAR,
+		monthly: 0,
+		annual: 0,
+		dti: 0,
+	};
+	const priorYearIncome: CreditEvaluationIncomeOverview = {
+		type: CreditEvaluationIncomeOverviewEnum.INDIVIDUAL_INCOME_PRIOR_YEAR,
+		monthly: 0,
+		annual: 0,
+		dti: 0,
+	};
+	const prior2YearIncome: Omit<CreditEvaluationIncomeOverview, 'type'> = {
 		monthly: 0,
 		annual: 0,
 		dti: 0,
 	};
 
-	creditEvaluation.incomes?.forEach((income) => {
-		income.incomeSources?.forEach((incomeSource) => {
-			switch (income.type) {
-				case CreditEvaluationIncomeTypeEnum.PAYSTUB:
-					if (dayjs(incomeSource.date).get('year') !== previousYear) {
-						break;
-					}
+	creditEvaluation.summaryOfIncomes.incomeSources?.forEach((income) => {
+		switch (income.year) {
+			case currentYear:
+				currentYearIncome.annual += income.eoyExpected;
 
-					currentIncome.annual += incomeSource.endOfYearExpectedIncome || 0;
-					break;
-				case CreditEvaluationIncomeTypeEnum.SELF_EMPLOYMENT:
-					if (dayjs(incomeSource.date).get('year') !== previousYear) {
-						break;
-					}
+				break;
+			case previousYear:
+				priorYearIncome.annual += income.eoyExpected;
 
-					currentIncome.annual += incomeSource.netProfit || 0;
-					break;
-				case CreditEvaluationIncomeTypeEnum.RETIREMENT_INCOME:
-					incomeSource.previousIncomes?.forEach((previousRetirementIncome) => {
-						if (previousRetirementIncome.year === previousYear) {
-							currentIncome.annual += previousRetirementIncome.yearIncome;
-						}
-					});
-					break;
-				default:
-					break;
-			}
-		});
+				break;
+			case before2Years:
+				prior2YearIncome.annual += income.eoyExpected;
+
+				break;
+			default:
+				break;
+		}
 	});
 
-	if (currentIncome.annual) {
-		incomesOverview.push(currentIncome);
+	if (currentYearIncome.annual) {
+		incomesOverview.push(currentYearIncome);
+	}
+	if (priorYearIncome.annual) {
+		incomesOverview.push(priorYearIncome);
 
 		if (creditEvaluation.debtDetails.deferredStudentLoans) {
 			incomesOverview.push({
-				...currentIncome,
+				...currentYearIncome,
 				type: CreditEvaluationIncomeOverviewEnum.INDIVIDUAL_INCOME_STUDENT_LOAN_ADJUSTED,
-				annual: currentIncome.annual - creditEvaluation.debtDetails.deferredStudentLoans * 12,
+				annual: currentYearIncome.annual - creditEvaluation.debtDetails.deferredStudentLoans * 12,
 			});
 		}
 		if (creditEvaluation.debtDetails.rentPayment) {
 			incomesOverview.push({
-				...currentIncome,
+				...currentYearIncome,
 				type: CreditEvaluationIncomeOverviewEnum.INDIVIDUAL_INCOME_RENT_ADJUSTED,
-				annual: currentIncome.annual - creditEvaluation.debtDetails.rentPayment * 12,
+				annual: currentYearIncome.annual - creditEvaluation.debtDetails.rentPayment * 12,
 			});
 		}
 		if (creditEvaluation.debtDetails.spouseIncome) {
 			incomesOverview.push({
-				...currentIncome,
+				...currentYearIncome,
 				type: CreditEvaluationIncomeOverviewEnum.HOUSEHOLD_INCOME,
 				annual:
-					currentIncome.annual +
+					currentYearIncome.annual +
 					creditEvaluation.debtDetails.spouseIncome * 12 -
 					(creditEvaluation.debtDetails.spousalDebt || 0) * 12,
+			});
+		}
+
+		incomesOverview.push({
+			...priorYearIncome,
+			type: CreditEvaluationIncomeOverviewEnum.INDIVIDUAL_INCOME_2_YEAR_AVERAGE,
+			annual: (priorYearIncome.annual + currentYearIncome.annual) / 2,
+		});
+
+		if (prior2YearIncome.annual) {
+			incomesOverview.push({
+				...priorYearIncome,
+				type: CreditEvaluationIncomeOverviewEnum.INDIVIDUAL_INCOME_3_YEAR_AVERAGE,
+				annual: (prior2YearIncome.annual + priorYearIncome.annual + currentYearIncome.annual) / 2,
 			});
 		}
 	}
