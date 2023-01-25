@@ -72,6 +72,8 @@ interface ICustomer extends Document {
 		estimatedValue?: number;
 		realEquity?: number;
 	};
+
+	cbcErrorMessage?: string;
 }
 
 const customerSchema: Schema = new Schema(
@@ -179,6 +181,10 @@ const customerSchema: Schema = new Schema(
 			estimatedEquity: Number,
 			estimatedValue: Number,
 			realEquity: Number,
+		},
+
+		cbcErrorMessage: {
+			type: String,
 		},
 	},
 	{ timestamps: true }

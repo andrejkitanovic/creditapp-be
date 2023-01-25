@@ -113,6 +113,10 @@ export const postWebhookCustomer: RequestHandler = async (req, res, next) => {
 				creditReportResponse.loanly_recent_report_pdf = reportPDFLink;
 				creditReportResponse.loanly_status = 'Credit Report Successful';
 
+				await Customer.findByIdAndUpdate(customer._id, {
+					cbcErrorMessage: undefined,
+				});
+
 				const reportData = jsonResponse.XML_INTERFACE.CREDITREPORT.BUREAU_TYPE;
 
 				// Create Credit Evaluation
@@ -157,6 +161,10 @@ export const postWebhookCustomer: RequestHandler = async (req, res, next) => {
 				creditReportResponse.credit_inquiry_error = jsonResponse.XML_INTERFACE?.ERROR_DESCRIPT || 'Error';
 				creditReportResponse.credit_inquiry_error_bureau = 'XPN';
 				creditReportResponse.loanly_status = 'Credit Report Error';
+
+				await Customer.findByIdAndUpdate(customer._id, {
+					cbcErrorMessage: creditReportResponse.credit_inquiry_error,
+				});
 			}
 		} else {
 			creditEvaluation = await CreditEvaluation.findOne({
