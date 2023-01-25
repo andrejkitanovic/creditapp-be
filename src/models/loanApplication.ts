@@ -138,6 +138,9 @@ const loanApplicationSchema: Schema = new Schema({
 		type: Number,
 		required: true,
 	},
+	totalOriginationFee: {
+		type: Number,
+	},
 	apr: {
 		type: Number,
 		required: true,
