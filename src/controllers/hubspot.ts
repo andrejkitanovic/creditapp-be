@@ -16,6 +16,8 @@ export const getHubspotLenders: RequestHandler = async (req, res, next) => {
 	try {
 		const { results: hsLenders } = await hubspotClient.crm.objects.basicApi.getPage('2-11419675', 100, undefined, [
 			'lender_name',
+			'origination_fee',
+			'credit_bureau',
 		]);
 		const lenders =
 			hsLenders?.map((lender) => ({
