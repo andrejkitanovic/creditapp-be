@@ -362,6 +362,10 @@ export const putRefetchCustomer: RequestHandler = async (req, res, next) => {
 			// 		});
 			// 	}
 			// }
+
+			await Customer.findByIdAndUpdate(id, {
+				cbcErrorMessage: null,
+			});
 			res.json({});
 		} else {
 			res.json({});
