@@ -9,11 +9,9 @@ import {
 	deleteCustomer as deleteCustomerController,
 	getSingleCustomer as getSingleCustomerController,
 	putCustomerSyncHubspot as putCustomerSyncHubspotController,
+	putRefetchCustomer as putRefetchCustomerController,
 } from 'controllers/customer';
 // import {
-// 	postCustomer as postCustomerValidator,
-// 	putCustomer as putCustomerValidator,
-// 	deleteCustomer as deleteCustomerValidator,
 // } from 'validators/customer';
 
 const router = Router();
@@ -70,6 +68,14 @@ defineRoutes(router, [
 		permissions: ['update:customers'],
 		// validator: putCustomerValidator,
 		controller: putCustomerSyncHubspotController,
+	},
+	{
+		method: 'put',
+		route: '/refetch/:id',
+		roles: ['user', 'admin'],
+		permissions: ['update:customers'],
+		// validator: putCustomerValidator,
+		controller: putRefetchCustomerController,
 	},
 ]);
 

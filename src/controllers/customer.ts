@@ -9,6 +9,14 @@ import LoanApplication from 'models/loanApplication';
 import LoanPackage from 'models/loanPackage';
 
 import { hsGetSingleContact, hsCreateContact, hsGetContactById } from './hubspot';
+import { dayjsUnix } from 'utils/dayjs';
+import { CBCApplicant, cbcPullCreditReport } from './cbc';
+import xmlToJson from 'xml2json';
+import fs from 'fs';
+import { absoluteFilePath } from 'utils/absoluteFilePath';
+import { htmlToPDF } from 'utils/htmlToPdf';
+import { cbcReportToCreditEvaluation } from './creditEvaluation';
+import dayjs from 'dayjs';
 
 export const getCustomers: RequestHandler = async (req, res, next) => {
 	try {
@@ -258,6 +266,106 @@ export const putCustomerSyncHubspot: RequestHandler = async (req, res, next) => 
 		});
 
 		res.json({});
+	} catch (err) {
+		next(err);
+	}
+};
+
+export const putRefetchCustomer: RequestHandler = async (req, res, next) => {
+	try {
+		const { id } = req.params;
+		const { firstName, lastName, middleName, address, city, state, zip, phone, social, email, birthday } = req.body;
+
+		const customer = await Customer.findByIdAndUpdate(
+			id,
+			{
+				firstName,
+				lastName,
+				middleName,
+				address,
+				city,
+				state,
+				zip,
+				phone,
+				social,
+				email,
+				birthday,
+			},
+			{ new: true }
+		);
+
+		const cbcApplicant: CBCApplicant = {
+			personalBusiness: 'personal',
+			firstName: customer?.firstName || '',
+			middleName: customer?.middleName || '',
+			lastName: customer?.lastName || '',
+			email: customer?.email || '',
+			//@ts-expect-error
+			birthdate: dayjsUnix(customer?.birthday).format('MM/DD/YYYY'),
+			ssn: customer?.social || '',
+			address: {
+				line: customer?.address || '',
+				city: customer?.city || '',
+				state: customer?.state || '',
+				postalCode: customer?.zip || '',
+			},
+		};
+
+		// CBC CALL
+		const cbcResponse = await cbcPullCreditReport(cbcApplicant);
+		const jsonResponse = JSON.parse(xmlToJson.toJson(cbcResponse.data));
+
+		const htmlReport = jsonResponse.XML_INTERFACE?.CREDITREPORT?.REPORT;
+
+		if (htmlReport && jsonResponse.XML_INTERFACE.CREDITREPORT.BUREAU_TYPE?.NOHIT !== 'True') {
+			const nowUnix = dayjs().unix();
+			const reportName = `./uploads/${customer?.hubspotId}-${nowUnix}_credit-report.html`;
+			fs.writeFileSync(reportName, htmlReport);
+			const reportLink = absoluteFilePath(req, reportName);
+
+			const pdfReport = await htmlToPDF(reportName);
+			const reportPDFName = reportName.replace('html', 'pdf');
+			fs.writeFileSync(reportPDFName, pdfReport);
+			const reportPDFLink = absoluteFilePath(req, reportPDFName);
+
+			await Customer.findByIdAndUpdate(customer?._id, {
+				cbcErrorMessage: undefined,
+			});
+
+			const reportData = jsonResponse.XML_INTERFACE.CREDITREPORT.BUREAU_TYPE;
+
+			// Create Credit Evaluation
+			const creditEvaluationData = cbcReportToCreditEvaluation(reportData);
+			const creditEvaluation = await CreditEvaluation.create({
+				customer: customer?._id,
+				...creditEvaluationData,
+				html: reportLink,
+				pdf: reportPDFLink,
+				state,
+			});
+			console.log(creditEvaluation);
+
+			// if (dealId) {
+			// 	const deal = await hsGetDealById(dealId);
+
+			// 	if (deal) {
+			// 		await LoanPackage.create({
+			// 			customer: customer?._id,
+			// 			creditEvaluation: creditEvaluation?._id,
+			// 			hubspotId: deal?.id,
+			// 			name: deal?.dealname,
+			// 			loanAmount: deal?.amount,
+			// 			monthlyPayment: deal?.monthly_payment,
+			// 			term: deal?.term_months,
+			// 			interestRate: deal?.interest_rate,
+			// 			originationFee: deal?.origination_fee,
+			// 		});
+			// 	}
+			// }
+			res.json({});
+		} else {
+			res.json({});
+		}
 	} catch (err) {
 		next(err);
 	}
