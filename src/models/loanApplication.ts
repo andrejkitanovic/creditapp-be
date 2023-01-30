@@ -58,7 +58,7 @@ interface ILoanApplication extends Document {
 	loanAmount: number;
 	monthlyPayment: number;
 	term: number;
-	creditInquiry: CBCRequestTypeEnum;
+	creditInquiry: CBCRequestTypeEnum[];
 	applicationDate: Date;
 	status: LoanApplicationStatus;
 	accountType: LoanApplicationAccountType;
@@ -109,11 +109,13 @@ const loanApplicationSchema: Schema = new Schema({
 		type: Number,
 		required: true,
 	},
-	creditInquiry: {
-		type: String,
-		enum: CBCRequestTypeEnum,
-		required: true,
-	},
+	creditInquiry: [
+		{
+			type: String,
+			enum: CBCRequestTypeEnum,
+			required: true,
+		},
+	],
 	applicationDate: {
 		type: Date,
 		required: true,
