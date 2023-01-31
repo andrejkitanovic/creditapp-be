@@ -221,7 +221,7 @@ export const getSingleCustomer: RequestHandler = async (req, res, next) => {
 	try {
 		const { id } = req.params;
 
-		const customer = await Customer.findById(id);
+		const customer = await Customer.findById(id).populate('spouse');
 
 		res.json({
 			data: customer,
