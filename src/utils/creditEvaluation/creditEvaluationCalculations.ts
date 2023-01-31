@@ -24,7 +24,6 @@ export const creditEvaluationCalculations = (creditEvaluation: LeanDocument<ICre
 const calculateSummaryOfIncomes = (creditEvaluation: LeanDocument<ICreditEvaluation>) => {
 	const summaryOfIncomes: CreditEvaluationSummaryOfIncomes = {
 		incomeSources: [],
-		total: 0,
 	};
 
 	const currentYear = dayjs().get('year');
@@ -87,11 +86,6 @@ const calculateSummaryOfIncomes = (creditEvaluation: LeanDocument<ICreditEvaluat
 
 		return true;
 	});
-
-	summaryOfIncomes.total =
-		summaryOfIncomes.incomeSources.reduce((prevValue, incomeSource) => {
-			return prevValue + incomeSource.eoyExpected;
-		}, 0) / summaryOfIncomes.incomeSources?.length;
 
 	return summaryOfIncomes;
 };
