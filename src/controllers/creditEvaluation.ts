@@ -24,7 +24,7 @@ export const getCreditEvaluations: RequestHandler = async (req, res, next) => {
 		const { data: creditEvaluations, count } = await queryFilter({
 			Model: CreditEvaluation,
 			query: req.query,
-			populate: 'customer customer.spouse',
+			populate: 'customer',
 			searchFields: ['customer.firstName', 'customer.lastName'],
 		});
 
@@ -87,7 +87,7 @@ export const getSingleCreditEvaluation: RequestHandler = async (req, res, next) 
 		const { id } = req.params;
 
 		let creditEvaluation = (await CreditEvaluation.findById(id)
-			.populate('customer')
+			.populate('customer customer.spouse')
 			.lean()) as LeanDocument<ICreditEvaluation>;
 
 		if (creditEvaluation) {

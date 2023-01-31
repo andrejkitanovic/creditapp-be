@@ -184,6 +184,9 @@ export const putCustomerSpouse: RequestHandler = async (req, res, next) => {
 		await Customer.findByIdAndUpdate(id, {
 			spouse,
 		});
+		await Customer.findByIdAndUpdate(spouse, {
+			spouse: id,
+		});
 
 		res.json({
 			// message: i18n.__('CONTROLLER.PARTNER.PUT_PARTNER.UPDATED'),
