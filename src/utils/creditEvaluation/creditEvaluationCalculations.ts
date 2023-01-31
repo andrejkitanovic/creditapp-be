@@ -88,13 +88,14 @@ const calculateDebtDetails = (creditEvaluation: LeanDocument<ICreditEvaluation>)
 		...creditEvaluation.debtDetails,
 	};
 
-	debtDetails.deferredStudentLoans = creditEvaluation.loans.reduce((prevValue, loan) => {
-		if (loan.payment <= 0) {
-			return prevValue;
-		}
+	debtDetails.deferredStudentLoans =
+		creditEvaluation.loans.reduce((prevValue, loan) => {
+			if (loan.payment !== -1) {
+				return prevValue;
+			}
 
-		return (prevValue += loan.payment);
-	}, 0) * 0.01;
+			return (prevValue += loan.balance);
+		}, 0) * 0.01;
 	debtDetails.totalDebtPayment =
 		(debtDetails.debtPayment || 0) + (debtDetails.deferredStudentLoans || 0) + (debtDetails.rentPayment || 0);
 	debtDetails.totalPayment =
