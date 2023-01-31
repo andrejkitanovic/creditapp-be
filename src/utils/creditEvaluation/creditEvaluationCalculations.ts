@@ -31,8 +31,16 @@ const calculateSummaryOfIncomes = (creditEvaluation: LeanDocument<ICreditEvaluat
 
 	creditEvaluation.incomes?.forEach((income) => {
 		income.incomeSources?.forEach((incomeSource) => {
+			let paystubDate: Date | null = null;
+
 			switch (income.type) {
 				case CreditEvaluationIncomeTypeEnum.PAYSTUB:
+					if (!paystubDate || dayjs(incomeSource.date).isAfter(paystubDate)) {
+						paystubDate = dayjs(incomeSource.date).toDate();
+					} else {
+						break;
+					}
+
 					if (dayjs(incomeSource.date).get('year') < last3Years) {
 						break;
 					}
@@ -70,21 +78,6 @@ const calculateSummaryOfIncomes = (creditEvaluation: LeanDocument<ICreditEvaluat
 					break;
 			}
 		});
-	});
-
-	summaryOfIncomes.incomeSources = summaryOfIncomes.incomeSources.filter((incomeSource) => {
-		if (incomeSource.type === CreditEvaluationIncomeTypeEnum.PAYSTUB) {
-			return !summaryOfIncomes.incomeSources.some((comparedIncomeSource) => {
-				if (
-					comparedIncomeSource.type === CreditEvaluationIncomeTypeEnum.PAYSTUB &&
-					comparedIncomeSource.year === incomeSource.year
-				) {
-					return dayjs(comparedIncomeSource.startDate).isAfter(dayjs(incomeSource.startDate));
-				}
-			});
-		}
-
-		return true;
 	});
 
 	return summaryOfIncomes;
