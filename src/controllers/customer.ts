@@ -176,6 +176,23 @@ export const putCustomer: RequestHandler = async (req, res, next) => {
 	}
 };
 
+export const putCustomerSpouse: RequestHandler = async (req, res, next) => {
+	try {
+		const { id } = req.params;
+		const { spouse } = req.body;
+
+		await Customer.findByIdAndUpdate(id, {
+			spouse,
+		});
+
+		res.json({
+			// message: i18n.__('CONTROLLER.PARTNER.PUT_PARTNER.UPDATED'),
+		});
+	} catch (err) {
+		next(err);
+	}
+};
+
 export const deleteCustomer: RequestHandler = async (req, res, next) => {
 	try {
 		const { id } = req.params;

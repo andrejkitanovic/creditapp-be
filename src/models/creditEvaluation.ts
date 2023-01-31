@@ -93,7 +93,7 @@ export enum CreditEvaluationIncomeOverviewEnum {
 	INDIVIDUAL_INCOME_STUDENT_LOAN_ADJUSTED = 'individual-income-student-loan-adjusted',
 	INDIVIDUAL_INCOME_RENT_ADJUSTED = 'individual-income-rent-adjusted',
 	INDIVIDUAL_INCOME_HALF_MORTGAGE = 'individual-income-half-mortgage',
-	HOUSEHOLD_INCOME = 'household-income'
+	HOUSEHOLD_INCOME = 'household-income',
 }
 
 // INCOME OVERVIEW

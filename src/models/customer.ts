@@ -2,6 +2,9 @@ import { Schema, model, Document } from 'mongoose';
 
 interface ICustomer extends Document {
 	hubspotId?: string;
+	// Spouse
+	spouse?: string;
+	// Informations
 	firstName: string;
 	lastName: string;
 	middleName?: string;
@@ -80,6 +83,10 @@ const customerSchema: Schema = new Schema(
 	{
 		hubspotId: {
 			type: String,
+		},
+		spouse: {
+			type: Schema.Types.ObjectId,
+			ref: 'Customer',
 		},
 		firstName: {
 			type: String,
