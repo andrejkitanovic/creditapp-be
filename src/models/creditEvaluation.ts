@@ -34,6 +34,7 @@ export enum CreditEvaluationIncomeTypeEnum {
 	PAYSTUB = 'paystub',
 	SELF_EMPLOYMENT = 'self-employment',
 	RETIREMENT_INCOME = 'retirement-income',
+	HOUSING_ALLOWANCE = "housing-allowance"
 }
 
 export enum CreditEvaluationIncomePeriodsEnum {
