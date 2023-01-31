@@ -94,7 +94,7 @@ const calculateDebtDetails = (creditEvaluation: LeanDocument<ICreditEvaluation>)
 		}
 
 		return (prevValue += loan.payment);
-	}, 0);
+	}, 0) * 0.01;
 	debtDetails.totalDebtPayment =
 		(debtDetails.debtPayment || 0) + (debtDetails.deferredStudentLoans || 0) + (debtDetails.rentPayment || 0);
 	debtDetails.totalPayment =
