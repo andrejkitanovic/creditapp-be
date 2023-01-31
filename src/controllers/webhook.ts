@@ -111,6 +111,7 @@ export const postWebhookCustomer: RequestHandler = async (req, res, next) => {
 				const reportPDFLink = absoluteFilePath(req, reportPDFName);
 
 				creditReportResponse.message = 'Successfully created user';
+
 				creditReportResponse.loanly_recent_report = reportLink;
 				creditReportResponse.loanly_recent_report_pdf = reportPDFLink;
 				creditReportResponse.loanly_status = 'Credit Report Successful';
@@ -123,6 +124,9 @@ export const postWebhookCustomer: RequestHandler = async (req, res, next) => {
 
 				// Create Credit Evaluation
 				const creditEvaluationData = cbcReportToCreditEvaluation(reportData);
+
+				creditReportResponse.credit_score = parseInt(reportData.SCORES.SCORE) ?? 0;
+
 				creditEvaluation = await CreditEvaluation.create({
 					customer: customer._id,
 					...creditEvaluationData,
@@ -165,7 +169,7 @@ export const postWebhookCustomer: RequestHandler = async (req, res, next) => {
 				creditReportResponse.loanly_status = 'Credit Report Error';
 
 				await Customer.findByIdAndUpdate(customer._id, {
-					cbcErrorMessage: creditReportResponse.credit_inquiry_error,
+					cbcErrorMessage: JSON.stringify(creditReportResponse.credit_inquiry_error),
 				});
 			}
 		} else {
@@ -174,7 +178,10 @@ export const postWebhookCustomer: RequestHandler = async (req, res, next) => {
 				reportDate: { $gte: dayjs().subtract(30, 'day').toDate() },
 			});
 
+			creditReportResponse.loanly_customer = `https://app.loanly.ai/customers/${customer?._id}`;
 			creditReportResponse.message = 'Successfully recalled user';
+			creditReportResponse.credit_score =
+				creditEvaluation?.creditScores.find((creditScore) => creditScore.type === 'XPN')?.score ?? 0;
 			creditReportResponse.loanly_recent_report_date = dayjs(creditEvaluation?.reportDate).unix();
 			creditReportResponse.loanly_recent_report = creditEvaluation?.html;
 			creditReportResponse.loanly_recent_report_pdf = creditEvaluation?.pdf;
