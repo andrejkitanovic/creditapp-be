@@ -87,7 +87,7 @@ export const getSingleCreditEvaluation: RequestHandler = async (req, res, next) 
 		const { id } = req.params;
 
 		let creditEvaluation = (await CreditEvaluation.findById(id)
-			.populate('customer customer.spouse')
+			.populate('customer', 'customer.spouse')
 			.lean()) as LeanDocument<ICreditEvaluation>;
 
 		if (creditEvaluation) {
