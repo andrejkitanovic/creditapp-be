@@ -24,7 +24,7 @@ export const getCreditEvaluations: RequestHandler = async (req, res, next) => {
 		const { data: creditEvaluations, count } = await queryFilter({
 			Model: CreditEvaluation,
 			query: req.query,
-			populate: 'customer',
+			populate: 'customer customer.spouse',
 			searchFields: ['customer.firstName', 'customer.lastName'],
 		});
 
