@@ -100,7 +100,11 @@ export const postWebhookCustomer: RequestHandler = async (req, res, next) => {
 
 			creditReportResponse.loanly_customer = `https://app.loanly.ai/customers/${customer?._id}`;
 
-			if (htmlReport && jsonResponse.XML_INTERFACE.CREDITREPORT.BUREAU_TYPE?.NOHIT !== 'True') {
+			if (
+				htmlReport &&
+				jsonResponse.XML_INTERFACE.CREDITREPORT.BUREAU_TYPE?.NOHIT !== 'True' &&
+				!jsonResponse.XML_INTERFACE.CREDITREPORT.BUREAU_TYPE?.RAWDATA?.DATA?.includes('FILE FROZEN')
+			) {
 				const reportName = `./uploads/${hubspotId}-${nowUnix}_credit-report.html`;
 				fs.writeFileSync(reportName, htmlReport);
 				const reportLink = absoluteFilePath(req, reportName);
@@ -160,11 +164,19 @@ export const postWebhookCustomer: RequestHandler = async (req, res, next) => {
 					creditReportResponse.loanly_loan_package = `https://app.loanly.ai/loan-packages/${loanPackage?._id}`;
 				}
 			} else {
+				creditReportResponse.credit_inquiry_error = jsonResponse.XML_INTERFACE?.ERROR_DESCRIPT || 'Error';
+
 				if (htmlReport && jsonResponse.XML_INTERFACE.CREDITREPORT.BUREAU_TYPE?.NOHIT === 'True') {
 					creditReportResponse.message = 'No hit';
+				} else if (
+					htmlReport &&
+					jsonResponse.XML_INTERFACE.CREDITREPORT.BUREAU_TYPE?.RAWDATA?.DATA?.includes('FILE FROZEN')
+				) {
+					creditReportResponse.message = 'File frozen';
+					creditReportResponse.credit_inquiry_error =
+						jsonResponse.XML_INTERFACE.CREDITREPORT.BUREAU_TYPE?.RAWDATA?.DATA;
 				} else creditReportResponse.message = 'Error while fetching report';
 
-				creditReportResponse.credit_inquiry_error = jsonResponse.XML_INTERFACE?.ERROR_DESCRIPT || 'Error';
 				creditReportResponse.credit_inquiry_error_bureau = 'XPN';
 				creditReportResponse.loanly_status = 'Credit Report Error';
 
