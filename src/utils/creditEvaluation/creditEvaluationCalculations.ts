@@ -105,12 +105,17 @@ const calculateDebtDetails = async (creditEvaluation: LeanDocument<ICreditEvalua
 	if (includeHousehold) {
 		const customer = await Customer.findById(creditEvaluation.customer);
 		if (customer?.spouse) {
-			const spouseCreditEval = await CreditEvaluation.findOne({ customer: customer.spouse }).lean() as ICreditEvaluation;
-			spouseCreditEval.summaryOfIncomes = calculateSummaryOfIncomes(creditEvaluation);
-			spouseCreditEval.debtDetails = await calculateDebtDetails(creditEvaluation, false);
-			spouseCreditEval.incomesOverview = calculateIncomesOverview(creditEvaluation);
+			const spouseCreditEval = (await CreditEvaluation.findOne({
+				customer: customer.spouse,
+			}).lean()) as ICreditEvaluation;
+			spouseCreditEval.summaryOfIncomes = calculateSummaryOfIncomes(spouseCreditEval);
+			spouseCreditEval.debtDetails = await calculateDebtDetails(spouseCreditEval, false);
+			spouseCreditEval.incomesOverview = calculateIncomesOverview(spouseCreditEval);
 
-			debtDetails.spouseIncome = 100;
+			debtDetails.spouseIncome =
+				spouseCreditEval.incomesOverview.find((income) => {
+					income.type === CreditEvaluationIncomeOverviewEnum.INDIVIDUAL_INCOME_CURRENT_YEAR;
+				})?.monthly ?? 0;
 			debtDetails.spousalDebt = spouseCreditEval.debtDetails.totalDebtPayment;
 		}
 
