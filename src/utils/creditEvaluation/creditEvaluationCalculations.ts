@@ -113,9 +113,9 @@ const calculateDebtDetails = async (creditEvaluation: LeanDocument<ICreditEvalua
 			spouseCreditEval.incomesOverview = calculateIncomesOverview(spouseCreditEval);
 
 			debtDetails.spouseIncome =
-				spouseCreditEval.incomesOverview.find((income) => {
-					income.type === CreditEvaluationIncomeOverviewEnum.INDIVIDUAL_INCOME_CURRENT_YEAR;
-				})?.monthly ?? 0;
+				spouseCreditEval.incomesOverview.find(
+					(income) => income.type === CreditEvaluationIncomeOverviewEnum.INDIVIDUAL_INCOME_CURRENT_YEAR
+				)?.monthly ?? 0;
 			debtDetails.spousalDebt = spouseCreditEval.debtDetails.totalDebtPayment;
 		}
 
