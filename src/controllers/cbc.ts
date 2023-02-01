@@ -261,7 +261,7 @@ export const cbcFormatMonths = (key: string): number | undefined => {
 };
 
 export const cbcFormatDate = (key: string): Date | undefined => {
-	if (!key || key === '/') return;
+	if (!key || key === '/' || typeof key !== 'string') return;
 
 	const dateParts = key.split('/');
 
