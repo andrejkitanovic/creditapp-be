@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
 
-import {
+import CreditEvaluation, {
 	CreditEvaluationDebtDetails,
 	CreditEvaluationIncomeOverview,
 	CreditEvaluationIncomeOverviewEnum,
@@ -9,11 +9,12 @@ import {
 	CreditEvaluationSummaryOfIncomes,
 	ICreditEvaluation,
 } from 'models/creditEvaluation';
+import Customer from 'models/customer';
 import { LeanDocument } from 'mongoose';
 
-export const creditEvaluationCalculations = (creditEvaluation: LeanDocument<ICreditEvaluation>) => {
+export const creditEvaluationCalculations = async (creditEvaluation: LeanDocument<ICreditEvaluation>) => {
 	creditEvaluation.summaryOfIncomes = calculateSummaryOfIncomes(creditEvaluation);
-	creditEvaluation.debtDetails = calculateDebtDetails(creditEvaluation);
+	creditEvaluation.debtDetails = await calculateDebtDetails(creditEvaluation, true);
 	creditEvaluation.incomesOverview = calculateIncomesOverview(creditEvaluation);
 	creditEvaluation.loanAffordability = calculateLoanAffordability(creditEvaluation);
 	return creditEvaluation;
@@ -83,7 +84,7 @@ const calculateSummaryOfIncomes = (creditEvaluation: LeanDocument<ICreditEvaluat
 	return summaryOfIncomes;
 };
 
-const calculateDebtDetails = (creditEvaluation: LeanDocument<ICreditEvaluation>) => {
+const calculateDebtDetails = async (creditEvaluation: LeanDocument<ICreditEvaluation>, includeHousehold: boolean) => {
 	const debtDetails: CreditEvaluationDebtDetails = {
 		...creditEvaluation.debtDetails,
 	};
@@ -99,9 +100,25 @@ const calculateDebtDetails = (creditEvaluation: LeanDocument<ICreditEvaluation>)
 	debtDetails.totalDebtPayment =
 		(debtDetails.debtPayment || 0) + (debtDetails.deferredStudentLoans || 0) + (debtDetails.rentPayment || 0);
 	debtDetails.totalPayment =
-		debtDetails.totalDebtPayment +
-		(debtDetails.spousalDebt || 0) -
-		(debtDetails.mortgagePayment ? debtDetails.mortgagePayment / 2 : 0);
+		debtDetails.totalDebtPayment - (debtDetails.mortgagePayment ? debtDetails.mortgagePayment / 2 : 0);
+
+	if (includeHousehold) {
+		const customer = await Customer.findById(creditEvaluation.customer);
+		if (customer?.spouse) {
+			const spouseCreditEval = await CreditEvaluation.findOne({ customer: customer.spouse }).lean() as ICreditEvaluation;
+			spouseCreditEval.summaryOfIncomes = calculateSummaryOfIncomes(creditEvaluation);
+			spouseCreditEval.debtDetails = await calculateDebtDetails(creditEvaluation, false);
+			spouseCreditEval.incomesOverview = calculateIncomesOverview(creditEvaluation);
+
+			debtDetails.spouseIncome = 100;
+			debtDetails.spousalDebt = spouseCreditEval.debtDetails.totalDebtPayment;
+		}
+
+		debtDetails.totalPayment =
+			debtDetails.totalDebtPayment +
+			(debtDetails.spousalDebt || 0) -
+			(debtDetails.mortgagePayment ? debtDetails.mortgagePayment / 2 : 0);
+	}
 
 	return debtDetails;
 };

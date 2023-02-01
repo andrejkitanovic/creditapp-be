@@ -94,7 +94,7 @@ export const getSingleCreditEvaluation: RequestHandler = async (req, res, next) 
 			.lean()) as LeanDocument<ICreditEvaluation>;
 
 		if (creditEvaluation) {
-			creditEvaluation = creditEvaluationCalculations(creditEvaluation);
+			creditEvaluation = await creditEvaluationCalculations(creditEvaluation);
 		}
 
 		res.json({
@@ -300,13 +300,11 @@ export const deleteCreditEvaluationIncome: RequestHandler = async (req, res, nex
 export const putCreditEvaluationDebt: RequestHandler = async (req, res, next) => {
 	try {
 		const { id } = req.params;
-		const { deferredStudentLoans, rentPayment, spouseIncome, spousalDebt, mortgagePayment } = req.body;
+		const { deferredStudentLoans, rentPayment, mortgagePayment } = req.body;
 
 		await CreditEvaluation.findByIdAndUpdate(id, {
 			'debtDetails.deferredStudentLoans': deferredStudentLoans,
 			'debtDetails.rentPayment': rentPayment,
-			'debtDetails.spouseIncome': spouseIncome,
-			'debtDetails.spousalDebt': spousalDebt,
 			'debtDetails.mortgagePayment': mortgagePayment,
 		});
 
