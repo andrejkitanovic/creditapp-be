@@ -31,27 +31,37 @@ const calculateSummaryOfIncomes = (creditEvaluation: LeanDocument<ICreditEvaluat
 	const last3Years = dayjs().subtract(3, 'year').get('year');
 
 	creditEvaluation.incomes?.forEach((income) => {
-		income.incomeSources?.forEach((incomeSource) => {
-			let paystubDate: Date | null = null;
+		let paystubIncomes: CreditEvaluationSummaryOfIncomes['incomeSources'] = [];
 
+		income.incomeSources?.reverse().forEach((incomeSource) => {
 			switch (income.type) {
 				case CreditEvaluationIncomeTypeEnum.PAYSTUB:
-					if (!paystubDate || dayjs(incomeSource.date).isAfter(paystubDate)) {
-						paystubDate = dayjs(incomeSource.date).toDate();
-					} else {
-						break;
-					}
-
 					if (dayjs(incomeSource.date).get('year') < last3Years) {
 						break;
 					}
 
-					summaryOfIncomes.incomeSources.push({
-						startDate: dayjs(incomeSource.date).toDate(),
-						year: dayjs(incomeSource.date).get('year'),
-						eoyExpected: incomeSource.endOfYearExpectedIncome || 0,
-						type: income.type,
-					});
+					// eslint-disable-next-line no-case-declarations
+					const incomeSameYear = paystubIncomes.find((income) => income.year === dayjs(incomeSource.date).get('year'));
+					if (incomeSameYear) {
+						if (!dayjs(incomeSameYear.startDate).isAfter(incomeSource.date)) {
+							paystubIncomes = paystubIncomes.filter((income) => income.startDate !== incomeSameYear.startDate);
+
+							paystubIncomes.push({
+								startDate: dayjs(incomeSource.date).toDate(),
+								year: dayjs(incomeSource.date).get('year'),
+								eoyExpected: incomeSource.endOfYearExpectedIncome || 0,
+								type: income.type,
+							});
+						}
+					} else {
+						paystubIncomes.push({
+							startDate: dayjs(incomeSource.date).toDate(),
+							year: dayjs(incomeSource.date).get('year'),
+							eoyExpected: incomeSource.endOfYearExpectedIncome || 0,
+							type: income.type,
+						});
+					}
+
 					break;
 				case CreditEvaluationIncomeTypeEnum.SELF_EMPLOYMENT:
 					break;
@@ -79,6 +89,8 @@ const calculateSummaryOfIncomes = (creditEvaluation: LeanDocument<ICreditEvaluat
 					break;
 			}
 		});
+
+		summaryOfIncomes.incomeSources.push(...paystubIncomes);
 	});
 
 	return summaryOfIncomes;
