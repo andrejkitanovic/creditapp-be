@@ -134,10 +134,19 @@ export const calculateIncomes = (type: CreditEvaluationIncomeTypeEnum, period: s
 					return prevValue + income.ytd / numberOfPeriodsToDate;
 				}, 0) / incomes.length;
 
-			result.incomeSources = incomes.map((income: { date: Date; amount: number; ytd: number }, index: number) => {
+			// eslint-disable-next-line no-case-declarations
+			const minPeriodsToDateObject: { [year: string]: number } = {};
+
+			result.incomeSources = incomes.map((income: { date: Date; amount: number; ytd: number }) => {
 				const year = dayjs(income.date).get('year');
 				const dayDiff = Math.round(dayjs(income.date).diff(startOfYear(year), 'days', true));
-				const numberOfPeriodsToDate = Math.max((dayDiff / 365) * (result.payStubs || 1), index + 1);
+
+				if (minPeriodsToDateObject[year]) {
+					minPeriodsToDateObject[year] += 1;
+				} else minPeriodsToDateObject[year] = 1;
+				const minPeriodsToDate = minPeriodsToDateObject[year];
+
+				const numberOfPeriodsToDate = Math.max((dayDiff / 365) * (result.payStubs || 1), minPeriodsToDate);
 				const avgPerPeriod = income.ytd / numberOfPeriodsToDate;
 				const numberOfPeriodsRemaining = (result.payStubs || 1) - numberOfPeriodsToDate;
 				const amountOfPayRemaining =
