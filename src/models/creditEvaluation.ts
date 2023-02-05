@@ -205,6 +205,7 @@ interface ICreditEvaluation extends Document {
 	selectedHouseholdIncome?: CreditEvaluationIncomeOverviewEnum;
 	// Loan Affordability
 	loanAffordability: CreditEvaluationLoanAffordability[];
+	loanAffordabilityRate: number;
 }
 
 const creditEvaluationSchema: Schema = new Schema(
@@ -472,6 +473,10 @@ const creditEvaluationSchema: Schema = new Schema(
 				term144: { type: Number },
 			},
 		],
+		loanAffordabilityRate: {
+			type: Number,
+			default: 14,
+		},
 	},
 
 	{ timestamps: true }

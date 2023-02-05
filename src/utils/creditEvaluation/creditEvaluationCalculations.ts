@@ -267,7 +267,7 @@ const calculateLoanAffordability = (creditEvaluation: LeanDocument<ICreditEvalua
 
 		loanAffordability.push({
 			source: incomeOverview.type,
-			rate: 14,
+			rate: creditEvaluation.loanAffordabilityRate || 14,
 			dti,
 
 			annualTotal,
