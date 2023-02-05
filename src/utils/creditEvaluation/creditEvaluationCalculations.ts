@@ -101,17 +101,17 @@ const calculateDebtDetails = async (creditEvaluation: LeanDocument<ICreditEvalua
 		...creditEvaluation.debtDetails,
 	};
 
-	if (!debtDetails.deferredStudentLoans) {
-		debtDetails.deferredStudentLoans =
-			creditEvaluation.loans.reduce((prevValue, loan) => {
-				if (loan.payment !== -1) {
-					return prevValue;
-				}
+	debtDetails.calculatedDeferredStudentLoans =
+		creditEvaluation.loans.reduce((prevValue, loan) => {
+			if (loan.payment !== -1) {
+				return prevValue;
+			}
 
-				return (prevValue += loan.balance);
-			}, 0) * 0.01;
-		debtDetails.deferredStudentLoansModified = false;
-	} else debtDetails.deferredStudentLoansModified = true;
+			return (prevValue += loan.balance);
+		}, 0) * 0.01;
+	if (!debtDetails.deferredStudentLoans) {
+		debtDetails.deferredStudentLoans = debtDetails.calculatedDeferredStudentLoans;
+	}
 
 	debtDetails.totalDebtPayment =
 		(debtDetails.debtPayment || 0) + (debtDetails.deferredStudentLoans || 0) + (debtDetails.rentPayment || 0);

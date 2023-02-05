@@ -58,8 +58,8 @@ export enum CreditEvaluationIncomePaystubsEnum {
 // DEBTS
 export type CreditEvaluationDebtDetails = {
 	debtPayment: number;
+	calculatedDeferredStudentLoans: number;
 	deferredStudentLoans: number;
-	deferredStudentLoansModified: boolean;
 	rentPayment: number;
 	totalDebtPayment: number;
 	spouseIncome: number;
@@ -395,12 +395,11 @@ const creditEvaluationSchema: Schema = new Schema(
 				type: Number,
 				default: 0,
 			},
+			calculatedDeferredStudentLoans: {
+				type: Number,
+			},
 			deferredStudentLoans: {
 				type: Number,
-				default: 0,
-			},
-			deferredStudentLoansModified: {
-				type: Boolean,
 			},
 			rentPayment: {
 				type: Number,
