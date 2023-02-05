@@ -8,7 +8,7 @@ import CreditEvaluation from 'models/creditEvaluation';
 import LoanApplication from 'models/loanApplication';
 import LoanPackage from 'models/loanPackage';
 
-import { hsGetSingleContact, hsCreateContact, hsGetContactById } from './hubspot';
+import { hsGetSingleContact, hsCreateContact, hsGetContactById, hsUpdateContact } from './hubspot';
 import { dayjsUnix } from 'utils/dayjs';
 import { CBCApplicant, cbcPullCreditReport } from './cbc';
 import xmlToJson from 'xml2json';
@@ -284,6 +284,22 @@ export const putCustomerSyncHubspot: RequestHandler = async (req, res, next) => 
 				// realEquity: customer?.assetInfo?.realEquity || contact?.calculated_equity,
 			},
 		});
+
+		res.json({});
+	} catch (err) {
+		next(err);
+	}
+};
+
+export const putCustomerPushHubspot: RequestHandler = async (req, res, next) => {
+	try {
+		const { id } = req.params;
+
+		const customer = await Customer.findById(id);
+
+		if (customer?.hubspotId) {
+			await hsUpdateContact(customer.hubspotId, customer);
+		}
 
 		res.json({});
 	} catch (err) {

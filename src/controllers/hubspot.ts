@@ -5,8 +5,10 @@ import {
 	FilterGroup as ContactFilterGroup,
 } from '@hubspot/api-client/lib/codegen/crm/contacts';
 import { RequestHandler } from 'express';
+import { ICustomer } from 'models/customer';
 import { ILoanApplication } from 'models/loanApplication';
 import { LeanDocument } from 'mongoose';
+import { filterObject } from 'utils/filterObject';
 
 const hubspotClient = new Client({ accessToken: process.env.HS_ACCESS_TOKEN });
 
@@ -148,15 +150,70 @@ export const hsGetSingleContact = async (property: string, value: string) => {
 	}
 };
 
-export const hsCreateContact = async (customer: any): Promise<Record<string, never> | SimplePublicObject> => {
+export const hsCreateContact = async (
+	customer: LeanDocument<ICustomer>
+): Promise<Record<string, never> | SimplePublicObject> => {
 	try {
 		return await hubspotClient.crm.contacts.basicApi.create({
 			properties: {
 				email: customer.email,
 				firstname: customer.firstName,
 				lastname: customer.lastName,
-				phone: customer.phone,
+				phone: customer.phone ?? '',
 			},
+		});
+	} catch (err) {
+		console.log(err);
+
+		return {};
+	}
+};
+
+export const hsUpdateContact = async (
+	contactId: string,
+	customer: LeanDocument<ICustomer>
+): Promise<Record<string, never> | SimplePublicObject> => {
+	try {
+		return await hubspotClient.crm.contacts.basicApi.update(contactId, {
+			properties: filterObject({
+				email: customer.email,
+				firstname: customer.firstName,
+				lastname: customer.lastName,
+				phone: customer.phone,
+				address: customer.address,
+				// 'date_of_birth',
+				mobilephone: customer.phone,
+				city: customer.city,
+				referred_by: customer.referralSource,
+				state: customer.state,
+				zip: customer.zip,
+				birth_city: customer.personalInfo?.placeOfBirth,
+				mother_s_maiden_name: customer.personalInfo?.mothersMaidenName,
+				favorite_pet_s_name: customer.personalInfo?.nameOfPet,
+				college_university_attended: customer.educationInfo?.collegeAttended,
+				field_of_study: customer.educationInfo?.fieldOfStudy,
+				degree: customer.educationInfo?.degree,
+				// graduation_date: customer.city,
+				monthly_housing_payment: customer.personalInfo?.monthlyHomeCost, // monthly home cost
+				monthly_gross_income: customer.personalInfo?.householdAnnualIncome, // personal monthly income
+				// total_annual_household_income: customer.,
+				credit_union_login: customer.personalInfo?.creditUnion, // Credit union ???
+				military_status: customer.personalInfo?.militaryStatus,
+				judgements_liens_bankruptcy_: customer.personalInfo?.bankruptcy, //bankrupcy
+				routing_number: customer.personalInfo?.bankRoutingNumber, //bank routing number
+				account_number: customer.personalInfo?.bankAccountNumber, //bank account number ???
+				employer: customer.employmentInfo?.employerName, // employer name
+				employer_phone_number: customer.employmentInfo?.employerPhone,
+				start_date_with_employer: customer.employmentInfo?.startDate, // start date
+				jobtitle: customer.employmentInfo?.jobTitle,
+				retirement_account_balance: customer.assetInfo?.retirementBalance,
+				calculated_real_estate_value: customer.assetInfo?.avmValue, // avm value
+				market_value_in_response_com: customer.assetInfo?.marketValue, // market value
+				zillow_value: customer.assetInfo?.zillowValue,
+				// estimated_credit_score: customer.city, // estimated equity ???
+				estimated_property_value: customer.assetInfo?.estimatedValue, // Estimated value
+				// calculated_equity: customer.city, // real equity ???
+			}),
 		});
 	} catch (err) {
 		console.log(err);

@@ -10,6 +10,7 @@ import {
 	deleteCustomer as deleteCustomerController,
 	getSingleCustomer as getSingleCustomerController,
 	putCustomerSyncHubspot as putCustomerSyncHubspotController,
+	putCustomerPushHubspot as putCustomerPushHubspotController,
 	putRefetchCustomer as putRefetchCustomerController,
 } from 'controllers/customer';
 // import {
@@ -72,11 +73,19 @@ defineRoutes(router, [
 	},
 	{
 		method: 'put',
-		route: '/hubspot/:id',
+		route: '/hubspot/sync/:id',
 		roles: ['user', 'admin'],
 		permissions: ['update:customers'],
 		// validator: putCustomerValidator,
 		controller: putCustomerSyncHubspotController,
+	},
+	{
+		method: 'put',
+		route: '/hubspot/push/:id',
+		roles: ['user', 'admin'],
+		permissions: ['update:customers'],
+		// validator: putCustomerValidator,
+		controller: putCustomerPushHubspotController,
 	},
 	{
 		method: 'put',
