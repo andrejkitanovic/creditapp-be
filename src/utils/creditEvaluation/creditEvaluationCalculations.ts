@@ -101,14 +101,18 @@ const calculateDebtDetails = async (creditEvaluation: LeanDocument<ICreditEvalua
 		...creditEvaluation.debtDetails,
 	};
 
-	debtDetails.deferredStudentLoans =
-		creditEvaluation.loans.reduce((prevValue, loan) => {
-			if (loan.payment !== -1) {
-				return prevValue;
-			}
+	if (!debtDetails.deferredStudentLoans) {
+		debtDetails.deferredStudentLoans =
+			creditEvaluation.loans.reduce((prevValue, loan) => {
+				if (loan.payment !== -1) {
+					return prevValue;
+				}
 
-			return (prevValue += loan.balance);
-		}, 0) * 0.01;
+				return (prevValue += loan.balance);
+			}, 0) * 0.01;
+		debtDetails.deferredStudentLoansModified = false;
+	} else debtDetails.deferredStudentLoansModified = true;
+
 	debtDetails.totalDebtPayment =
 		(debtDetails.debtPayment || 0) + (debtDetails.deferredStudentLoans || 0) + (debtDetails.rentPayment || 0);
 	debtDetails.totalPayment =
@@ -126,9 +130,8 @@ const calculateDebtDetails = async (creditEvaluation: LeanDocument<ICreditEvalua
 
 			if (spouseCreditEval.selectedHouseholdIncome) {
 				debtDetails.spouseIncome =
-					spouseCreditEval.incomesOverview.find(
-						(income) => income.type === spouseCreditEval.selectedHouseholdIncome
-					)?.monthly ?? 0;
+					spouseCreditEval.incomesOverview.find((income) => income.type === spouseCreditEval.selectedHouseholdIncome)
+						?.monthly ?? 0;
 			}
 			debtDetails.spousalDebt = spouseCreditEval.debtDetails.totalDebtPayment;
 		}
@@ -206,7 +209,7 @@ const calculateIncomesOverview = (creditEvaluation: LeanDocument<ICreditEvaluati
 				annual: priorYearIncome.annual - creditEvaluation.debtDetails.rentPayment * 12,
 			});
 		}
-		if(creditEvaluation.debtDetails.mortgagePayment){
+		if (creditEvaluation.debtDetails.mortgagePayment) {
 			incomesOverview.push({
 				...priorYearIncome,
 				type: CreditEvaluationIncomeOverviewEnum.INDIVIDUAL_INCOME_HALF_MORTGAGE,
