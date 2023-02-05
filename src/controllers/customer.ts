@@ -246,7 +246,7 @@ export const putCustomerSyncHubspot: RequestHandler = async (req, res, next) => 
 			state: customer?.state || contact?.state,
 			zip: customer?.zip || contact?.zip,
 			phone: customer?.phone || contact?.mobilephone,
-			// birthday: customer?.birthday || contact?.date_of_birth,
+			birthday: customer?.birthday || contact?.date_of_birth,
 			referralSource: customer?.referralSource || contact?.referred_by,
 			// leadSource,
 			personalInfo: {
@@ -266,7 +266,7 @@ export const putCustomerSyncHubspot: RequestHandler = async (req, res, next) => 
 				collegeAttended: customer?.educationInfo?.collegeAttended || contact?.college_university_attended,
 				fieldOfStudy: customer?.educationInfo?.fieldOfStudy || contact?.field_of_study,
 				degree: customer?.educationInfo?.degree || contact?.degree,
-				// graduatedDate: customer?.educationInfo?.graduatedDate || contact?.graduation_date,
+				graduatedDate: customer?.educationInfo?.graduatedDate || contact?.graduation_date,
 			},
 			employmentInfo: {
 				employerName: customer?.employmentInfo?.employerName || contact?.employer,
