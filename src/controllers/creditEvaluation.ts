@@ -347,6 +347,21 @@ export const putCreditEvaluationLoanApplicationsToHubspot: RequestHandler = asyn
 	}
 };
 
+export const putCreditEvaluationHouseholdIncome: RequestHandler = async (req, res, next) => {
+	try {
+		const { id } = req.params;
+		const { type } = req.body;
+
+		await CreditEvaluation.findByIdAndUpdate(id, { selectedHouseholdIncome: type });
+
+		res.json({
+			// data: result,
+		});
+	} catch (err) {
+		next(err);
+	}
+};
+
 // CBC Functions
 
 export const cbcReportToCreditEvaluation = (reportData: any) => {

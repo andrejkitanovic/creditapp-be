@@ -201,6 +201,7 @@ interface ICreditEvaluation extends Document {
 	summaryOfIncomes: CreditEvaluationSummaryOfIncomes;
 	// Income Overview
 	incomesOverview: CreditEvaluationIncomeOverview[];
+	selectedHouseholdIncome?: CreditEvaluationIncomeOverviewEnum;
 	// Loan Affordability
 	loanAffordability: CreditEvaluationLoanAffordability[];
 }
@@ -446,6 +447,10 @@ const creditEvaluationSchema: Schema = new Schema(
 				dti: { type: Number },
 			},
 		],
+		selectedHouseholdIncome: {
+			type: String,
+			enum: CreditEvaluationIncomeOverviewEnum,
+		},
 		// Loan Affordability
 		loanAffordability: [
 			{

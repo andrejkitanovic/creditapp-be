@@ -124,10 +124,12 @@ const calculateDebtDetails = async (creditEvaluation: LeanDocument<ICreditEvalua
 			spouseCreditEval.debtDetails = await calculateDebtDetails(spouseCreditEval, false);
 			spouseCreditEval.incomesOverview = calculateIncomesOverview(spouseCreditEval);
 
-			debtDetails.spouseIncome =
-				spouseCreditEval.incomesOverview.find(
-					(income) => income.type === CreditEvaluationIncomeOverviewEnum.INDIVIDUAL_INCOME_CURRENT_YEAR
-				)?.monthly ?? 0;
+			if (spouseCreditEval.selectedHouseholdIncome) {
+				debtDetails.spouseIncome =
+					spouseCreditEval.incomesOverview.find(
+						(income) => income.type === spouseCreditEval.selectedHouseholdIncome
+					)?.monthly ?? 0;
+			}
 			debtDetails.spousalDebt = spouseCreditEval.debtDetails.totalDebtPayment;
 		}
 
