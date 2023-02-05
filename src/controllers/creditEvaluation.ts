@@ -371,6 +371,23 @@ export const putCreditEvaluationHouseholdIncome: RequestHandler = async (req, re
 	}
 };
 
+export const putCreditEvaluationLoanAffordabilityRate: RequestHandler = async (req, res, next) => {
+	try {
+		const { id } = req.params;
+		const { rate } = req.body;
+
+		await CreditEvaluation.findByIdAndUpdate(id, {
+			loanAffordabilityRate: rate,
+		});
+
+		res.json({
+			// data: result,
+		});
+	} catch (err) {
+		next(err);
+	}
+};
+
 // CBC Functions
 
 export const cbcReportToCreditEvaluation = (reportData: any) => {
