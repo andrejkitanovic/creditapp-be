@@ -94,7 +94,7 @@ defineRoutes(router, [
 	},
 	{
 		method: 'put',
-		route: '/loan-applications/household-income/:id',
+		route: '/household-income/:id',
 		roles: ['user', 'admin'],
 		// permissions: ['read:customers'],
 		controller: putCreditEvaluationHouseholdIncomeController,
