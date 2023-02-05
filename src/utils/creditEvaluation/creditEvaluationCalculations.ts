@@ -206,6 +206,13 @@ const calculateIncomesOverview = (creditEvaluation: LeanDocument<ICreditEvaluati
 				annual: priorYearIncome.annual - creditEvaluation.debtDetails.rentPayment * 12,
 			});
 		}
+		if(creditEvaluation.debtDetails.mortgagePayment){
+			incomesOverview.push({
+				...priorYearIncome,
+				type: CreditEvaluationIncomeOverviewEnum.INDIVIDUAL_INCOME_HALF_MORTGAGE,
+				annual: priorYearIncome.annual - creditEvaluation.debtDetails.mortgagePayment * 6,
+			});
+		}
 		if (creditEvaluation.debtDetails.spouseIncome) {
 			incomesOverview.push({
 				...priorYearIncome,
