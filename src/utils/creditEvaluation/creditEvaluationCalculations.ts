@@ -259,7 +259,7 @@ const calculateLoanAffordability = (creditEvaluation: LeanDocument<ICreditEvalua
 	const loanAffordability: CreditEvaluationLoanAffordability[] = [];
 
 	creditEvaluation.incomesOverview.forEach((incomeOverview) => {
-		const rate = 14;
+		const rate = creditEvaluation.loanAffordabilityRate || 14;
 		const dti = 43;
 		const annualTotal = incomeOverview.annual * (dti / 100);
 		const monthlyTotal = annualTotal / 12;
@@ -267,7 +267,7 @@ const calculateLoanAffordability = (creditEvaluation: LeanDocument<ICreditEvalua
 
 		loanAffordability.push({
 			source: incomeOverview.type,
-			rate: creditEvaluation.loanAffordabilityRate || 14,
+			rate,
 			dti,
 
 			annualTotal,
