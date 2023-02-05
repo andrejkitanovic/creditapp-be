@@ -150,16 +150,14 @@ export const hsGetSingleContact = async (property: string, value: string) => {
 	}
 };
 
-export const hsCreateContact = async (
-	customer: LeanDocument<ICustomer>
-): Promise<Record<string, never> | SimplePublicObject> => {
+export const hsCreateContact = async (customer: any): Promise<Record<string, never> | SimplePublicObject> => {
 	try {
 		return await hubspotClient.crm.contacts.basicApi.create({
 			properties: {
 				email: customer.email,
 				firstname: customer.firstName,
 				lastname: customer.lastName,
-				phone: customer.phone ?? '',
+				phone: customer.phone,
 			},
 		});
 	} catch (err) {
