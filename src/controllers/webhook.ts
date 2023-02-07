@@ -35,6 +35,7 @@ export const postWebhookCustomer: RequestHandler = async (req, res, next) => {
 			sendForce,
 			referralSource,
 			leadSource,
+			statedMonthlyIncome
 		} = req.body;
 
 		// Search if customer exists
@@ -137,6 +138,7 @@ export const postWebhookCustomer: RequestHandler = async (req, res, next) => {
 					html: reportLink,
 					pdf: reportPDFLink,
 					state,
+					statedMonthlyIncome
 				});
 
 				let loanPackage;

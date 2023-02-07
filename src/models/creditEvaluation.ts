@@ -87,6 +87,8 @@ Household Income Debt Adjusted (A m modified annual income amount with a negativ
 Household Income Student Loan Adjusted (A m modified annual income amount with a negative monthly debt modifier)
 */
 export enum CreditEvaluationIncomeOverviewEnum {
+	STATED_INCOME = 'stated-income',
+
 	INDIVIDUAL_INCOME_CURRENT_YEAR = 'individual-income-current-year',
 	INDIVIDUAL_INCOME_PRIOR_YEAR = 'individual-income-prior-year',
 	INDIVIDUAL_INCOME_2_YEAR_AVERAGE = 'individual-income-2-year-average',
@@ -163,6 +165,16 @@ export type CreditEvaluationIncome = {
 	incomeSources: CreditEvaluationIncomeSource[];
 };
 
+// export type CreditEvaluationCollection = {
+// 	dateVerified: Date;
+// 	status: string;
+// 	memberNumber: number;
+// };
+
+// export type CreditEvaluationPublicRecords = {
+
+// }
+
 interface ICreditEvaluation extends Document {
 	customer: string;
 	// HTML and PDF
@@ -175,6 +187,7 @@ interface ICreditEvaluation extends Document {
 	ageOfFile: Date;
 	averageMonthsOfOpenRevolvingCredit: number;
 	loanPackageAmount: number;
+	statedMonthlyIncome: number;
 	// Credit Scores
 	creditScores: {
 		type: 'XPN';
@@ -206,6 +219,11 @@ interface ICreditEvaluation extends Document {
 	// Loan Affordability
 	loanAffordability: CreditEvaluationLoanAffordability[];
 	loanAffordabilityRate: number;
+
+	// Collections
+	// collections: CreditEvaluationCollection[];
+	// Public Records
+	// publicRecords: CreditEvaluationPublicRecords[];
 }
 
 const creditEvaluationSchema: Schema = new Schema(
@@ -240,6 +258,9 @@ const creditEvaluationSchema: Schema = new Schema(
 			type: Number,
 		},
 		loanPackageAmount: {
+			type: Number,
+		},
+		statedMonthlyIncome: {
 			type: Number,
 		},
 		creditScores: [

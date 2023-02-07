@@ -4,22 +4,40 @@ interface ICustomer extends Document {
 	hubspotId?: string;
 	// Spouse
 	spouse?: string;
-	// Informations
+	// General Information
 	firstName: string;
-	lastName: string;
 	middleName?: string;
+	lastName: string;
+	salutation: string;
+	email: string;
+	social?: string; // TO CHECK
+	birthday: Date;
 	address?: string;
 	city?: string;
 	state?: string;
 	zip?: string;
 	phone?: string;
-	social?: string; // TO CHECK
-	email: string;
-	birthday: Date;
+	mobilePhone?: string;
+
+	// Additional
 	associatedBrand?: string;
 	referralSource?: string;
 	leadSource?: string;
+
+	// Personal Information
 	personalInfo: {
+		driversLicenseId?: string;
+		driversLicenseIssueDate?: Date;
+		driversLicenseExpireDate?: Date;
+		creditUnion?: string;
+		personalBank?: string;
+		militaryStatus?: string;
+		bankRoutingNumber?: string;
+		bankAccountNumber?: string;
+		creditRepairBefore?: boolean;
+		judgementsLiensBankruptcy?: string;
+		previoiusFinanceCompany?: boolean;
+
 		placeOfBirth?: string;
 		bornInDifferentCountry?: boolean;
 		USResident?: boolean;
@@ -29,40 +47,53 @@ interface ICustomer extends Document {
 		highSchoolCity?: string;
 		nameOfStreet?: string;
 		nameOfPet?: string;
-		driversLicenseId?: string;
-		driversLicenseIssueDate?: Date;
-		driversLicenseExpireDate?: Date;
 		rentOrOwn?: 'rent' | 'own';
 		monthlyHomeCost?: number;
 		moveInDate?: Date;
 		personalMonthlyIncome?: number;
 		householdAnnualIncome?: number;
-		creditUnion?: string;
-		personalBank?: string;
-		militaryStatus?: string;
 		fraudAlerts?: boolean;
 		numberOfFraudAlerts?: number;
 		maritialStatus?: string;
-		creditRepairBefore?: boolean;
-		bankRoutingNumber?: string;
-		bankAccountNumber?: string;
 		bankruptcy?: boolean;
-		previoiusFinanceCompany?: boolean;
 	};
+
+	// Housing Information
+	housingInfo: {
+		houstingStatus?: string;
+		monthlyHousingPayment?: number;
+		estimatedLengthOfTimeAtResidence?: number;
+		moveInDate?: Date;
+		calculatedLengthOfTimeAtResidence?: number;
+		yearsAtCurrentAddress?: number;
+	};
+
+	// Employment Information
+	employmentInfo: {
+		incomeType?: string;
+		employerName?: string;
+		employerPhone?: string;
+		employerAddress?: string;
+
+		startDate?: Date;
+		jobTitle?: string;
+		earnIncomeYearRound?: number;
+	};
+	
+	// Security Questions
+
+	// Education Information
 	educationInfo: {
 		collegeAttended?: string;
 		fieldOfStudy?: string;
 		degree?: string;
 		graduatedDate?: Date;
+		graduateSchoolAttended?: string;
+		graduateSchoolFieldOfStudy?: string;
+		graduateDegreeReceived?: string;
 	};
-	employmentInfo: {
-		employerName?: string;
-		employerPhone?: string;
-		employerAddress?: string;
-		startDate?: Date;
-		jobTitle?: string;
-		earnIncomeYearRound?: number;
-	};
+
+	// Asset Information
 	assetInfo: {
 		bankBalance?: number;
 		investmentBalance?: number;
@@ -75,6 +106,7 @@ interface ICustomer extends Document {
 		estimatedValue?: number;
 		realEquity?: number;
 	};
+	// Primary Residence Valuation
 
 	cbcErrorMessage?: string;
 }
@@ -92,11 +124,11 @@ const customerSchema: Schema = new Schema(
 			type: String,
 			required: true,
 		},
+		middleName: String,
 		lastName: {
 			type: String,
 			required: true,
 		},
-		middleName: String,
 		address: {
 			type: String,
 		},

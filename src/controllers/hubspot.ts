@@ -39,43 +39,92 @@ export const getHubspotLenders: RequestHandler = async (req, res, next) => {
 export const hsGetContactById = async (contactId: string): Promise<{ [key: string]: string }> => {
 	try {
 		const { properties } = await hubspotClient.crm.contacts.basicApi.getById(contactId, [
-			'email',
+			// GENERAL INFORMATION
 			'firstname',
+			'middle_name_or_initial',
 			'lastname',
-			'phone',
-			'address',
+			'salutation',
+			'email',
 			'date_of_birth',
-			'mobilephone', // phone
+			'address',
 			'city',
-			'referred_by', // referral partner
 			'state',
 			'zip',
-			'birth_city', // place of birth
+			'phone',
+			'mobilephone',
+
+			// PERSONAL INFORMATION
+			'driver_s_license_number',
+			'dl_issuance_date',
+			'dl_expiration_date',
+			'member_of_credit_union',
+			// 'leadin_current_bank_relationship_a336c6175472fb581f1e7ca0877fd813', // archived
+			'personal_banking_relationship',
+			'current_military_affiliation',
+			'routing_number',
+			'account_number',
+			'have_you_been_through_credit_repair_',
+			'judgements_liens_bankruptcy_',
+			'have_you_worked_with_a_finance_company_like_ours_before_',
+
+			// HOUSING INFO
+			'housing_status',
+			'monthly_housing_payment',
+			'estimated_length_of_time_at_residence',
+			'move_in_date',
+			'calculated_length_of_time_at_residence',
+			'years_at_current_address',
+
+			// EMPLOYMENT INFO
+			'income_type',
+			'employer',
+			'employer_phone_number',
+			'employer_address',
+			'estimated_time_at_job',
+			'start_date_with_employer',
+			'calculated_length_of_employment',
+			'occupation_position',
+			'monthly_gross_income',
+			'annual_personal_income',
+			'front_end_dti_ratio',
+			'total_annual_household_income',
+			'household_front_end_dti_ratio__cloned_',
+			'stated_monthly_income',
+			'stated_annual_income',
+			'stated_annual_household_income',
+
+			// SECURITY QUESTIONS
+			'birth_city',
+			'were_you_born_in_a_foreign_country_',
+			'are_you_a_legal_permanent_resident_',
+			'green_card_expiration_date',
 			'mother_s_maiden_name',
+			'high_school_mascot',
+			'high_school_city',
+			'name_of_street_you_grew_up_on',
 			'favorite_pet_s_name',
+
+			// EDUCATION
 			'college_university_attended',
 			'field_of_study',
 			'degree',
 			'graduation_date',
-			'monthly_housing_payment', // monthly home cost
-			'monthly_gross_income', // personal monthly income
-			'total_annual_household_income', // House hold annual income
-			'credit_union_login', // Credit union ???
-			'military_status',
-			'judgements_liens_bankruptcy_', //bankrupcy
-			'routing_number', //bank routing number
-			'account_number', //bank account number ???
-			'employer', // employer name
-			'employer_phone_number',
-			'start_date_with_employer', // start date
-			'jobtitle',
+			'graduate_school_attended',
+			'graduate_school_field_of_study',
+			'graduate_degree_received',
+
+			// ASSET INFORMATION
+			'combined_checking_savings_balance',
+			'stocks_bonds_mutual_funds',
 			'retirement_account_balance',
-			'calculated_real_estate_value', // avm value
-			'market_value_in_response_com', // market value
+
+			// PRIMARY RESIDENCE VALUATION
+			'avm_in_response_com',
+			'market_value_in_response_com',
 			'zillow_value',
-			'estimated_credit_score', // estimated equity ???
-			'estimated_property_value', // Estimated value
-			'calculated_equity', // real equity ???
+			'estimated_property_value',
+			'calculated_value',
+			'calculated_equity',
 		]);
 
 		return {
@@ -97,43 +146,92 @@ export const hsGetSingleContact = async (property: string, value: string) => {
 		const searchFilter = {
 			filterGroups: [filterGroup],
 			properties: [
-				'email',
+				// GENERAL INFORMATION
 				'firstname',
+				'middle_name_or_initial',
 				'lastname',
-				'phone',
-				'address',
+				'salutation',
+				'email',
 				'date_of_birth',
-				'mobilephone', // phone
+				'address',
 				'city',
-				'referred_by', // referral partner
 				'state',
 				'zip',
-				'birth_city', // place of birth
+				'phone',
+				'mobilephone',
+
+				// PERSONAL INFORMATION
+				'driver_s_license_number',
+				'dl_issuance_date',
+				'dl_expiration_date',
+				'member_of_credit_union',
+				// 'leadin_current_bank_relationship_a336c6175472fb581f1e7ca0877fd813', // archived
+				'personal_banking_relationship',
+				'current_military_affiliation',
+				'routing_number',
+				'account_number',
+				'have_you_been_through_credit_repair_',
+				'judgements_liens_bankruptcy_',
+				'have_you_worked_with_a_finance_company_like_ours_before_',
+
+				// HOUSING INFO
+				'housing_status',
+				'monthly_housing_payment',
+				'estimated_length_of_time_at_residence',
+				'move_in_date',
+				'calculated_length_of_time_at_residence',
+				'years_at_current_address',
+
+				// EMPLOYMENT INFO
+				'income_type',
+				'employer',
+				'employer_phone_number',
+				'employer_address',
+				'estimated_time_at_job',
+				'start_date_with_employer',
+				'calculated_length_of_employment',
+				'occupation_position',
+				'monthly_gross_income',
+				'annual_personal_income',
+				'front_end_dti_ratio',
+				'total_annual_household_income',
+				'household_front_end_dti_ratio__cloned_',
+				'stated_monthly_income',
+				'stated_annual_income',
+				'stated_annual_household_income',
+
+				// SECURITY QUESTIONS
+				'birth_city',
+				'were_you_born_in_a_foreign_country_',
+				'are_you_a_legal_permanent_resident_',
+				'green_card_expiration_date',
 				'mother_s_maiden_name',
+				'high_school_mascot',
+				'high_school_city',
+				'name_of_street_you_grew_up_on',
 				'favorite_pet_s_name',
+
+				// EDUCATION
 				'college_university_attended',
 				'field_of_study',
 				'degree',
 				'graduation_date',
-				'monthly_housing_payment', // monthly home cost
-				'monthly_gross_income', // personal monthly income
-				'total_annual_household_income', // House hold annual income
-				'credit_union_login', // Credit union ???
-				'military_status',
-				'judgements_liens_bankruptcy_', //bankrupcy
-				'routing_number', //bank routing number
-				'account_number', //bank account number ???
-				'employer', // employer name
-				'employer_phone_number',
-				'start_date_with_employer', // start date
-				'jobtitle',
+				'graduate_school_attended',
+				'graduate_school_field_of_study',
+				'graduate_degree_received',
+
+				// ASSET INFORMATION
+				'combined_checking_savings_balance',
+				'stocks_bonds_mutual_funds',
 				'retirement_account_balance',
-				'calculated_real_estate_value', // avm value
-				'market_value_in_response_com', // market value
+
+				// PRIMARY RESIDENCE VALUATION
+				'avm_in_response_com',
+				'market_value_in_response_com',
 				'zillow_value',
-				'estimated_credit_score', // estimated equity ???
-				'estimated_property_value', // Estimated value
-				'calculated_equity', // real equity ???
+				'estimated_property_value',
+				'calculated_value',
+				'calculated_equity',
 			],
 			limit: 1,
 			sorts: ['id'],

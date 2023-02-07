@@ -241,6 +241,14 @@ const calculateIncomesOverview = (creditEvaluation: LeanDocument<ICreditEvaluati
 			});
 		}
 	}
+	if (creditEvaluation.statedMonthlyIncome) {
+		incomesOverview.push({
+			type: CreditEvaluationIncomeOverviewEnum.STATED_INCOME,
+			dti: 0,
+			monthly: creditEvaluation.statedMonthlyIncome,
+			annual: creditEvaluation.statedMonthlyIncome * 12,
+		});
+	}
 
 	// Calculate DTI
 	incomesOverview = incomesOverview.map((incomeOverview) => ({
