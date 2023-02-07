@@ -88,7 +88,6 @@ Household Income Student Loan Adjusted (A m modified annual income amount with a
 */
 export enum CreditEvaluationIncomeOverviewEnum {
 	STATED_INCOME = 'stated-income',
-
 	INDIVIDUAL_INCOME_CURRENT_YEAR = 'individual-income-current-year',
 	INDIVIDUAL_INCOME_PRIOR_YEAR = 'individual-income-prior-year',
 	INDIVIDUAL_INCOME_2_YEAR_AVERAGE = 'individual-income-2-year-average',

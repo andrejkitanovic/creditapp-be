@@ -4,13 +4,14 @@ interface ICustomer extends Document {
 	hubspotId?: string;
 	// Spouse
 	spouse?: string;
+
 	// General Information
 	firstName: string;
 	middleName?: string;
 	lastName: string;
 	salutation: string;
 	email: string;
-	social?: string; // TO CHECK
+	social?: string;
 	birthday: Date;
 	address?: string;
 	city?: string;
@@ -38,20 +39,10 @@ interface ICustomer extends Document {
 		judgementsLiensBankruptcy?: string;
 		previoiusFinanceCompany?: boolean;
 
-		placeOfBirth?: string;
-		bornInDifferentCountry?: boolean;
 		USResident?: boolean;
 		loanEmail?: string;
 		mothersMaidenName?: string;
-		highSchoolMascot?: string;
-		highSchoolCity?: string;
-		nameOfStreet?: string;
-		nameOfPet?: string;
 		rentOrOwn?: 'rent' | 'own';
-		monthlyHomeCost?: number;
-		moveInDate?: Date;
-		personalMonthlyIncome?: number;
-		householdAnnualIncome?: number;
 		fraudAlerts?: boolean;
 		numberOfFraudAlerts?: number;
 		maritialStatus?: string;
@@ -74,13 +65,36 @@ interface ICustomer extends Document {
 		employerName?: string;
 		employerPhone?: string;
 		employerAddress?: string;
+		estimatedTimeAtJob?: string;
+		startDateWithEmployer?: Date;
+		calculatedLengthOfEmployment?: string;
+		occupationPosition?: string;
+		monthlyGrossIncome?: number;
+		annualPersonalIncome?: number;
+		frontEndRtiRatio?: number;
+		totalAnnualHouseholdIncome?: number;
+		householdFrontEndDtiRatio?: number;
+		statedMonthlyIncome?: number;
+		statedAnnualIncome?: number;
+		statedAnnualHouseholdIncome?: number;
 
 		startDate?: Date;
 		jobTitle?: string;
 		earnIncomeYearRound?: number;
 	};
-	
+
 	// Security Questions
+	securityQuestions: {
+		birthCity?: string;
+		bronInForeignCountry?: boolean;
+		legalPermanentResident?: boolean;
+		greenCardExpirationDate?: string;
+		mothersMaidenName?: string;
+		highSchoolMascot?: string;
+		highSchoolCity?: string;
+		nameOfStreetYouGrewUp?: string;
+		favoritePetsName?: string;
+	};
 
 	// Education Information
 	educationInfo: {
@@ -95,18 +109,28 @@ interface ICustomer extends Document {
 
 	// Asset Information
 	assetInfo: {
+		combinedCheckingSavingsBalance?: number;
+		stocksBondsMutualFunds?: number;
+		retirementAccountBalance?: number;
+
 		bankBalance?: number;
 		investmentBalance?: number;
 		cryptoBalance?: number;
 		retirementBalance?: number;
+		realEquity?: number;
+		estimatedEquity?: number;
+		estimatedValue?: number;
+	};
+
+	// Primary Residence Valuation
+	primaryResidenceValuation: {
 		avmValue?: number;
 		marketValue?: number;
 		zillowValue?: number;
-		estimatedEquity?: number;
-		estimatedValue?: number;
-		realEquity?: number;
+		estimatedPropertyValue?: number;
+		calculatedValue?: number;
+		calculatedEquity?: number;
 	};
-	// Primary Residence Valuation
 
 	cbcErrorMessage?: string;
 }
@@ -120,6 +144,7 @@ const customerSchema: Schema = new Schema(
 			type: Schema.Types.ObjectId,
 			ref: 'Customer',
 		},
+		// General Information
 		firstName: {
 			type: String,
 			required: true,
@@ -127,6 +152,20 @@ const customerSchema: Schema = new Schema(
 		middleName: String,
 		lastName: {
 			type: String,
+			required: true,
+		},
+		salutation: {
+			type: String,
+		},
+		email: {
+			type: String,
+			required: true,
+		},
+		social: {
+			type: String,
+		},
+		birthday: {
+			type: Date,
 			required: true,
 		},
 		address: {
@@ -141,18 +180,13 @@ const customerSchema: Schema = new Schema(
 		zip: {
 			type: String,
 		},
-		phone: String,
-		social: {
+		phone: {
 			type: String,
 		},
-		email: {
+		mobilePhone: {
 			type: String,
-			required: true,
 		},
-		birthday: {
-			type: Date,
-			required: true,
-		},
+
 		associatedBrand: {
 			type: String,
 		},
@@ -162,64 +196,115 @@ const customerSchema: Schema = new Schema(
 		leadSource: {
 			type: String,
 		},
+
+		// Personal Information
 		personalInfo: {
-			placeOfBirth: String,
-			bornInDifferentCountry: Boolean,
-			USResident: Boolean,
-			loanEmail: String,
-			mothersMaidenName: String,
-			highSchoolMascot: String,
-			highSchoolCity: String,
-			nameOfStreet: String,
-			nameOfPet: String,
 			driversLicenseId: String,
 			driversLicenseIssueDate: Date,
 			driversLicenseExpireDate: Date,
+			creditUnion: String,
+			personalBank: String,
+			militaryStatus: String,
+			bankRoutingNumber: String,
+			bankAccountNumber: String,
+			creditRepairBefore: Boolean,
+			judgementsLiensBankruptcy: String,
+			previoiusFinanceCompany: Boolean,
+
+			USResident: Boolean,
+			loanEmail: String,
+			mothersMaidenName: String,
 			rentOrOwn: {
 				type: String,
 				enum: ['rent', 'own'],
 			},
-			monthlyHomeCost: Number,
-			moveInDate: Date,
-			personalMonthlyIncome: Number,
-			householdAnnualIncome: Number,
-			creditUnion: String,
-			personalBank: String,
-			militaryStatus: String,
 			fraudAlerts: Boolean,
 			numberOfFraudAlerts: Number,
 			maritialStatus: String,
-			creditRepairBefore: Boolean,
-			bankRoutingNumber: String,
-			bankAccountNumber: String,
 			bankruptcy: Boolean,
-			previoiusFinanceCompany: Boolean,
 		},
+
+		// Housing Information
+		housingInfo: {
+			houstingStatus: String,
+			monthlyHousingPayment: Number,
+			estimatedLengthOfTimeAtResidence: Number,
+			moveInDate: Date,
+			calculatedLengthOfTimeAtResidence: Number,
+			yearsAtCurrentAddress: Number,
+		},
+
+		// Employment Information
+		employmentInfo: {
+			incomeType: String,
+			employerName: String,
+			employerPhone: String,
+			employerAddress: String,
+			estimatedTimeAtJob: String,
+			startDateWithEmployer: Date,
+			calculatedLengthOfEmployment: String,
+			occupationPosition: String,
+			monthlyGrossIncome: Number,
+			annualPersonalIncome: Number,
+			frontEndRtiRatio: Number,
+			totalAnnualHouseholdIncome: Number,
+			householdFrontEndDtiRatio: Number,
+			statedMonthlyIncome: Number,
+			statedAnnualIncome: Number,
+			statedAnnualHouseholdIncome: Number,
+
+			startDate: Date,
+			jobTitle: String,
+			earnIncomeYearRound: Number,
+		},
+
+		// Security Questions
+		securityQuestions: {
+			birthCity: String,
+			bronInForeignCountry: Boolean,
+			legalPermanentResident: Boolean,
+			greenCardExpirationDate: String,
+			mothersMaidenName: String,
+			highSchoolMascot: String,
+			highSchoolCity: String,
+			nameOfStreetYouGrewUp: String,
+			favoritePetsName: String,
+		},
+
+		// Education Information
 		educationInfo: {
 			collegeAttended: String,
 			fieldOfStudy: String,
 			degree: String,
 			graduatedDate: Date,
+			graduateSchoolAttended: String,
+			graduateSchoolFieldOfStudy: String,
+			graduateDegreeReceived: String,
 		},
-		employmentInfo: {
-			employerName: String,
-			employerPhone: String,
-			employerAddress: String,
-			startDate: Date,
-			jobTitle: String,
-			earnIncomeYearRound: Number,
-		},
+
+		// Asset Information
 		assetInfo: {
+			combinedCheckingSavingsBalance: Number,
+			stocksBondsMutualFunds: Number,
+			retirementAccountBalance: Number,
+
 			bankBalance: Number,
 			investmentBalance: Number,
 			cryptoBalance: Number,
 			retirementBalance: Number,
+			realEquity: Number,
+			estimatedEquity: Number,
+			estimatedValue: Number,
+		},
+
+		// Primary Residence Valuation
+		primaryResidenceValuation: {
 			avmValue: Number,
 			marketValue: Number,
 			zillowValue: Number,
-			estimatedEquity: Number,
-			estimatedValue: Number,
-			realEquity: Number,
+			estimatedPropertyValue: Number,
+			calculatedValue: Number,
+			calculatedEquity: Number,
 		},
 
 		cbcErrorMessage: {

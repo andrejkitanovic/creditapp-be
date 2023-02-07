@@ -272,43 +272,91 @@ export const hsUpdateContact = async (
 	try {
 		return await hubspotClient.crm.contacts.basicApi.update(contactId, {
 			properties: filterObject({
-				email: customer.email,
+				// GENERAL INFORMATION
 				firstname: customer.firstName,
+				middle_name_or_initial: customer.middleName,
 				lastname: customer.lastName,
-				phone: customer.phone,
-				address: customer.address,
+				salutation: customer.salutation,
+				email: customer.email,
 				// 'date_of_birth',
-				mobilephone: customer.phone,
+				address: customer.address,
 				city: customer.city,
-				referred_by: customer.referralSource,
 				state: customer.state,
 				zip: customer.zip,
-				birth_city: customer.personalInfo?.placeOfBirth,
-				mother_s_maiden_name: customer.personalInfo?.mothersMaidenName,
-				favorite_pet_s_name: customer.personalInfo?.nameOfPet,
-				college_university_attended: customer.educationInfo?.collegeAttended,
-				field_of_study: customer.educationInfo?.fieldOfStudy,
-				degree: customer.educationInfo?.degree,
-				// graduation_date: customer.city,
-				monthly_housing_payment: customer.personalInfo?.monthlyHomeCost, // monthly home cost
-				monthly_gross_income: customer.personalInfo?.householdAnnualIncome, // personal monthly income
-				// total_annual_household_income: customer.,
-				credit_union_login: customer.personalInfo?.creditUnion, // Credit union ???
-				military_status: customer.personalInfo?.militaryStatus,
-				judgements_liens_bankruptcy_: customer.personalInfo?.bankruptcy, //bankrupcy
-				routing_number: customer.personalInfo?.bankRoutingNumber, //bank routing number
-				account_number: customer.personalInfo?.bankAccountNumber, //bank account number ???
-				employer: customer.employmentInfo?.employerName, // employer name
-				employer_phone_number: customer.employmentInfo?.employerPhone,
-				start_date_with_employer: customer.employmentInfo?.startDate, // start date
-				jobtitle: customer.employmentInfo?.jobTitle,
-				retirement_account_balance: customer.assetInfo?.retirementBalance,
-				calculated_real_estate_value: customer.assetInfo?.avmValue, // avm value
-				market_value_in_response_com: customer.assetInfo?.marketValue, // market value
-				zillow_value: customer.assetInfo?.zillowValue,
-				// estimated_credit_score: customer.city, // estimated equity ???
-				estimated_property_value: customer.assetInfo?.estimatedValue, // Estimated value
-				// calculated_equity: customer.city, // real equity ???
+				phone: customer.phone,
+				mobilephone: customer.mobilePhone,
+
+				// PERSONAL INFORMATION
+				driver_s_license_number: customer.personalInfo.driversLicenseId,
+				// dl_issuance_date: customer.personalInfo.driversLicenseIssueDate,
+				// dl_expiration_date: customer.personalInfo.driversLicenseExpireDate,
+				member_of_credit_union: customer.personalInfo.creditUnion,
+				personal_banking_relationship: customer.personalInfo.personalBank,
+				current_military_affiliation: customer.personalInfo.militaryStatus,
+				routing_number: customer.personalInfo.bankRoutingNumber,
+				account_number: customer.personalInfo.bankAccountNumber,
+				have_you_been_through_credit_repair_: customer.personalInfo.creditRepairBefore,
+				judgements_liens_bankruptcy_: customer.personalInfo.judgementsLiensBankruptcy,
+				have_you_worked_with_a_finance_company_like_ours_before_: customer.personalInfo.previoiusFinanceCompany,
+
+				// HOUSING INFO
+				housing_status: customer.housingInfo.houstingStatus,
+				monthly_housing_payment: customer.housingInfo.monthlyHousingPayment,
+				estimated_length_of_time_at_residence: customer.housingInfo.estimatedLengthOfTimeAtResidence,
+				// move_in_date: customer.housingInfo.moveInDate,
+				calculated_length_of_time_at_residence: customer.housingInfo.calculatedLengthOfTimeAtResidence,
+				years_at_current_address: customer.housingInfo.yearsAtCurrentAddress,
+
+				// EMPLOYMENT INFO
+				income_type: customer.employmentInfo.incomeType,
+				employer: customer.employmentInfo.employerName,
+				employer_phone_number: customer.employmentInfo.employerPhone,
+				employer_address: customer.employmentInfo.employerAddress,
+				estimated_time_at_job: customer.employmentInfo.estimatedTimeAtJob,
+				start_date_with_employer: customer.employmentInfo.startDateWithEmployer,
+				calculated_length_of_employment: customer.employmentInfo.calculatedLengthOfEmployment,
+				occupation_position: customer.employmentInfo.occupationPosition,
+				monthly_gross_income: customer.employmentInfo.monthlyGrossIncome,
+				annual_personal_income: customer.employmentInfo.annualPersonalIncome,
+				front_end_dti_ratio: customer.employmentInfo.frontEndRtiRatio,
+				total_annual_household_income: customer.employmentInfo.totalAnnualHouseholdIncome,
+				household_front_end_dti_ratio__cloned_: customer.employmentInfo.householdFrontEndDtiRatio,
+				stated_monthly_income: customer.employmentInfo.statedMonthlyIncome,
+				stated_annual_income: customer.employmentInfo.statedAnnualIncome,
+				stated_annual_household_income: customer.employmentInfo.statedAnnualHouseholdIncome,
+
+				// SECURITY QUESTIONS
+				birth_city: customer.securityQuestions.birthCity,
+				were_you_born_in_a_foreign_country_: customer.securityQuestions.bronInForeignCountry,
+				are_you_a_legal_permanent_resident_: customer.securityQuestions.legalPermanentResident,
+				green_card_expiration_date: customer.securityQuestions.greenCardExpirationDate,
+				mother_s_maiden_name: customer.securityQuestions.mothersMaidenName,
+				high_school_mascot: customer.securityQuestions.highSchoolMascot,
+				high_school_city: customer.securityQuestions.highSchoolCity,
+				name_of_street_you_grew_up_on: customer.securityQuestions.nameOfStreetYouGrewUp,
+				favorite_pet_s_name: customer.securityQuestions.favoritePetsName,
+
+				// EDUCATION
+				college_university_attended: customer.educationInfo.collegeAttended,
+				field_of_study: customer.educationInfo.fieldOfStudy,
+				degree: customer.educationInfo.degree,
+				graduation_date: customer.educationInfo.graduatedDate,
+				graduate_school_attended: customer.educationInfo.graduateSchoolAttended,
+				graduate_school_field_of_study: customer.educationInfo.graduateSchoolFieldOfStudy,
+				graduate_degree_received: customer.educationInfo.graduateDegreeReceived,
+
+				// ASSET INFORMATION
+				combined_checking_savings_balance: customer.assetInfo.combinedCheckingSavingsBalance,
+				stocks_bonds_mutual_funds: customer.assetInfo.stocksBondsMutualFunds,
+				retirement_account_balance: customer.assetInfo.retirementAccountBalance,
+
+				// PRIMARY RESIDENCE VALUATION
+				avm_in_response_com: customer.primaryResidenceValuation.avmValue,
+				market_value_in_response_com: customer.primaryResidenceValuation.marketValue,
+				zillow_value: customer.primaryResidenceValuation.zillowValue,
+				estimated_property_value: customer.primaryResidenceValuation.estimatedPropertyValue,
+				calculated_value: customer.primaryResidenceValuation.calculatedValue,
+				calculated_equity: customer.primaryResidenceValuation.calculatedEquity,
 			}),
 		});
 	} catch (err) {
