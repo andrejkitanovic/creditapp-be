@@ -28,7 +28,7 @@ import routing from 'routes';
 import 'controllers/cbc';
 
 const corsOptions = {
-	origin: 'https://app.loanly.ai',
+	// origin: 'https://app.loanly.ai',
 	// optionsSuccessStatus: 200,
 };
 
