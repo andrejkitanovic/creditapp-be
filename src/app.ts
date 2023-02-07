@@ -27,10 +27,15 @@ import routing from 'routes';
 
 import 'controllers/cbc';
 
+const corsOptions = {
+	origin: 'https://app.loanly.ai/',
+	// optionsSuccessStatus: 200,
+};
+
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cors());
+app.use(cors(corsOptions));
 app.set('view engine', 'jade');
 
 swagger(app);
