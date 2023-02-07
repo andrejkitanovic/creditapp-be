@@ -7,6 +7,7 @@ import {
 	postCustomer as postCustomerController,
 	putCustomer as putCustomerController,
 	putCustomerSpouse as putCustomerSpouseController,
+	deleteCustomerSpouse as deleteCustomerSpouseController,
 	deleteCustomer as deleteCustomerController,
 	getSingleCustomer as getSingleCustomerController,
 	putCustomerSyncHubspot as putCustomerSyncHubspotController,
@@ -55,6 +56,14 @@ defineRoutes(router, [
 		permissions: ['update:customers'],
 		// validator: putCustomerSpouseValidator,
 		controller: putCustomerSpouseController,
+	},
+	{
+		method: 'delete',
+		route: '/spouse/:id',
+		roles: ['user', 'admin'],
+		permissions: ['update:customers'],
+		// validator: putCustomerSpouseValidator,
+		controller: deleteCustomerSpouseController,
 	},
 	{
 		method: 'delete',

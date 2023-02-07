@@ -3,7 +3,7 @@ import { RequestHandler } from 'express';
 import { queryFilter } from 'helpers/filters';
 import { createMeta } from 'helpers/meta';
 
-import Customer from 'models/customer';
+import Customer, { ICustomer } from 'models/customer';
 import CreditEvaluation from 'models/creditEvaluation';
 import LoanApplication from 'models/loanApplication';
 import LoanPackage from 'models/loanPackage';
@@ -186,6 +186,27 @@ export const putCustomerSpouse: RequestHandler = async (req, res, next) => {
 		});
 		await Customer.findByIdAndUpdate(spouse, {
 			spouse: id,
+		});
+
+		res.json({
+			// message: i18n.__('CONTROLLER.PARTNER.PUT_PARTNER.UPDATED'),
+		});
+	} catch (err) {
+		next(err);
+	}
+};
+
+export const deleteCustomerSpouse: RequestHandler = async (req, res, next) => {
+	try {
+		const { id } = req.params;
+
+		const customer = (await Customer.findById(id)) as ICustomer;
+
+		await Customer.findByIdAndUpdate(customer.spouse, {
+			spouse: null,
+		});
+		await Customer.findByIdAndUpdate(id, {
+			spouse: null,
 		});
 
 		res.json({

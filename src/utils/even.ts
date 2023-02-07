@@ -4,7 +4,7 @@ import { ICustomer } from 'models/customer';
 import { ILoanApplication } from 'models/loanApplication';
 import { LeanDocument } from 'mongoose';
 
-const axiosEvent = axios.create({
+const axiosEven = axios.create({
 	baseURL: 'https://api.evenfinancial.com',
 	headers: {
 		Authorization: `Bearer ${process.env.EVENT_APIKEY}`,
@@ -25,7 +25,7 @@ export const eventPostLoanApplication = (
 	} else if (creditScore >= 720) {
 		providedCreditRating = 'excellent';
 	}
-	return axiosEvent.post('/leads/rateTables', {
+	return axiosEven.post('/leads/rateTables', {
 		productTypes: ['loan'],
 		personalInformation: {
 			firstName: customer.firstName,
@@ -33,8 +33,8 @@ export const eventPostLoanApplication = (
 			email: customer.email,
 			city: customer.city,
 			state: customer.state,
-			// primaryPhone: '2125556789',
-			// address1: '175 5th Ave',
+			primaryPhone: customer.phone,
+			address1: customer.address,
 			// address2: 'Apartment 5',
 			zipcode: customer.zip,
 			// dateOfBirth: '1993-10-09',
