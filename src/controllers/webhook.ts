@@ -35,7 +35,7 @@ export const postWebhookCustomer: RequestHandler = async (req, res, next) => {
 			sendForce,
 			referralSource,
 			leadSource,
-			statedMonthlyIncome
+			statedMonthlyIncome,
 		} = req.body;
 
 		// Search if customer exists
@@ -138,7 +138,7 @@ export const postWebhookCustomer: RequestHandler = async (req, res, next) => {
 					html: reportLink,
 					pdf: reportPDFLink,
 					state,
-					statedMonthlyIncome
+					statedMonthlyIncome,
 				});
 
 				let loanPackage;
@@ -158,6 +158,10 @@ export const postWebhookCustomer: RequestHandler = async (req, res, next) => {
 							originationFee: deal?.origination_fee,
 						});
 					}
+				}
+
+				if (creditEvaluation.declineReasonCodes) {
+					creditReportResponse.decline_reason_codes = creditEvaluation.declineReasonCodes.join(';');
 				}
 
 				creditReportResponse.loanly_credit_evaluation = `https://app.loanly.ai/credit-evaluations/${creditEvaluation?._id}`;
@@ -201,6 +205,10 @@ export const postWebhookCustomer: RequestHandler = async (req, res, next) => {
 			creditReportResponse.loanly_recent_report_pdf = creditEvaluation?.pdf;
 
 			creditReportResponse.loanly_credit_evaluation = `https://app.loanly.ai/credit-evaluations/${creditEvaluation?._id}`;
+
+			if (creditEvaluation?.declineReasonCodes) {
+				creditReportResponse.decline_reason_codes = creditEvaluation.declineReasonCodes.join(';');
+			}
 
 			const loanPackage = await LoanPackage.findOne({ creditEvaluation: creditEvaluation?._id || '' });
 			if (loanPackage) {

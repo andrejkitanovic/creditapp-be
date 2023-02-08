@@ -187,6 +187,9 @@ interface ICreditEvaluation extends Document {
 	averageMonthsOfOpenRevolvingCredit: number;
 	loanPackageAmount: number;
 	statedMonthlyIncome: number;
+
+	// Decline Reason Codes
+	declineReasonCodes: string[];
 	// Credit Scores
 	creditScores: {
 		type: 'XPN';
@@ -262,6 +265,7 @@ const creditEvaluationSchema: Schema = new Schema(
 		statedMonthlyIncome: {
 			type: Number,
 		},
+		declineReasonCodes: [{ type: String }],
 		creditScores: [
 			{
 				type: {

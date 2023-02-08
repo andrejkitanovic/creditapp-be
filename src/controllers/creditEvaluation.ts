@@ -483,6 +483,11 @@ export const cbcReportToCreditEvaluation = (reportData: any) => {
 			return prevValue;
 		}, 0) || [];
 
+	const declineReasonCodes =
+		reportData.SCORES?.FACTORS?.REASON?.filter((reason: any) => {
+			return typeof reason.CODE === 'string' && typeof reason.DESCRIPTION === 'string';
+		}).map((reason: any) => `(${reason.CODE}) ${reason.DESCRIPTION}`) ?? [];
+
 	return {
 		reportDate: dayjs().toDate(),
 		firstCreditAccount,
@@ -490,6 +495,7 @@ export const cbcReportToCreditEvaluation = (reportData: any) => {
 		ageOfFile,
 		averageMonthsOfOpenRevolvingCredit,
 		// loanPackageAmount: 0,
+		declineReasonCodes,
 		creditScores: [
 			{
 				type: 'XPN',
@@ -498,11 +504,9 @@ export const cbcReportToCreditEvaluation = (reportData: any) => {
 		],
 		recentInquiries,
 		tradelines,
-		// businessTradelines: [{}].
 		loans,
 		debtDetails: {
 			debtPayment,
 		},
-		// loanAffordabilityCalculator: {};
 	};
 };
