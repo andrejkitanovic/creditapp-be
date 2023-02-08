@@ -293,13 +293,13 @@ export const putCustomerSyncHubspot: RequestHandler = async (req, res, next) => 
 			// HOUSING INFO
 			housingInfo: {
 				houstingStatus: customer?.housingInfo?.houstingStatus || contact?.housing_status,
-				monthlyHousingPayment: customer?.housingInfo?.houstingStatus || contact?.monthly_housing_payment,
+				monthlyHousingPayment: customer?.housingInfo?.monthlyHousingPayment || contact?.monthly_housing_payment,
 				estimatedLengthOfTimeAtResidence:
-					customer?.housingInfo?.houstingStatus || contact?.estimated_length_of_time_at_residence,
-				moveInDate: customer?.housingInfo?.houstingStatus || contact?.move_in_date,
+					customer?.housingInfo?.estimatedLengthOfTimeAtResidence || contact?.estimated_length_of_time_at_residence,
+				moveInDate: customer?.housingInfo?.moveInDate || contact?.move_in_date,
 				calculatedLengthOfTimeAtResidence:
-					customer?.housingInfo?.houstingStatus || contact?.calculated_length_of_time_at_residence,
-				yearsAtCurrentAddress: customer?.housingInfo?.houstingStatus || contact?.years_at_current_address,
+					customer?.housingInfo?.calculatedLengthOfTimeAtResidence || contact?.calculated_length_of_time_at_residence,
+				yearsAtCurrentAddress: customer?.housingInfo?.yearsAtCurrentAddress || contact?.years_at_current_address,
 			},
 			// EMPLOYMENT INFO
 			employmentInfo: {

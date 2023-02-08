@@ -56,7 +56,7 @@ interface ICustomer extends Document {
 		estimatedLengthOfTimeAtResidence?: number;
 		moveInDate?: Date;
 		calculatedLengthOfTimeAtResidence?: number;
-		yearsAtCurrentAddress?: string;
+		yearsAtCurrentAddress?: number;
 	};
 
 	// Employment Information
@@ -231,7 +231,7 @@ const customerSchema: Schema = new Schema(
 			estimatedLengthOfTimeAtResidence: Number,
 			moveInDate: Date,
 			calculatedLengthOfTimeAtResidence: Number,
-			yearsAtCurrentAddress: String,
+			yearsAtCurrentAddress: Number,
 		},
 
 		// Employment Information
