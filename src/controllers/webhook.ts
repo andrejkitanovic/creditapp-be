@@ -1,6 +1,6 @@
 import xmlToJson from 'xml2json';
 import dayjs from 'dayjs';
-import fs from 'fs';
+import fs, { writeFileSync } from 'fs';
 import { RequestHandler } from 'express';
 
 import { CBCApplicant, cbcPullCreditReport } from './cbc';
@@ -126,6 +126,8 @@ export const postWebhookCustomer: RequestHandler = async (req, res, next) => {
 				});
 
 				const reportData = jsonResponse.XML_INTERFACE.CREDITREPORT.BUREAU_TYPE;
+
+				writeFileSync('./response.json', JSON.stringify(reportData));
 
 				// Create Credit Evaluation
 				const creditEvaluationData = cbcReportToCreditEvaluation(reportData);

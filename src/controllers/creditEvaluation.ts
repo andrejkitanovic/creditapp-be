@@ -471,6 +471,45 @@ export const cbcReportToCreditEvaluation = (reportData: any) => {
 			};
 		}) || [];
 
+	// COLLECTIONS
+	const collections =
+		reportData.CC_ATTRIB.CCCOLLECTIONS?.ITEM_COLLECTION?.map((collectionData: any) => {
+			return {
+				dateVerified: cbcFormatDate(collectionData.BALANCEDATE),
+				status: `${collectionData.STATUS?.CODE} ${collectionData.STATUS?.DESCRIPTION}`,
+				memberNumber: collectionData.MEMBERNUMBER,
+				narrativesCreditorAccountNumber: '', // TODO
+				industryCode: collectionData.INDUSTRYCODE?.DESCRIPTION,
+				dateReported: cbcFormatDate(collectionData.REPORTDATE),
+				amount: parseFloat(collectionData.AMOUNT) ?? undefined,
+				balance: parseFloat(collectionData.BALANCE) ?? undefined,
+				dateClosed: cbcFormatDate(collectionData.DATECLOSED),
+			};
+		}) || [];
+
+	// PUBLCI RECORDS
+	const publicRecords =
+		reportData.CC_ATTRIB.CCPUBLICRECORDS?.ITEM_PUBLICRECORD?.map((publicRecord: any) => {
+			return {
+				courtNumber: publicRecord.COURTNAMENUMBER,
+				dateReported: cbcFormatDate(publicRecord.DATEFILED_REPTD),
+				memberNumber: '', // TODO
+				amount: parseFloat(publicRecord.AMOUNT) ?? undefined,
+				recordType: publicRecord.PUBLICRECTYPE?.DESCRIPTION,
+				datePaid: cbcFormatDate(publicRecord.DATEPAID),
+				plaintiff: '', // TODO
+				assets: parseFloat(publicRecord.ASSETS) ?? undefined,
+				courtType: '', // TODO
+				accDesignator: publicRecord.ACCDESIGNATOR?.DESCRIPTION,
+				attorney: '', // TODO
+				liability: parseFloat(publicRecord.LIABILITY) ?? undefined,
+				publicRecordDisposition: publicRecord.PUBRECDISPOSITION?.DESCRIPTION,
+				docket: publicRecord.DOCKET,
+				industry: publicRecord.INDUSTRY?.DESCRIPTION,
+				origDate: cbcFormatDate(publicRecord.ORIGINALDATE),
+			};
+		}) || [];
+
 	const averageMonthsOfOpenRevolvingCredit = totalMonthsOfOpenRevolvingCredits / totalOpenTradelines;
 
 	// DEBT
@@ -508,5 +547,8 @@ export const cbcReportToCreditEvaluation = (reportData: any) => {
 		debtDetails: {
 			debtPayment,
 		},
+
+		collections,
+		publicRecords,
 	};
 };

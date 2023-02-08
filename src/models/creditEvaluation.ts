@@ -164,15 +164,36 @@ export type CreditEvaluationIncome = {
 	incomeSources: CreditEvaluationIncomeSource[];
 };
 
-// export type CreditEvaluationCollection = {
-// 	dateVerified: Date;
-// 	status: string;
-// 	memberNumber: number;
-// };
+export type CreditEvaluationCollection = {
+	dateVerified: Date;
+	status: string;
+	memberNumber: string;
+	narrativesCreditorAccountNumber: string;
+	industryCode: string;
+	dateReported: Date;
+	amount: number;
+	balance: number;
+	dateClosed: Date;
+};
 
-// export type CreditEvaluationPublicRecords = {
-
-// }
+export type CreditEvaluationPublicRecords = {
+	courtNumber: string;
+	dateReported: Date;
+	memberNumber: string;
+	amount: number;
+	recordType: string;
+	datePaid: Date;
+	plaintiff: string;
+	assets: string;
+	courtType: string;
+	accDesignator: string;
+	attorney: string;
+	liability: number;
+	publicRecordDisposition: string;
+	docket: string;
+	industry: string;
+	origDate: Date;
+};
 
 interface ICreditEvaluation extends Document {
 	customer: string;
@@ -223,9 +244,9 @@ interface ICreditEvaluation extends Document {
 	loanAffordabilityRate: number;
 
 	// Collections
-	// collections: CreditEvaluationCollection[];
+	collections: CreditEvaluationCollection[];
 	// Public Records
-	// publicRecords: CreditEvaluationPublicRecords[];
+	publicRecords: CreditEvaluationPublicRecords[];
 }
 
 const creditEvaluationSchema: Schema = new Schema(
@@ -500,6 +521,38 @@ const creditEvaluationSchema: Schema = new Schema(
 		loanAffordabilityRate: {
 			type: Number,
 			default: 14,
+		},
+
+		// Collections
+		collections: {
+			dateVerified: Date,
+			status: String,
+			memberNumber: String,
+			narrativesCreditorAccountNumber: String,
+			industryCode: String,
+			dateReported: Date,
+			amount: Number,
+			balance: Number,
+			dateClosed: Date,
+		},
+		// Public Records
+		publicRecords: {
+			courtNumber: String,
+			dateReported: Date,
+			memberNumber: String,
+			amount: Number,
+			recordType: String,
+			datePaid: Date,
+			plaintiff: String,
+			assets: String,
+			courtType: String,
+			accDesignator: String,
+			attorney: String,
+			liability: Number,
+			publicRecordDisposition: String,
+			docket: String,
+			industry: String,
+			origDate: Date,
 		},
 	},
 
