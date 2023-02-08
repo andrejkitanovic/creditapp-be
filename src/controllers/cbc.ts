@@ -260,6 +260,12 @@ export const cbcFormatMonths = (key: string): number | undefined => {
 	return undefined;
 };
 
+export const cbcFormatString = (key: string): string | undefined => {
+	if (!key || typeof key !== 'string') return;
+
+	return key;
+};
+
 export const cbcFormatDate = (key: string): Date | undefined => {
 	if (!key || key === '/' || typeof key !== 'string') return;
 

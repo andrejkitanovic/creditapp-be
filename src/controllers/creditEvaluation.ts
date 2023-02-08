@@ -16,7 +16,7 @@ import LoanApplication from 'models/loanApplication';
 import { LeanDocument } from 'mongoose';
 import { creditEvaluationCalculations } from 'utils/creditEvaluation/creditEvaluationCalculations';
 import { startOfYear } from 'utils/dayjs';
-import { cbcFormatDate, cbcFormatMonths } from './cbc';
+import { cbcFormatDate, cbcFormatMonths, cbcFormatString } from './cbc';
 import { hsCreateLoan, hsUpdateLoan } from './hubspot';
 
 export const getCreditEvaluations: RequestHandler = async (req, res, next) => {
@@ -477,9 +477,9 @@ export const cbcReportToCreditEvaluation = (reportData: any) => {
 			return {
 				dateVerified: cbcFormatDate(collectionData.BALANCEDATE),
 				status: `${collectionData.STATUS?.CODE} ${collectionData.STATUS?.DESCRIPTION}`,
-				memberNumber: collectionData.MEMBERNUMBER,
+				memberNumber: cbcFormatString(collectionData.MEMBERNUMBER),
 				narrativesCreditorAccountNumber: '', // TODO
-				industryCode: collectionData.INDUSTRYCODE?.DESCRIPTION,
+				industryCode: cbcFormatString(collectionData.INDUSTRYCODE?.DESCRIPTION),
 				dateReported: cbcFormatDate(collectionData.REPORTDATE),
 				amount: parseFloat(collectionData.AMOUNT) ?? undefined,
 				balance: parseFloat(collectionData.BALANCE) ?? undefined,
@@ -488,24 +488,29 @@ export const cbcReportToCreditEvaluation = (reportData: any) => {
 		}) || [];
 
 	// PUBLCI RECORDS
+	let publicRecordsData = reportData.CC_ATTRIB.CCPUBLICRECORDS?.ITEM_PUBLICRECORD;
+	if (Boolean(publicRecordsData) && !Array.isArray(publicRecordsData)) {
+		publicRecordsData = [publicRecordsData];
+	}
+
 	const publicRecords =
-		reportData.CC_ATTRIB.CCPUBLICRECORDS?.ITEM_PUBLICRECORD?.map((publicRecord: any) => {
+		publicRecordsData?.map((publicRecord: any) => {
 			return {
-				courtNumber: publicRecord.COURTNAMENUMBER,
+				courtNumber: cbcFormatString(publicRecord.COURTNAMENUMBER),
 				dateReported: cbcFormatDate(publicRecord.DATEFILED_REPTD),
 				memberNumber: '', // TODO
 				amount: parseFloat(publicRecord.AMOUNT) ?? undefined,
-				recordType: publicRecord.PUBLICRECTYPE?.DESCRIPTION,
+				recordType: cbcFormatString(publicRecord.PUBLICRECTYPE?.DESCRIPTION),
 				datePaid: cbcFormatDate(publicRecord.DATEPAID),
 				plaintiff: '', // TODO
 				assets: parseFloat(publicRecord.ASSETS) ?? undefined,
 				courtType: '', // TODO
-				accDesignator: publicRecord.ACCDESIGNATOR?.DESCRIPTION,
+				accDesignator: cbcFormatString(publicRecord.ACCDESIGNATOR?.DESCRIPTION),
 				attorney: '', // TODO
 				liability: parseFloat(publicRecord.LIABILITY) ?? undefined,
-				publicRecordDisposition: publicRecord.PUBRECDISPOSITION?.DESCRIPTION,
-				docket: publicRecord.DOCKET,
-				industry: publicRecord.INDUSTRY?.DESCRIPTION,
+				publicRecordDisposition: cbcFormatString(publicRecord.PUBRECDISPOSITION?.DESCRIPTION),
+				docket: cbcFormatString(publicRecord.DOCKET),
+				industry: cbcFormatString(publicRecord.INDUSTRY?.DESCRIPTION),
 				origDate: cbcFormatDate(publicRecord.ORIGINALDATE),
 			};
 		}) || [];
