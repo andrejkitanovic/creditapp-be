@@ -86,3 +86,22 @@ export const putMe: RequestHandler = async (req, res, next) => {
 		next(err);
 	}
 };
+
+export const putMePassword: RequestHandler = async (req, res, next) => {
+	try {
+		const { id } = req.auth;
+		const { password } = req.body;
+
+		const hashedPassword = await bcrypt.hash(password, 12);
+
+		await User.findByIdAndUpdate(id, {
+			password: hashedPassword,
+		});
+
+		res.json({
+			message: i18n.__('CONTROLLER.AUTH.PUT_ME_PASSWORD.UPDATED'),
+		});
+	} catch (err) {
+		next(err);
+	}
+};

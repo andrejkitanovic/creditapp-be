@@ -6,6 +6,7 @@ import {
 	postLogin as postLoginController,
 	postRegister as postRegisterController,
 	putMe as putMeController,
+	putMePassword as putMePasswordController,
 } from 'controllers/auth';
 import {
 	postLogin as postLoginValidator,
@@ -39,6 +40,13 @@ defineRoutes(router, [
 		roles: ['user', 'admin'],
 		validator: putMeValidator,
 		controller: putMeController,
+	},
+	{
+		method: 'put',
+		route: '/me/password',
+		roles: ['user', 'admin'],
+		// validator: putMeValidator,
+		controller: putMePasswordController,
 	},
 ]);
 
