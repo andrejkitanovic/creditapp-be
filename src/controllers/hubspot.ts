@@ -113,6 +113,7 @@ export const hsGetContactById = async (contactId: string): Promise<{ [key: strin
 			'graduate_school_attended',
 			'graduate_school_field_of_study',
 			'graduate_degree_received',
+			'graduate_graduation_date',
 
 			// ASSET INFORMATION
 			'combined_checking_savings_balance',
@@ -220,6 +221,7 @@ export const hsGetSingleContact = async (property: string, value: string) => {
 				'graduate_school_attended',
 				'graduate_school_field_of_study',
 				'graduate_degree_received',
+				'graduate_graduation_date',
 
 				// ASSET INFORMATION
 				'combined_checking_savings_balance',
@@ -345,6 +347,7 @@ export const hsUpdateContact = async (
 				graduate_school_attended: customer.educationInfo.graduateSchoolAttended,
 				graduate_school_field_of_study: customer.educationInfo.graduateSchoolFieldOfStudy,
 				graduate_degree_received: customer.educationInfo.graduateDegreeReceived,
+				graduate_graduation_date: customer.educationInfo.graduateGraduationDate,
 
 				// ASSET INFORMATION
 				combined_checking_savings_balance: customer.assetInfo.combinedCheckingSavingsBalance,

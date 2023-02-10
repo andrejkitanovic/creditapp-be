@@ -105,6 +105,7 @@ interface ICustomer extends Document {
 		graduateSchoolAttended?: string;
 		graduateSchoolFieldOfStudy?: string;
 		graduateDegreeReceived?: string;
+		graduateGraduationDate?: Date;
 	};
 
 	// Asset Information
@@ -280,6 +281,7 @@ const customerSchema: Schema = new Schema(
 			graduateSchoolAttended: String,
 			graduateSchoolFieldOfStudy: String,
 			graduateDegreeReceived: String,
+			graduateGraduationDate: Date,
 		},
 
 		// Asset Information
