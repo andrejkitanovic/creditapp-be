@@ -65,6 +65,13 @@ const calculateSummaryOfIncomes = (creditEvaluation: LeanDocument<ICreditEvaluat
 
 					break;
 				case CreditEvaluationIncomeTypeEnum.SELF_EMPLOYMENT:
+					summaryOfIncomes.incomeSources.push({
+						startDate: dayjs(incomeSource.date).toDate(),
+						year: dayjs(incomeSource.date).get('year'),
+						eoyExpected: incomeSource.netProfit || 0,
+						type: income.type,
+					});
+
 					break;
 				case CreditEvaluationIncomeTypeEnum.ADDITIONAL_INCOME:
 				case CreditEvaluationIncomeTypeEnum.HOUSING_ALLOWANCE:
