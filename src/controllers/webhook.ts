@@ -104,7 +104,8 @@ export const postWebhookCustomer: RequestHandler = async (req, res, next) => {
 			if (
 				htmlReport &&
 				jsonResponse.XML_INTERFACE.CREDITREPORT.BUREAU_TYPE?.NOHIT !== 'True' &&
-				!jsonResponse.XML_INTERFACE.CREDITREPORT.BUREAU_TYPE?.RAWDATA?.DATA?.includes('FILE FROZEN')
+				!jsonResponse.XML_INTERFACE.CREDITREPORT.BUREAU_TYPE?.RAWDATA?.DATA?.includes('FILE FROZEN') &&
+				!jsonResponse.XML_INTERFACE.CREDITREPORT.BUREAU_TYPE?.RAWDATA?.DATA?.includes('FILE LOCKED')
 			) {
 				const reportName = `./uploads/${hubspotId}-${nowUnix}_credit-report.html`;
 				fs.writeFileSync(reportName, htmlReport);
@@ -179,6 +180,13 @@ export const postWebhookCustomer: RequestHandler = async (req, res, next) => {
 					jsonResponse.XML_INTERFACE.CREDITREPORT.BUREAU_TYPE?.RAWDATA?.DATA?.includes('FILE FROZEN')
 				) {
 					creditReportResponse.message = 'File frozen';
+					creditReportResponse.credit_inquiry_error =
+						jsonResponse.XML_INTERFACE.CREDITREPORT.BUREAU_TYPE?.RAWDATA?.DATA;
+				} else if (
+					htmlReport &&
+					jsonResponse.XML_INTERFACE.CREDITREPORT.BUREAU_TYPE?.RAWDATA?.DATA?.includes('FILE LOCKED')
+				) {
+					creditReportResponse.message = 'File locked';
 					creditReportResponse.credit_inquiry_error =
 						jsonResponse.XML_INTERFACE.CREDITREPORT.BUREAU_TYPE?.RAWDATA?.DATA;
 				} else creditReportResponse.message = 'Error while fetching report';
