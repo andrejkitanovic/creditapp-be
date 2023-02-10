@@ -72,6 +72,7 @@ export type CreditEvaluationDebtDetails = {
 export type CreditEvaluationSummaryOfIncomes = {
 	incomeSources: {
 		startDate?: Date;
+		source?: string;
 		year: number;
 		eoyExpected: number;
 		type: CreditEvaluationIncomeTypeEnum;
