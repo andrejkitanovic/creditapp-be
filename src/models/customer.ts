@@ -53,7 +53,7 @@ interface ICustomer extends Document {
 	housingInfo: {
 		houstingStatus?: string;
 		monthlyHousingPayment?: number;
-		estimatedLengthOfTimeAtResidence?: number;
+		estimatedLengthOfTimeAtResidence?: string;
 		moveInDate?: Date;
 		calculatedLengthOfTimeAtResidence?: number;
 		yearsAtCurrentAddress?: string;
@@ -229,7 +229,7 @@ const customerSchema: Schema = new Schema(
 		housingInfo: {
 			houstingStatus: String,
 			monthlyHousingPayment: Number,
-			estimatedLengthOfTimeAtResidence: Number,
+			estimatedLengthOfTimeAtResidence: String,
 			moveInDate: Date,
 			calculatedLengthOfTimeAtResidence: Number,
 			yearsAtCurrentAddress: String,
