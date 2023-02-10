@@ -33,7 +33,7 @@ type CreditEvaluationLoan = {
 export enum CreditEvaluationIncomeTypeEnum {
 	PAYSTUB = 'paystub',
 	SELF_EMPLOYMENT = 'self-employment',
-	RETIREMENT_INCOME = 'retirement-income',
+	ADDITIONAL_INCOME = 'additional-income',
 	HOUSING_ALLOWANCE = 'housing-allowance',
 }
 
@@ -149,7 +149,7 @@ export type CreditEvaluationIncomeSource = {
 	yearOverYearNetGrowth?: number;
 	annualWages?: number;
 	mothlyWage?: number;
-	// RETIREMENT
+	// ADDITIONAL
 	source?: string;
 	monthlyBenefit?: number;
 	previousIncomes?: {
@@ -426,7 +426,7 @@ const creditEvaluationSchema: Schema = new Schema(
 						yearOverYearNetGrowth: { type: Number },
 						annualWages: { type: Number },
 						mothlyWage: { type: Number },
-						// RETIREMENT
+						// ADDITIONAL
 						source: { type: String },
 						monthlyBenefit: { type: Number },
 						previousIncomes: [

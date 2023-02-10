@@ -202,7 +202,7 @@ export const calculateIncomes = (type: CreditEvaluationIncomeTypeEnum, period: s
 
 			break;
 		case CreditEvaluationIncomeTypeEnum.HOUSING_ALLOWANCE:
-		case CreditEvaluationIncomeTypeEnum.RETIREMENT_INCOME:
+		case CreditEvaluationIncomeTypeEnum.ADDITIONAL_INCOME:
 			result.incomeSources = incomes.map((income: { date: Date; source: string; monthlyBenefit: number }) => {
 				const currentYear = dayjs().get('year');
 

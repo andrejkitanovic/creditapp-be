@@ -66,7 +66,7 @@ const calculateSummaryOfIncomes = (creditEvaluation: LeanDocument<ICreditEvaluat
 					break;
 				case CreditEvaluationIncomeTypeEnum.SELF_EMPLOYMENT:
 					break;
-				case CreditEvaluationIncomeTypeEnum.RETIREMENT_INCOME:
+				case CreditEvaluationIncomeTypeEnum.ADDITIONAL_INCOME:
 				case CreditEvaluationIncomeTypeEnum.HOUSING_ALLOWANCE:
 					summaryOfIncomes.incomeSources.push({
 						startDate: dayjs(incomeSource.date).toDate(),
