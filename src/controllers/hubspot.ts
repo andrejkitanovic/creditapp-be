@@ -6,6 +6,7 @@ import {
 } from '@hubspot/api-client/lib/codegen/crm/contacts';
 import { RequestHandler } from 'express';
 import { ICustomer } from 'models/customer';
+import LoanPackage from 'models/loanPackage';
 import { ILoanApplication } from 'models/loanApplication';
 import { LeanDocument } from 'mongoose';
 import { filterObject } from 'utils/filterObject';
@@ -411,7 +412,7 @@ export const hsGetLenderById = async (lenderId: string): Promise<{ [key: string]
 // LOANS
 export const hsCreateLoan = async (loanApplication: LeanDocument<ILoanApplication>) => {
 	try {
-		const { id } = await hubspotClient.crm.objects.basicApi.create('2-11419916', {
+		const { id: loanId } = await hubspotClient.crm.objects.basicApi.create('2-11419916', {
 			properties: {
 				loan_name: loanApplication.name,
 				amount: loanApplication.loanAmount?.toString(),
@@ -430,7 +431,37 @@ export const hsCreateLoan = async (loanApplication: LeanDocument<ILoanApplicatio
 			},
 		});
 
-		return id;
+		// Get Lender
+		const { id: lenderId } = await hubspotClient.crm.objects.basicApi.getById('2-11419675', loanApplication.lenderId);
+		if (lenderId) {
+			// Associate lender
+			await hubspotClient.crm.objects.associationsApi.create(
+				'2-11419916',
+				loanId,
+				'2-11419675',
+				lenderId,
+				'lender'
+			);
+		}
+
+		const loanPackage = await LoanPackage.findOne({ creditEvaluation: loanApplication.creditEvaluation });
+		if (loanPackage) {
+			// Get Deal
+			const { id: dealId } = await hubspotClient.crm.deals.basicApi.getById(loanPackage.hubspotId ?? '');
+
+			if (dealId) {
+				// Associate deal
+				await hubspotClient.crm.objects.associationsApi.create(
+					'2-11419916',
+					loanId,
+					'deal',
+					dealId,
+					'loan_application'
+				);
+			}
+		}
+
+		return loanId;
 	} catch (err) {
 		console.log(err);
 
