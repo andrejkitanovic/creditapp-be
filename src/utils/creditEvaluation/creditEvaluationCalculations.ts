@@ -6,6 +6,7 @@ import CreditEvaluation, {
 	CreditEvaluationIncomeOverviewEnum,
 	CreditEvaluationIncomeTypeEnum,
 	CreditEvaluationLoanAffordability,
+	CreditEvaluationLoanAffordabilityEnum,
 	CreditEvaluationSummaryOfIncomes,
 	ICreditEvaluation,
 } from 'models/creditEvaluation';
@@ -16,7 +17,7 @@ export const creditEvaluationCalculations = async (creditEvaluation: LeanDocumen
 	creditEvaluation.summaryOfIncomes = calculateSummaryOfIncomes(creditEvaluation);
 	creditEvaluation.debtDetails = await calculateDebtDetails(creditEvaluation, true);
 	creditEvaluation.incomesOverview = calculateIncomesOverview(creditEvaluation);
-	creditEvaluation.loanAffordability = calculateLoanAffordability(creditEvaluation);
+	creditEvaluation.loanAffordability = await calculateLoanAffordability(creditEvaluation);
 	return creditEvaluation;
 };
 
@@ -263,25 +264,139 @@ const calculateIncomesOverview = (creditEvaluation: LeanDocument<ICreditEvaluati
 	return incomesOverview;
 };
 
-const calculateLoanAffordability = (creditEvaluation: LeanDocument<ICreditEvaluation>) => {
-	const loanAffordability: CreditEvaluationLoanAffordability[] = [];
+const calculateLoanAffordability = async (creditEvaluation: LeanDocument<ICreditEvaluation>) => {
+	const loanAffordabilitiesRaw: { source: CreditEvaluationLoanAffordabilityEnum; annual: number; debt: number }[] = [];
+	const loanAffordabilities: CreditEvaluationLoanAffordability[] = [];
+	const rate = creditEvaluation.loanAffordabilityRate || 14;
+	const dti = 43;
 
-	creditEvaluation.incomesOverview.forEach((incomeOverview) => {
-		const rate = creditEvaluation.loanAffordabilityRate || 14;
-		const dti = 43;
-		const annualTotal = incomeOverview.annual * (dti / 100);
+	if (creditEvaluation.selectedHouseholdIncome) {
+		const selectedIncome = creditEvaluation.incomesOverview.find(
+			(income) => income.type === creditEvaluation.selectedHouseholdIncome
+		) as CreditEvaluationIncomeOverview;
+
+		loanAffordabilitiesRaw.push({
+			source: CreditEvaluationLoanAffordabilityEnum.SELECTED_INCOME,
+			annual: selectedIncome.annual,
+			debt: creditEvaluation.debtDetails.debtPayment,
+		});
+
+		if (creditEvaluation.debtDetails.deferredStudentLoans) {
+			loanAffordabilitiesRaw.push({
+				source: CreditEvaluationLoanAffordabilityEnum.AFFORDABILITY_INCLUDING_STUDENT_LOAN_DEBT,
+				annual: selectedIncome.annual,
+				debt: creditEvaluation.debtDetails.debtPayment + creditEvaluation.debtDetails.deferredStudentLoans,
+			});
+		}
+		if (creditEvaluation.debtDetails.rentPayment) {
+			loanAffordabilitiesRaw.push({
+				source: CreditEvaluationLoanAffordabilityEnum.AFFORDABILITY_INCLUDING_RENT,
+				annual: selectedIncome.annual,
+				debt: creditEvaluation.debtDetails.debtPayment + creditEvaluation.debtDetails.rentPayment,
+			});
+		}
+		if (creditEvaluation.debtDetails.deferredStudentLoans && creditEvaluation.debtDetails.rentPayment) {
+			loanAffordabilitiesRaw.push({
+				source: CreditEvaluationLoanAffordabilityEnum.AFFORDABILITY_INCLUDING_RENT_AND_DEFERRED_STUDENT_LOANS,
+				annual: selectedIncome.annual,
+				debt:
+					creditEvaluation.debtDetails.debtPayment +
+					creditEvaluation.debtDetails.rentPayment +
+					creditEvaluation.debtDetails.deferredStudentLoans,
+			});
+		}
+		if (creditEvaluation.debtDetails.mortgagePayment) {
+			loanAffordabilitiesRaw.push({
+				source: CreditEvaluationLoanAffordabilityEnum.AFFRODABILITY_HALF_MORTAGE,
+				annual: selectedIncome.annual,
+				debt: creditEvaluation.debtDetails.debtPayment - creditEvaluation.debtDetails.mortgagePayment / 2,
+			});
+		}
+
+		// SPOUSE
+
+		const customer = await Customer.findById(creditEvaluation.customer);
+		if (customer?.spouse) {
+			const spouseCreditEval = (await CreditEvaluation.findOne({
+				customer: customer.spouse,
+			}).lean()) as ICreditEvaluation;
+
+			if (creditEvaluation.debtDetails.spouseIncome) {
+				loanAffordabilitiesRaw.push({
+					source: CreditEvaluationLoanAffordabilityEnum.HOUSEHOLD_INCOME,
+					annual: selectedIncome.annual + creditEvaluation.debtDetails.spouseIncome * 12,
+					debt:
+						creditEvaluation.debtDetails.debtPayment -
+						creditEvaluation.debtDetails.mortgagePayment / 2 +
+						(spouseCreditEval.debtDetails.debtPayment - creditEvaluation.debtDetails.mortgagePayment / 2),
+				});
+			}
+
+			if (
+				creditEvaluation.debtDetails.spouseIncome &&
+				(creditEvaluation.debtDetails.deferredStudentLoans || spouseCreditEval.debtDetails.deferredStudentLoans)
+			) {
+				loanAffordabilitiesRaw.push({
+					source:
+						CreditEvaluationLoanAffordabilityEnum.HOUSEHOLD_AFFORDABILITY_INCLUDING_RENT_AND_DEFERRED_STUDENT_LOANS,
+					annual: selectedIncome.annual + creditEvaluation.debtDetails.spouseIncome * 12,
+					debt:
+						creditEvaluation.debtDetails.debtPayment -
+						creditEvaluation.debtDetails.mortgagePayment / 2 +
+						(spouseCreditEval.debtDetails.debtPayment - creditEvaluation.debtDetails.mortgagePayment / 2) +
+						(creditEvaluation.debtDetails.deferredStudentLoans || 0) +
+						(spouseCreditEval.debtDetails.deferredStudentLoans || 0),
+				});
+			}
+			if (
+				creditEvaluation.debtDetails.spouseIncome &&
+				(creditEvaluation.debtDetails.rentPayment || spouseCreditEval.debtDetails.rentPayment)
+			) {
+				loanAffordabilitiesRaw.push({
+					source: CreditEvaluationLoanAffordabilityEnum.HOUSEHOLD_AFFORDABILITY_INCLUDING_RENT,
+					annual: selectedIncome.annual + creditEvaluation.debtDetails.spouseIncome * 12,
+					debt:
+						creditEvaluation.debtDetails.debtPayment -
+						creditEvaluation.debtDetails.mortgagePayment / 2 +
+						(spouseCreditEval.debtDetails.debtPayment - creditEvaluation.debtDetails.mortgagePayment / 2) +
+						(creditEvaluation.debtDetails.rentPayment || 0) +
+						(spouseCreditEval.debtDetails.rentPayment || 0),
+				});
+			}
+			if (
+				creditEvaluation.debtDetails.spouseIncome &&
+				(creditEvaluation.debtDetails.deferredStudentLoans || spouseCreditEval.debtDetails.deferredStudentLoans) &&
+				(creditEvaluation.debtDetails.rentPayment || spouseCreditEval.debtDetails.rentPayment)
+			) {
+				loanAffordabilitiesRaw.push({
+					source:
+						CreditEvaluationLoanAffordabilityEnum.HOUSEHOLD_AFFORDABILITY_INCLUDING_RENT_AND_DEFERRED_STUDENT_LOANS,
+					annual: selectedIncome.annual + creditEvaluation.debtDetails.spouseIncome * 12,
+					debt:
+						creditEvaluation.debtDetails.debtPayment -
+						creditEvaluation.debtDetails.mortgagePayment / 2 +
+						(spouseCreditEval.debtDetails.debtPayment - creditEvaluation.debtDetails.mortgagePayment / 2) +
+						(creditEvaluation.debtDetails.deferredStudentLoans || 0) +
+						(spouseCreditEval.debtDetails.deferredStudentLoans || 0) +
+						(creditEvaluation.debtDetails.rentPayment || 0) +
+						(spouseCreditEval.debtDetails.rentPayment || 0),
+				});
+			}
+		}
+	}
+
+	loanAffordabilitiesRaw.forEach((loanAffordabilityRaw) => {
+		const annualTotal = loanAffordabilityRaw.annual * (dti / 100);
 		const monthlyTotal = annualTotal / 12;
-		const monthlyTotalWithDebt = monthlyTotal - (creditEvaluation.debtDetails.totalDebtPayment || 0);
+		const monthlyTotalWithDebt = monthlyTotal - loanAffordabilityRaw.debt;
 
-		loanAffordability.push({
-			source: incomeOverview.type,
+		loanAffordabilities.push({
+			source: loanAffordabilityRaw.source,
 			rate,
 			dti,
-
 			annualTotal,
 			monthlyTotal,
 			monthlyTotalWithDebt,
-
 			term60: calculatePV(rate / 100 / 12, 60, monthlyTotalWithDebt),
 			term72: calculatePV(rate / 100 / 12, 72, monthlyTotalWithDebt),
 			term84: calculatePV(rate / 100 / 12, 84, monthlyTotalWithDebt),
@@ -290,7 +405,7 @@ const calculateLoanAffordability = (creditEvaluation: LeanDocument<ICreditEvalua
 		});
 	});
 
-	return loanAffordability;
+	return loanAffordabilities;
 };
 
 function calculatePV(rate: number, nper: number, pmt: number) {

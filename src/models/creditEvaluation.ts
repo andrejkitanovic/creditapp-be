@@ -78,14 +78,6 @@ export type CreditEvaluationSummaryOfIncomes = {
 	}[];
 };
 
-/*
-Current Income (from income table)
-Current Income Debt Adjusted (from income table, with a negative monthly. debt modifier)
-Current Income Student Loan Adjusted (from income table, with a negative monthly debt modifier)
-Household Income (A modified annual income amount)
-Household Income Debt Adjusted (A m modified annual income amount with a negative monthly debt modifier)
-Household Income Student Loan Adjusted (A m modified annual income amount with a negative monthly debt modifier)
-*/
 export enum CreditEvaluationIncomeOverviewEnum {
 	STATED_INCOME = 'stated-income',
 	INDIVIDUAL_INCOME_CURRENT_YEAR = 'individual-income-current-year',
@@ -106,9 +98,21 @@ export type CreditEvaluationIncomeOverview = {
 	dti: number;
 };
 
+export enum CreditEvaluationLoanAffordabilityEnum {
+	SELECTED_INCOME = 'selected-income',
+	AFFORDABILITY_INCLUDING_STUDENT_LOAN_DEBT = 'affordability-including-student-loan-debt',
+	AFFORDABILITY_INCLUDING_RENT = 'affordability-including-rent',
+	AFFORDABILITY_INCLUDING_RENT_AND_DEFERRED_STUDENT_LOANS = 'affordability-including-rent-and-deferred-student-loans',
+	AFFRODABILITY_HALF_MORTAGE = 'affordability-half-mortgage',
+	HOUSEHOLD_INCOME = 'household-income',
+	HOUSEHOLD_AFFORDABILITY_INCLUDING_STUDENT_LOAN_DEBT = 'household-affordability-including-student-loan-debt',
+	HOUSEHOLD_AFFORDABILITY_INCLUDING_RENT = 'household-affordability-including-rent',
+	HOUSEHOLD_AFFORDABILITY_INCLUDING_RENT_AND_DEFERRED_STUDENT_LOANS = 'household-affordability-including-rent-and-deferred-student-loans',
+}
+
 // LOAN AFFORDABILITY
 export type CreditEvaluationLoanAffordability = {
-	source: CreditEvaluationIncomeOverviewEnum;
+	source: CreditEvaluationLoanAffordabilityEnum;
 	rate: number;
 	dti: number;
 
@@ -503,7 +507,7 @@ const creditEvaluationSchema: Schema = new Schema(
 		// Loan Affordability
 		loanAffordability: [
 			{
-				source: { type: String, enum: CreditEvaluationIncomeOverviewEnum },
+				source: { type: String, enum: CreditEvaluationLoanAffordabilityEnum },
 				rate: { type: Number },
 				dti: { type: Number },
 

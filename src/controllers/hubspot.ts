@@ -435,13 +435,7 @@ export const hsCreateLoan = async (loanApplication: LeanDocument<ILoanApplicatio
 		const { id: lenderId } = await hubspotClient.crm.objects.basicApi.getById('2-11419675', loanApplication.lenderId);
 		if (lenderId) {
 			// Associate lender
-			await hubspotClient.crm.objects.associationsApi.create(
-				'2-11419916',
-				loanId,
-				'2-11419675',
-				lenderId,
-				'lender'
-			);
+			await hubspotClient.crm.objects.associationsApi.create('2-11419916', loanId, '2-11419675', lenderId, 'lender');
 		}
 
 		const loanPackage = await LoanPackage.findOne({ creditEvaluation: loanApplication.creditEvaluation });
