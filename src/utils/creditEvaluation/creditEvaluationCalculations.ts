@@ -252,8 +252,8 @@ const calculateIncomesOverview = (creditEvaluation: LeanDocument<ICreditEvaluati
 					type: CreditEvaluationIncomeOverviewEnum.HOUSEHOLD_INCOME,
 					annual:
 						selectedIncome.annual +
-						creditEvaluation.debtDetails.spouseIncome * 12 -
-						(creditEvaluation.debtDetails.spousalDebt || 0) * 12,
+						creditEvaluation.debtDetails.spouseIncome * 12 
+						// - (creditEvaluation.debtDetails.spousalDebt || 0) * 12,
 				});
 			}
 		}
