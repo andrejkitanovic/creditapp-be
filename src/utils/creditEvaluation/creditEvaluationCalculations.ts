@@ -220,40 +220,42 @@ const calculateIncomesOverview = (creditEvaluation: LeanDocument<ICreditEvaluati
 	}
 
 	if (creditEvaluation.selectedHouseholdIncome) {
-		const selectedIncome = creditEvaluation.incomesOverview.find(
+		const selectedIncome = incomesOverview.find(
 			(income) => income.type === creditEvaluation.selectedHouseholdIncome
 		) as CreditEvaluationIncomeOverview;
 
-		if (creditEvaluation.debtDetails.deferredStudentLoans) {
-			incomesOverview.push({
-				...priorYearIncome,
-				type: CreditEvaluationIncomeOverviewEnum.INDIVIDUAL_INCOME_STUDENT_LOAN_ADJUSTED,
-				annual: selectedIncome.annual - creditEvaluation.debtDetails.deferredStudentLoans * 12,
-			});
-		}
-		if (creditEvaluation.debtDetails.rentPayment) {
-			incomesOverview.push({
-				...priorYearIncome,
-				type: CreditEvaluationIncomeOverviewEnum.INDIVIDUAL_INCOME_RENT_ADJUSTED,
-				annual: selectedIncome.annual - creditEvaluation.debtDetails.rentPayment * 12,
-			});
-		}
-		if (creditEvaluation.debtDetails.mortgagePayment) {
-			incomesOverview.push({
-				...priorYearIncome,
-				type: CreditEvaluationIncomeOverviewEnum.INDIVIDUAL_INCOME_HALF_MORTGAGE,
-				annual: selectedIncome.annual - creditEvaluation.debtDetails.mortgagePayment * 6,
-			});
-		}
-		if (creditEvaluation.debtDetails.spouseIncome) {
-			incomesOverview.push({
-				...priorYearIncome,
-				type: CreditEvaluationIncomeOverviewEnum.HOUSEHOLD_INCOME,
-				annual:
-					selectedIncome.annual +
-					creditEvaluation.debtDetails.spouseIncome * 12 -
-					(creditEvaluation.debtDetails.spousalDebt || 0) * 12,
-			});
+		if (selectedIncome) {
+			if (creditEvaluation.debtDetails.deferredStudentLoans) {
+				incomesOverview.push({
+					...priorYearIncome,
+					type: CreditEvaluationIncomeOverviewEnum.INDIVIDUAL_INCOME_STUDENT_LOAN_ADJUSTED,
+					annual: selectedIncome.annual - creditEvaluation.debtDetails.deferredStudentLoans * 12,
+				});
+			}
+			if (creditEvaluation.debtDetails.rentPayment) {
+				incomesOverview.push({
+					...priorYearIncome,
+					type: CreditEvaluationIncomeOverviewEnum.INDIVIDUAL_INCOME_RENT_ADJUSTED,
+					annual: selectedIncome.annual - creditEvaluation.debtDetails.rentPayment * 12,
+				});
+			}
+			if (creditEvaluation.debtDetails.mortgagePayment) {
+				incomesOverview.push({
+					...priorYearIncome,
+					type: CreditEvaluationIncomeOverviewEnum.INDIVIDUAL_INCOME_HALF_MORTGAGE,
+					annual: selectedIncome.annual - creditEvaluation.debtDetails.mortgagePayment * 6,
+				});
+			}
+			if (creditEvaluation.debtDetails.spouseIncome) {
+				incomesOverview.push({
+					...priorYearIncome,
+					type: CreditEvaluationIncomeOverviewEnum.HOUSEHOLD_INCOME,
+					annual:
+						selectedIncome.annual +
+						creditEvaluation.debtDetails.spouseIncome * 12 -
+						(creditEvaluation.debtDetails.spousalDebt || 0) * 12,
+				});
+			}
 		}
 	}
 
