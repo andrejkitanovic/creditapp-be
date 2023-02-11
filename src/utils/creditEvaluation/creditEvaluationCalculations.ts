@@ -198,6 +198,15 @@ const calculateIncomesOverview = (creditEvaluation: LeanDocument<ICreditEvaluati
 		}
 	});
 
+	if (creditEvaluation.statedMonthlyIncome) {
+		incomesOverview.push({
+			type: CreditEvaluationIncomeOverviewEnum.STATED_INCOME,
+			dti: 0,
+			monthly: creditEvaluation.statedMonthlyIncome,
+			annual: creditEvaluation.statedMonthlyIncome * 12,
+		});
+	}
+
 	if (currentYearIncome.annual) {
 		incomesOverview.push(currentYearIncome);
 	}
@@ -250,22 +259,11 @@ const calculateIncomesOverview = (creditEvaluation: LeanDocument<ICreditEvaluati
 				incomesOverview.push({
 					...priorYearIncome,
 					type: CreditEvaluationIncomeOverviewEnum.HOUSEHOLD_INCOME,
-					annual:
-						selectedIncome.annual +
-						creditEvaluation.debtDetails.spouseIncome * 12 
-						// - (creditEvaluation.debtDetails.spousalDebt || 0) * 12,
+					annual: selectedIncome.annual + creditEvaluation.debtDetails.spouseIncome * 12,
+					// - (creditEvaluation.debtDetails.spousalDebt || 0) * 12,
 				});
 			}
 		}
-	}
-
-	if (creditEvaluation.statedMonthlyIncome) {
-		incomesOverview.push({
-			type: CreditEvaluationIncomeOverviewEnum.STATED_INCOME,
-			dti: 0,
-			monthly: creditEvaluation.statedMonthlyIncome,
-			annual: creditEvaluation.statedMonthlyIncome * 12,
-		});
 	}
 
 	// Calculate DTI
