@@ -8,7 +8,7 @@
 		"start:dev": "ts-node ./src/app.ts",
 		"start": "node ./dist/app.js",
 		"watch": "nodemon ./src/app.ts",
-		"build": "tsc && npm run copy-templates",
+		"build": "tsc",
 		"test": "jest --passWithNoTests",
 		"format:check": "prettier --check ./src/**/*.ts",
 		"format:write": "prettier --write ./src/**/*.ts",
