@@ -207,22 +207,31 @@ const calculateIncomesOverview = (creditEvaluation: LeanDocument<ICreditEvaluati
 		});
 	}
 
+	let incomeYearsLength = 0;
 	if (currentYearIncome.annual) {
 		incomesOverview.push(currentYearIncome);
+		incomeYearsLength += 1;
 	}
 	if (priorYearIncome.annual) {
 		incomesOverview.push(priorYearIncome);
+		incomeYearsLength += 1;
+	}
+
+	if (prior2YearIncome.annual) {
+		incomeYearsLength += 1;
 	}
 
 	incomesOverview.push({
 		...priorYearIncome,
 		type: CreditEvaluationIncomeOverviewEnum.INDIVIDUAL_INCOME_2_YEAR_AVERAGE,
-		annual: (priorYearIncome.annual + currentYearIncome.annual) / 2,
+		annual: (priorYearIncome.annual + currentYearIncome.annual) / Math.min(2, incomeYearsLength),
 	});
+
 	incomesOverview.push({
 		...priorYearIncome,
 		type: CreditEvaluationIncomeOverviewEnum.INDIVIDUAL_INCOME_3_YEAR_AVERAGE,
-		annual: (prior2YearIncome.annual + priorYearIncome.annual + currentYearIncome.annual) / 2,
+		annual:
+			(prior2YearIncome.annual + priorYearIncome.annual + currentYearIncome.annual) / Math.min(3, incomeYearsLength),
 	});
 
 	if (creditEvaluation.selectedHouseholdIncome) {
