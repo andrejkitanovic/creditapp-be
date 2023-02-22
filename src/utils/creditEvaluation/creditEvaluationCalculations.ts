@@ -119,7 +119,7 @@ const calculateDebtDetails = async (creditEvaluation: LeanDocument<ICreditEvalua
 			return (prevValue += loan.balance);
 		}, 0) * 0.01;
 	if (!debtDetails.deferredStudentLoans) {
-		debtDetails.deferredStudentLoans = debtDetails.calculatedDeferredStudentLoans;
+		debtDetails.deferredStudentLoans = parseFloat(debtDetails.calculatedDeferredStudentLoans.toFixed(2));
 	}
 
 	debtDetails.totalDebtPayment =

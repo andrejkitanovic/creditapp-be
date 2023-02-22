@@ -400,7 +400,7 @@ export const cbcReportToCreditEvaluation = (reportData: any) => {
 
 	const tradelines =
 		reportData.CC_ATTRIB.CCTRADELINES.ITEM_TRADELINE?.filter(
-			(tradelineData: any) => tradelineData.CREDITLIMIT !== '-1'
+			(tradelineData: any) => tradelineData.CREDITLIMIT !== '-1' || tradelineData.FIRMNAME_ID.includes('AMEX')
 		).map((tradelineData: any) => {
 			if (!firstTrade || dayjs(cbcFormatDate(tradelineData.DATEOPENED)).diff(dayjs(firstTrade)) < 0) {
 				firstTrade = cbcFormatDate(tradelineData.DATEOPENED);
@@ -412,11 +412,16 @@ export const cbcReportToCreditEvaluation = (reportData: any) => {
 				totalMonthsOfOpenRevolvingCredits += dayjs().diff(dayjs(cbcFormatDate(tradelineData.DATEOPENED)), 'month');
 			}
 
+			let payment = tradelineData.MONTHLYPAYMENT;
+			if (tradelineData.FIRMNAME_ID.includes('AMEX') && payment === '-1') {
+				payment = parseFloat(tradelineData.BALANCEPAYMENT) * 0.01;
+			}
+
 			return {
 				status: tradelineData.CLOSEDIND.CODE === 'C' ? 'closed' : 'opened',
 				creditor: tradelineData.FIRMNAME_ID,
 				balance: parseFloat(tradelineData.BALANCEPAYMENT) ?? undefined,
-				payment: parseFloat(tradelineData.MONTHLYPAYMENT) ?? undefined,
+				payment: Math.max(0, parseFloat(payment)) ?? undefined,
 				hpb: parseFloat(tradelineData.HIGHCREDIT) ?? undefined,
 				creditLimit: parseFloat(tradelineData.CREDITLIMIT) ?? undefined,
 				opened: cbcFormatDate(tradelineData.DATEOPENED),
@@ -455,7 +460,7 @@ export const cbcReportToCreditEvaluation = (reportData: any) => {
 	// LOANS
 	const loans =
 		reportData.CC_ATTRIB.CCTRADELINES.ITEM_TRADELINE?.filter(
-			(tradelineData: any) => tradelineData.CREDITLIMIT === '-1'
+			(tradelineData: any) => tradelineData.CREDITLIMIT === '-1' && !tradelineData.FIRMNAME_ID.includes('AMEX')
 		).map((tradelineData: any) => {
 			return {
 				status: tradelineData.CLOSEDIND.CODE === 'C' ? 'closed' : 'opened',
