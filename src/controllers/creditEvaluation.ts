@@ -492,7 +492,7 @@ export const cbcReportToCreditEvaluation = (reportData: any) => {
 			};
 		}) || [];
 
-	// PUBLCI RECORDS
+	// PUBLIC RECORDS
 	let publicRecordsData = reportData.CC_ATTRIB.CCPUBLICRECORDS?.ITEM_PUBLICRECORD;
 	if (Boolean(publicRecordsData) && !Array.isArray(publicRecordsData)) {
 		publicRecordsData = [publicRecordsData];
@@ -537,6 +537,34 @@ export const cbcReportToCreditEvaluation = (reportData: any) => {
 			return typeof reason.CODE === 'string' && typeof reason.DESCRIPTION === 'string';
 		}).map((reason: any) => `(${reason.CODE}) ${reason.DESCRIPTION}`) ?? [];
 
+	// LATE PAYMENTS
+	const latePayments =
+		reportData.CC_ATTRIB.CCTRADELINES.ITEM_TRADELINE?.filter(
+			(tradelineData: any) =>
+				tradelineData.RATING_30 !== '0' || tradelineData.RATING_60 !== '0' || tradelineData.RATING_90 !== '0'
+		).map((tradelineData: any) => {
+			return {
+				creditor: tradelineData.FIRMNAME_ID,
+				reportDate: cbcFormatDate(tradelineData.DATEREPORTED),
+				rating30: parseFloat(tradelineData.RATING_30) ?? 0,
+				rating60: parseFloat(tradelineData.RATING_60) ?? 0,
+				rating90: parseFloat(tradelineData.RATING_90) ?? 0,
+			};
+		}) || [];
+
+	// CHARGEOFFS
+	const chargeOffs =
+		reportData.CC_ATTRIB.CCTRADELINES.ITEM_TRADELINE?.filter(
+			(tradelineData: any) => tradelineData.CHARGEOFFAMOUNT !== '-1'
+		).map((tradelineData: any) => {
+			return {
+				creditor: tradelineData.FIRMNAME_ID,
+				reportDate: cbcFormatDate(tradelineData.DATEREPORTED),
+				chargeoff: parseFloat(tradelineData.CHARGEOFFAMOUNT) ?? undefined,
+				pastdue: parseFloat(tradelineData.PASTDUE) ?? undefined,
+			};
+		}) || [];
+
 	return {
 		reportDate: dayjs().toDate(),
 		firstCreditAccount,
@@ -560,5 +588,7 @@ export const cbcReportToCreditEvaluation = (reportData: any) => {
 
 		collections,
 		publicRecords,
+		latePayments,
+		chargeOffs,
 	};
 };

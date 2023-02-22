@@ -200,6 +200,21 @@ export type CreditEvaluationPublicRecords = {
 	origDate: Date;
 };
 
+export type CreditEvaluationLatePayments = {
+	creditor: string;
+	reportDate: Date;
+	rating30: number;
+	rating60: number;
+	rating90: number;
+};
+
+export type CreditEvaluationChargeoffs = {
+	creditor: string;
+	reportDate: Date;
+	chargeoff: number;
+	pastdue: number;
+};
+
 interface ICreditEvaluation extends Document {
 	customer: string;
 	// HTML and PDF
@@ -252,6 +267,10 @@ interface ICreditEvaluation extends Document {
 	collections: CreditEvaluationCollection[];
 	// Public Records
 	publicRecords: CreditEvaluationPublicRecords[];
+	// Late Payments
+	latePayments: CreditEvaluationLatePayments[];
+	// Chargeoffs
+	chargeOffs: CreditEvaluationChargeoffs[];
 }
 
 const creditEvaluationSchema: Schema = new Schema(
@@ -561,6 +580,24 @@ const creditEvaluationSchema: Schema = new Schema(
 				docket: String,
 				industry: String,
 				origDate: Date,
+			},
+		],
+
+		latePayments: [
+			{
+				creditor: String,
+				reportDate: Date,
+				rating30: Number,
+				rating60: Number,
+				rating90: Number,
+			},
+		],
+		chargeOffs: [
+			{
+				creditor: String,
+				reportDate: Date,
+				chargeoff: Number,
+				pastdue: Number,
 			},
 		],
 	},
