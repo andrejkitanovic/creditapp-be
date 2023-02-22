@@ -216,17 +216,15 @@ const calculateIncomesOverview = (creditEvaluation: LeanDocument<ICreditEvaluati
 		incomesOverview.push(priorYearIncome);
 		incomeYearsLength += 1;
 	}
-
-	if (prior2YearIncome.annual) {
-		incomeYearsLength += 1;
-	}
-
 	incomesOverview.push({
 		...priorYearIncome,
 		type: CreditEvaluationIncomeOverviewEnum.INDIVIDUAL_INCOME_2_YEAR_AVERAGE,
 		annual: (priorYearIncome.annual + currentYearIncome.annual) / Math.min(2, incomeYearsLength),
 	});
 
+	if (prior2YearIncome.annual) {
+		incomeYearsLength += 1;
+	}
 	incomesOverview.push({
 		...priorYearIncome,
 		type: CreditEvaluationIncomeOverviewEnum.INDIVIDUAL_INCOME_3_YEAR_AVERAGE,
