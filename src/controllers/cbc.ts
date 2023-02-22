@@ -24,7 +24,7 @@ const axiosCbc = axios.create({
 export const cbcCheckAndChangePassword = async () => {
 	const cbcEntity = await CBC.findOne();
 
-	if (cbcEntity && dayjs(cbcEntity.nextReset).diff(dayjs()) <= 0) {
+	if (cbcEntity && dayjs(cbcEntity.nextReset).subtract(1, 'd').diff(dayjs()) <= 0) {
 		const newPassword = crypto.randomBytes(20).toString('hex');
 		const md5 = crypto.createHash('md5').update(newPassword).digest('hex');
 		const hashedPassword = bin2hex(md5);
@@ -32,7 +32,7 @@ export const cbcCheckAndChangePassword = async () => {
 		const xml = cbcXML({
 			data_area: {
 				header_data: {
-					user_pwd: await cbcPassword(),
+					user_pwd: cbcEntity.password,
 					new_pwd: hashedPassword,
 					action: 'PWD_CHANGE',
 				},

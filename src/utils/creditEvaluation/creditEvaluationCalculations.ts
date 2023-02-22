@@ -212,21 +212,18 @@ const calculateIncomesOverview = (creditEvaluation: LeanDocument<ICreditEvaluati
 	}
 	if (priorYearIncome.annual) {
 		incomesOverview.push(priorYearIncome);
-
-		incomesOverview.push({
-			...priorYearIncome,
-			type: CreditEvaluationIncomeOverviewEnum.INDIVIDUAL_INCOME_2_YEAR_AVERAGE,
-			annual: (priorYearIncome.annual + currentYearIncome.annual) / 2,
-		});
-
-		if (prior2YearIncome.annual) {
-			incomesOverview.push({
-				...priorYearIncome,
-				type: CreditEvaluationIncomeOverviewEnum.INDIVIDUAL_INCOME_3_YEAR_AVERAGE,
-				annual: (prior2YearIncome.annual + priorYearIncome.annual + currentYearIncome.annual) / 2,
-			});
-		}
 	}
+
+	incomesOverview.push({
+		...priorYearIncome,
+		type: CreditEvaluationIncomeOverviewEnum.INDIVIDUAL_INCOME_2_YEAR_AVERAGE,
+		annual: (priorYearIncome.annual + currentYearIncome.annual) / 2,
+	});
+	incomesOverview.push({
+		...priorYearIncome,
+		type: CreditEvaluationIncomeOverviewEnum.INDIVIDUAL_INCOME_3_YEAR_AVERAGE,
+		annual: (prior2YearIncome.annual + priorYearIncome.annual + currentYearIncome.annual) / 2,
+	});
 
 	if (creditEvaluation.selectedHouseholdIncome) {
 		const selectedIncome = incomesOverview.find(

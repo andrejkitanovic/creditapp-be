@@ -417,13 +417,18 @@ export const cbcReportToCreditEvaluation = (reportData: any) => {
 				payment = parseFloat(tradelineData.BALANCEPAYMENT) * 0.01;
 			}
 
+			let creditLimit = tradelineData.CREDITLIMIT;
+			if (creditLimit === '-1') {
+				creditLimit = tradelineData.HIGHCREDIT;
+			}
+
 			return {
 				status: tradelineData.CLOSEDIND.CODE === 'C' ? 'closed' : 'opened',
 				creditor: tradelineData.FIRMNAME_ID,
 				balance: parseFloat(tradelineData.BALANCEPAYMENT) ?? undefined,
 				payment: Math.max(0, parseFloat(payment)) ?? undefined,
 				hpb: parseFloat(tradelineData.HIGHCREDIT) ?? undefined,
-				creditLimit: parseFloat(tradelineData.CREDITLIMIT) ?? undefined,
+				creditLimit: parseFloat(creditLimit) ?? undefined,
 				opened: cbcFormatDate(tradelineData.DATEOPENED),
 				reportDate: cbcFormatDate(tradelineData.DATEREPORTED),
 				accountType: tradelineData.OWNERSHIP.DESCRIPTION,
