@@ -433,8 +433,8 @@ export const cbcReportToCreditEvaluation = (reportData: any) => {
 				reportDate: cbcFormatDate(tradelineData.DATEREPORTED),
 				accountType: tradelineData.OWNERSHIP.DESCRIPTION,
 				utilizationRate:
-					parseFloat(tradelineData.BALANCEPAYMENT) && parseFloat(tradelineData.CREDITLIMIT)
-						? parseFloat(tradelineData.BALANCEPAYMENT) / parseFloat(tradelineData.CREDITLIMIT)
+					parseFloat(tradelineData.BALANCEPAYMENT) && parseFloat(creditLimit)
+						? parseFloat(tradelineData.BALANCEPAYMENT) / parseFloat(creditLimit)
 						: 0,
 			};
 		}) || [];
