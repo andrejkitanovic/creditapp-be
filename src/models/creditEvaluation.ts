@@ -13,6 +13,7 @@ type CreditEvaluationTradeline = {
 	reportDate: Date;
 	accountType: string;
 	utilizationRate: number;
+	typeDetail: string;
 };
 
 // LOANS
@@ -27,6 +28,7 @@ type CreditEvaluationLoan = {
 	reportDate: Date;
 	accountType: string;
 	debitToCreditRatio: string;
+	typeDetail: string;
 };
 
 // INCOMES
@@ -379,6 +381,9 @@ const creditEvaluationSchema: Schema = new Schema(
 				utilizationRate: {
 					type: Number,
 				},
+				typeDetail: {
+					type: String,
+				},
 			},
 		],
 		loans: [
@@ -413,6 +418,9 @@ const creditEvaluationSchema: Schema = new Schema(
 				},
 				debitToCreditRatio: {
 					type: Number,
+				},
+				typeDetail: {
+					type: String,
 				},
 			},
 		],

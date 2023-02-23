@@ -231,7 +231,7 @@ const customerSchema: Schema = new Schema(
 			monthlyHousingPayment: Number,
 			estimatedLengthOfTimeAtResidence: String,
 			moveInDate: Date,
-			calculatedLengthOfTimeAtResidence: Number,
+			calculatedLengthOfTimeAtResidence: String,
 			yearsAtCurrentAddress: String,
 		},
 

@@ -436,6 +436,7 @@ export const cbcReportToCreditEvaluation = (reportData: any) => {
 					parseFloat(tradelineData.BALANCEPAYMENT) && parseFloat(creditLimit)
 						? parseFloat(tradelineData.BALANCEPAYMENT) / parseFloat(creditLimit)
 						: 0,
+				typeDetail: tradelineData.TRADETYPE?.DESCRIPTION,
 			};
 		}) || [];
 
@@ -478,6 +479,7 @@ export const cbcReportToCreditEvaluation = (reportData: any) => {
 				reportDate: cbcFormatDate(tradelineData.DATEREPORTED),
 				accountType: tradelineData.OWNERSHIP.DESCRIPTION,
 				debitToCreditRatio: tradelineData.BALANCEPAYMENT / tradelineData.HIGHCREDIT,
+				typeDetail: tradelineData.TRADETYPE?.DESCRIPTION,
 			};
 		}) || [];
 
