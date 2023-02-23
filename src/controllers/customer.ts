@@ -23,6 +23,7 @@ export const getCustomers: RequestHandler = async (req, res, next) => {
 		const { data: customers, count } = await queryFilter({
 			Model: Customer,
 			query: req.query,
+			populate: 'spouse',
 			searchFields: ['firstName', 'lastName', 'middleName', 'address', 'email'],
 		});
 
@@ -350,7 +351,7 @@ export const putCustomerSyncHubspot: RequestHandler = async (req, res, next) => 
 				graduateSchoolFieldOfStudy:
 					customer?.educationInfo?.graduateSchoolFieldOfStudy || contact?.graduate_school_field_of_study,
 				graduateDegreeReceived: customer?.educationInfo?.graduateDegreeReceived || contact?.graduate_degree_received,
-				graduateGraduationDate: customer?.educationInfo?.graduateGraduationDate || contact?.graduate_graduation_date
+				graduateGraduationDate: customer?.educationInfo?.graduateGraduationDate || contact?.graduate_graduation_date,
 			},
 			// ASSET INFORMATION
 			assetInfo: {
