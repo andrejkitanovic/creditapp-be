@@ -28,8 +28,8 @@ import routing from 'routes';
 import 'controllers/cbc';
 
 // const corsOptions = {
-	// origin: 'https://app.loanly.ai',
-	// optionsSuccessStatus: 200,
+// origin: 'https://app.loanly.ai',
+// optionsSuccessStatus: 200,
 // };
 
 const app = express();

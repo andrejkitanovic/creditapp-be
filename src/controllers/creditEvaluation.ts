@@ -544,18 +544,39 @@ export const cbcReportToCreditEvaluation = (reportData: any) => {
 			return typeof reason.CODE === 'string' && typeof reason.DESCRIPTION === 'string';
 		}).map((reason: any) => `(${reason.CODE}) ${reason.DESCRIPTION}`) ?? [];
 
+	const paymentCodes = {
+		1: '30',
+		2: '60',
+		3: '90',
+	};
 	// LATE PAYMENTS
 	const latePayments =
 		reportData.CC_ATTRIB.CCTRADELINES.ITEM_TRADELINE?.filter(
 			(tradelineData: any) =>
 				tradelineData.RATING_30 !== '0' || tradelineData.RATING_60 !== '0' || tradelineData.RATING_90 !== '0'
 		).map((tradelineData: any) => {
+			const reportDate = cbcFormatDate(tradelineData.DATEREPORTED);
+
+			const paymentHistory = `${tradelineData.PAYMENTPATTERN1}${tradelineData.PAYMENTPATTERN2}`
+				.split('')
+				.map((payment) => (Object.keys(paymentCodes).includes(payment) ? payment : '-'));
+			const paymentPattern: string[] = [];
+			paymentHistory.forEach((payment, index) => {
+				if (payment !== '-') {
+					paymentPattern.push(
+						//@ts-expect-error
+						`${dayjs(reportDate).subtract(index, 'months').format('MM/YY')} - ${paymentCodes[payment]}`
+					);
+				}
+			});
+
 			return {
 				creditor: tradelineData.FIRMNAME_ID,
-				reportDate: cbcFormatDate(tradelineData.DATEREPORTED),
+				reportDate,
 				rating30: parseFloat(tradelineData.RATING_30) ?? 0,
 				rating60: parseFloat(tradelineData.RATING_60) ?? 0,
 				rating90: parseFloat(tradelineData.RATING_90) ?? 0,
+				paymentPattern
 			};
 		}) || [];
 

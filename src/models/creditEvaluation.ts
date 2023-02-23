@@ -208,6 +208,7 @@ export type CreditEvaluationLatePayments = {
 	rating30: number;
 	rating60: number;
 	rating90: number;
+	paymentPattern: string;
 };
 
 export type CreditEvaluationChargeoffs = {
@@ -598,6 +599,7 @@ const creditEvaluationSchema: Schema = new Schema(
 				rating30: Number,
 				rating60: Number,
 				rating90: Number,
+				paymentPattern: String
 			},
 		],
 		chargeOffs: [
