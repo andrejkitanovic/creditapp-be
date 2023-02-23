@@ -55,7 +55,7 @@ interface ICustomer extends Document {
 		monthlyHousingPayment?: number;
 		estimatedLengthOfTimeAtResidence?: string;
 		moveInDate?: Date;
-		calculatedLengthOfTimeAtResidence?: number;
+		calculatedLengthOfTimeAtResidence?: string;
 		yearsAtCurrentAddress?: string;
 	};
 
