@@ -484,8 +484,13 @@ export const cbcReportToCreditEvaluation = (reportData: any) => {
 		}) || [];
 
 	// COLLECTIONS
+	let reportCollections = reportData.CC_ATTRIB.CCCOLLECTIONS.ITEM_COLLECTION;
+	if (Boolean(reportCollections) && !Array.isArray(reportCollections)) {
+		reportCollections = [reportCollections];
+	}
+
 	const collections =
-		reportData.CC_ATTRIB.CCCOLLECTIONS?.ITEM_COLLECTION?.map((collectionData: any) => {
+		reportCollections?.map((collectionData: any) => {
 			return {
 				dateVerified: cbcFormatDate(collectionData.BALANCEDATE),
 				status: `${collectionData.STATUS?.CODE} ${collectionData.STATUS?.DESCRIPTION}`,
@@ -576,7 +581,7 @@ export const cbcReportToCreditEvaluation = (reportData: any) => {
 				rating30: parseFloat(tradelineData.RATING_30) ?? 0,
 				rating60: parseFloat(tradelineData.RATING_60) ?? 0,
 				rating90: parseFloat(tradelineData.RATING_90) ?? 0,
-				paymentPattern
+				paymentPattern,
 			};
 		}) || [];
 
