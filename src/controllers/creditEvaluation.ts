@@ -532,7 +532,10 @@ export const cbcReportToCreditEvaluation = (reportData: any) => {
 			};
 		}) || [];
 
-	const averageMonthsOfOpenRevolvingCredit = totalMonthsOfOpenRevolvingCredits / totalOpenTradelines;
+	let averageMonthsOfOpenRevolvingCredit;
+	if (totalOpenTradelines) {
+		averageMonthsOfOpenRevolvingCredit = totalMonthsOfOpenRevolvingCredits / totalOpenTradelines;
+	}
 
 	// DEBT
 	const debtPayment =
@@ -542,7 +545,7 @@ export const cbcReportToCreditEvaluation = (reportData: any) => {
 			}
 
 			return prevValue;
-		}, 0) || [];
+		}, 0) || 0;
 
 	const declineReasonCodes =
 		reportData.SCORES?.FACTORS?.REASON?.filter((reason: any) => {

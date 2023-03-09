@@ -96,7 +96,8 @@ export const postWebhookCustomer: RequestHandler = async (req, res, next) => {
 			// CBC CALL
 			const cbcResponse = await cbcPullCreditReport(cbcApplicant);
 			const jsonResponse = JSON.parse(xmlToJson.toJson(cbcResponse.data));
-			
+			// writeFileSync('response.json', JSON.stringify(jsonResponse));
+
 			const htmlReport = jsonResponse.XML_INTERFACE?.CREDITREPORT?.REPORT;
 
 			creditReportResponse.loanly_customer = `https://app.loanly.ai/customers/${customer?._id}`;
