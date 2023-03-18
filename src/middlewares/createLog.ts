@@ -1,14 +1,20 @@
 import { RequestHandler } from 'express';
+
 import Log from 'models/log';
 
 const createLog: RequestHandler = async (req, res, next) => {
 	const { method, baseUrl, body } = req;
 
+	const oldJson = res.json;
+	res.json = (body) => {
+		res.locals.body = body;
+		return oldJson.call(res, body);
+	};
+
 	next();
 
 	res.on('finish', async () => {
-		const { statusCode, statusMessage } = res;
-		const { req } = await res.json();
+		const { statusCode, statusMessage, locals } = res;
 
 		await Log.create({
 			method,
@@ -16,7 +22,7 @@ const createLog: RequestHandler = async (req, res, next) => {
 			body: JSON.stringify(body),
 			statusCode,
 			statusMessage,
-			response: JSON.stringify(req.body),
+			response: JSON.stringify(locals.body),
 		});
 	});
 };
