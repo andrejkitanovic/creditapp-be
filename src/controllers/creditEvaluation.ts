@@ -400,7 +400,9 @@ export const cbcReportToCreditEvaluation = (reportData: any) => {
 
 	const tradelines =
 		reportData.CC_ATTRIB.CCTRADELINES.ITEM_TRADELINE?.filter(
-			(tradelineData: any) => tradelineData.CREDITLIMIT !== '-1' || tradelineData.FIRMNAME_ID.includes('AMEX')
+			(tradelineData: any) =>
+				(tradelineData.CREDITLIMIT !== '-1' || tradelineData.FIRMNAME_ID.includes('AMEX')) &&
+				tradelineData.TRADETYPE?.CODE !== '47'
 		).map((tradelineData: any) => {
 			if (!firstTrade || dayjs(cbcFormatDate(tradelineData.DATEOPENED)).diff(dayjs(firstTrade)) < 0) {
 				firstTrade = cbcFormatDate(tradelineData.DATEOPENED);
@@ -466,7 +468,9 @@ export const cbcReportToCreditEvaluation = (reportData: any) => {
 	// LOANS
 	const loans =
 		reportData.CC_ATTRIB.CCTRADELINES.ITEM_TRADELINE?.filter(
-			(tradelineData: any) => tradelineData.CREDITLIMIT === '-1' && !tradelineData.FIRMNAME_ID.includes('AMEX')
+			(tradelineData: any) =>
+				(tradelineData.CREDITLIMIT === '-1' && !tradelineData.FIRMNAME_ID.includes('AMEX')) ||
+				tradelineData.TRADETYPE?.CODE === '47'
 		).map((tradelineData: any) => {
 			return {
 				status: tradelineData.CLOSEDIND.CODE === 'C' ? 'closed' : 'opened',
