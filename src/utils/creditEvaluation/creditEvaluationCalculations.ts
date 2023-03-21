@@ -68,7 +68,7 @@ const calculateSummaryOfIncomes = (creditEvaluation: LeanDocument<ICreditEvaluat
 					summaryOfIncomes.incomeSources.push({
 						startDate: dayjs(incomeSource.date).toDate(),
 						year: dayjs(incomeSource.date).get('year'),
-						eoyExpected: incomeSource.netProfit || 0,
+						eoyExpected: (incomeSource.netProfit ?? 0) + (incomeSource.annualWages ?? 0),
 						type: income.type,
 					});
 
