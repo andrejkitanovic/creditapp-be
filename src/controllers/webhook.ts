@@ -11,7 +11,6 @@ import Customer from 'models/customer';
 
 import { absoluteFilePath } from 'utils/absoluteFilePath';
 import { cbcReportToCreditEvaluation } from './creditEvaluation';
-import { dayjsUnix } from 'utils/dayjs';
 import { hsGetDealById } from './hubspot';
 import { htmlToPDF } from 'utils/htmlToPdf';
 
@@ -31,6 +30,7 @@ export const postWebhookCustomer: RequestHandler = async (req, res, next) => {
 			state,
 			zip,
 			birthday,
+			dateOfBirthString,
 			associatedBrand,
 			sendForce,
 			referralSource,
@@ -83,7 +83,7 @@ export const postWebhookCustomer: RequestHandler = async (req, res, next) => {
 				middleName: '',
 				lastName,
 				email,
-				birthdate: dayjsUnix(birthday).format('MM/DD/YYYY'),
+				birthdate: dateOfBirthString,
 				ssn: social,
 				address: {
 					line: address,
