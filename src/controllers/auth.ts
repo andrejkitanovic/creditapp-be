@@ -28,7 +28,7 @@ export const postLogin: RequestHandler = async (req, res, next) => {
 	try {
 		const { email } = req.body;
 
-		const user = await User.findOne({ email });
+		const user = await User.findOne({ email: { $regex: new RegExp(email, 'i') } });
 
 		const token = jwt.sign({ id: user?._id }, process.env.DECODE_KEY || '', {
 			// expiresIn: "1h",
