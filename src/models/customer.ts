@@ -38,15 +38,10 @@ interface ICustomer extends Document {
 		creditRepairBefore?: boolean;
 		judgementsLiensBankruptcy?: string;
 		previoiusFinanceCompany?: boolean;
-
-		USResident?: boolean;
-		loanEmail?: string;
-		mothersMaidenName?: string;
-		rentOrOwn?: 'rent' | 'own';
-		fraudAlerts?: boolean;
-		numberOfFraudAlerts?: number;
-		maritialStatus?: string;
-		bankruptcy?: boolean;
+		maritalStatus?: string;
+		businessBank?: string;
+		businessBankRoutingNumber?: string;
+		businessBankAccountNumber?: string;
 	};
 
 	// Housing Information
@@ -77,10 +72,6 @@ interface ICustomer extends Document {
 		statedMonthlyIncome?: number;
 		statedAnnualIncome?: number;
 		statedAnnualHouseholdIncome?: number;
-
-		startDate?: Date;
-		jobTitle?: string;
-		earnIncomeYearRound?: number;
 	};
 
 	// Security Questions
@@ -113,14 +104,6 @@ interface ICustomer extends Document {
 		combinedCheckingSavingsBalance?: number;
 		stocksBondsMutualFunds?: number;
 		retirementAccountBalance?: number;
-
-		bankBalance?: number;
-		investmentBalance?: number;
-		cryptoBalance?: number;
-		retirementBalance?: number;
-		realEquity?: number;
-		estimatedEquity?: number;
-		estimatedValue?: number;
 	};
 
 	// Primary Residence Valuation
@@ -211,18 +194,10 @@ const customerSchema: Schema = new Schema(
 			creditRepairBefore: Boolean,
 			judgementsLiensBankruptcy: String,
 			previoiusFinanceCompany: Boolean,
-
-			USResident: Boolean,
-			loanEmail: String,
-			mothersMaidenName: String,
-			rentOrOwn: {
-				type: String,
-				enum: ['rent', 'own'],
-			},
-			fraudAlerts: Boolean,
-			numberOfFraudAlerts: Number,
-			maritialStatus: String,
-			bankruptcy: Boolean,
+			maritalStatus: String,
+			businessBank: String,
+			businessBankRoutingNumber: String,
+			businessBankAccountNumber: String,
 		},
 
 		// Housing Information
@@ -253,10 +228,6 @@ const customerSchema: Schema = new Schema(
 			statedMonthlyIncome: Number,
 			statedAnnualIncome: Number,
 			statedAnnualHouseholdIncome: Number,
-
-			startDate: Date,
-			jobTitle: String,
-			earnIncomeYearRound: Number,
 		},
 
 		// Security Questions
@@ -289,14 +260,6 @@ const customerSchema: Schema = new Schema(
 			combinedCheckingSavingsBalance: Number,
 			stocksBondsMutualFunds: Number,
 			retirementAccountBalance: Number,
-
-			bankBalance: Number,
-			investmentBalance: Number,
-			cryptoBalance: Number,
-			retirementBalance: Number,
-			realEquity: Number,
-			estimatedEquity: Number,
-			estimatedValue: Number,
 		},
 
 		// Primary Residence Valuation

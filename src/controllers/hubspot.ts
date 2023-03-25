@@ -288,6 +288,7 @@ export const hsUpdateContact = async (
 				zip: customer.zip,
 				phone: customer.phone,
 				mobilephone: customer.mobilePhone,
+				referral_company: customer.referralSource,
 
 				// PERSONAL INFORMATION
 				driver_s_license_number: customer.personalInfo.driversLicenseId,
@@ -301,6 +302,7 @@ export const hsUpdateContact = async (
 				have_you_been_through_credit_repair_: customer.personalInfo.creditRepairBefore,
 				judgements_liens_bankruptcy_: customer.personalInfo.judgementsLiensBankruptcy,
 				have_you_worked_with_a_finance_company_like_ours_before_: customer.personalInfo.previoiusFinanceCompany,
+				marital_status: customer.personalInfo.maritalStatus,
 
 				// HOUSING INFO
 				housing_status: customer.housingInfo.houstingStatus,

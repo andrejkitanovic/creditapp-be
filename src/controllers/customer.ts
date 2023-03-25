@@ -281,6 +281,7 @@ export const putCustomerSyncHubspot: RequestHandler = async (req, res, next) => 
 			zip: customer?.zip || contact?.zip,
 			phone: customer?.phone || contact?.phone,
 			mobilePhone: customer?.mobilePhone || contact.mobilephone,
+			referral_company: customer?.referralSource || contact.referral_company,
 
 			// PERSONAL INFORMATION
 			personalInfo: {
@@ -298,6 +299,7 @@ export const putCustomerSyncHubspot: RequestHandler = async (req, res, next) => 
 				previoiusFinanceCompany:
 					customer?.personalInfo?.previoiusFinanceCompany ||
 					contact?.have_you_worked_with_a_finance_company_like_ours_before_,
+				maritalStatus: customer?.personalInfo?.maritalStatus || contact?.marital_status,
 			},
 			// HOUSING INFO
 			housingInfo: {
