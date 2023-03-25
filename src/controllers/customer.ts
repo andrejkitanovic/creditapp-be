@@ -281,7 +281,7 @@ export const putCustomerSyncHubspot: RequestHandler = async (req, res, next) => 
 			zip: customer?.zip || contact?.zip,
 			phone: customer?.phone || contact?.phone,
 			mobilePhone: customer?.mobilePhone || contact.mobilephone,
-			referral_company: customer?.referralSource || contact.referral_company,
+			referralSource: customer?.referralSource || contact.referral_company,
 
 			// PERSONAL INFORMATION
 			personalInfo: {
