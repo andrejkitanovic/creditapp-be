@@ -142,6 +142,7 @@ const loanApplicationSchema: Schema = new Schema({
 	},
 	totalOriginationFee: {
 		type: Number,
+		required: true,
 	},
 	apr: {
 		type: Number,
@@ -176,9 +177,9 @@ loanApplicationSchema.pre('findOneAndUpdate', async function (next) {
 		rawObject.originationFee
 	);
 
-	if (rawObject.originationFee) {
+	if (rawObject.totalOriginationFee) {
 		//@ts-expect-error
-		this._update.totalOriginationFee = rawObject.loanAmount * (rawObject.originationFee / 100);
+		this._update.originationFee = (rawObject.totalOriginationFee / rawObject.loanAmount) * 100;
 	}
 
 	next();
@@ -187,8 +188,8 @@ loanApplicationSchema.pre('validate', function (next) {
 	this.loanWeightFactor = calculateLoanWeightFactor(this.loanAmount, this.interestRate);
 	this.apr = calculateAPR(this.loanAmount, this.term, this.interestRate, this.originationFee);
 
-	if (this.originationFee) {
-		this.totalOriginationFee = this.loanAmount * (this.originationFee / 100);
+	if (this.totalOriginationFee) {
+		this.originationFee = (this.totalOriginationFee / this.loanAmount) * 100;
 	}
 	next();
 });
