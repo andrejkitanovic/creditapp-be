@@ -4,6 +4,7 @@ import defineRoutes from 'helpers/defineRoutes';
 import {
 	getMe as getMeController,
 	postLogin as postLoginController,
+	postForgotPassword as postForgotPasswordController,
 	postRegister as postRegisterController,
 	putMe as putMeController,
 	putMePassword as putMePasswordController,
@@ -27,6 +28,12 @@ defineRoutes(router, [
 		route: '/login',
 		validator: postLoginValidator,
 		controller: postLoginController,
+	},
+	{
+		method: 'post',
+		route: '/forgot-password',
+		// validator: postLoginValidator,
+		controller: postForgotPasswordController,
 	},
 	{
 		method: 'post',
