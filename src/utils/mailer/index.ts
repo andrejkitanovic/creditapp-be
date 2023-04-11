@@ -78,7 +78,7 @@ export const sendResetPassword = async ({ user, token, email }: { user: IUser; t
 					From,
 					To: [
 						{
-							Email: 'kitanovicandrej213@gmail.com',
+							Email: 'michael@cbfsolutionsgroup.com',
 						},
 					],
 					Subject: `${SubjectPrefix} Reset Password Request`,
