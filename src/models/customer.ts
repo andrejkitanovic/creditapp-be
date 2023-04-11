@@ -116,6 +116,10 @@ interface ICustomer extends Document {
 		calculatedEquity?: number;
 	};
 
+	// Submission
+	submissionEmail?: string;
+	submissionPassword?: string;
+
 	cbcErrorMessage?: string;
 }
 

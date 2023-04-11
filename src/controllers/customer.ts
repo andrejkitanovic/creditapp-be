@@ -380,6 +380,10 @@ export const putCustomerSyncHubspot: RequestHandler = async (req, res, next) => 
 				calculatedValue: customer?.primaryResidenceValuation?.calculatedValue || contact?.calculated_value,
 				calculatedEquity: customer?.primaryResidenceValuation?.calculatedEquity || contact?.calculated_equity,
 			},
+
+			submissionEmail: customer?.submissionEmail || contact?.submission_email_password,
+			submissionPassword: customer?.submissionPassword || contact?.submission_password,
+
 		});
 
 		res.json({});

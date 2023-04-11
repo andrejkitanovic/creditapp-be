@@ -235,6 +235,10 @@ export const hsGetSingleContact = async (property: string, value: string) => {
 				'estimated_property_value',
 				'calculated_value',
 				'calculated_equity',
+
+				// SUBMISSION
+				'submission_email_password',
+				'submission_password'
 			],
 			limit: 1,
 			sorts: ['id'],
@@ -363,6 +367,9 @@ export const hsUpdateContact = async (
 				estimated_property_value: customer.primaryResidenceValuation.estimatedPropertyValue,
 				calculated_value: customer.primaryResidenceValuation.calculatedValue,
 				calculated_equity: customer.primaryResidenceValuation.calculatedEquity,
+
+				submission_email_password: customer.submissionEmail,
+				submission_password: customer.submissionPassword,
 			}),
 		});
 	} catch (err) {
