@@ -22,7 +22,7 @@ export const getLoanApplications: RequestHandler = async (req, res, next) => {
 
 		// Check if up to date
 		for await (let loanApplication of loanApplicationsRaw) {
-			if (loanApplication.hubspotId) {
+			if (loanApplication.hubspotId && loanApplication.upToDate) {
 				const hsLoan = await hsFetchLoan(loanApplication.hubspotId);
 
 				if (hsLoan) {
