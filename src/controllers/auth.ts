@@ -5,6 +5,7 @@ import bcrypt from 'bcryptjs';
 import i18n from 'helpers/i18n';
 import User, { IUser } from 'models/user';
 import { adminPermissions } from 'helpers/permissions';
+import { sendResetPassword } from 'utils/mailer';
 
 export const getMe: RequestHandler = async (req, res, next) => {
 	try {
@@ -37,6 +38,25 @@ export const postLogin: RequestHandler = async (req, res, next) => {
 		res.json({
 			token,
 			message: i18n.__('CONTROLLER.AUTH.POST_LOGIN.LOGGED_IN'),
+		});
+	} catch (err) {
+		next(err);
+	}
+};
+
+export const postForgotPassword: RequestHandler = async (req, res, next) => {
+	try {
+		const { email } = req.body;
+
+		const user = await User.findOne({ email: { $regex: new RegExp(email, 'i') } });
+
+		const token = jwt.sign({ id: user?._id }, process.env.DECODE_KEY || '', {
+			expiresIn: '1h',
+		});
+		await sendResetPassword({ user: user as IUser, token, email });
+
+		res.json({
+			message: i18n.__('CONTROLLER.AUTH.POST_FORGOT_PASSWORD.EMAIL_SENT'),
 		});
 	} catch (err) {
 		next(err);

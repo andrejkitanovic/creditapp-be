@@ -1,6 +1,7 @@
 import nodeMailjet from 'node-mailjet';
 import { readFile } from 'helpers/readFile';
 import path from 'path';
+import { IUser } from 'models/user';
 
 const mailjet = nodeMailjet.connect(process.env.MJ_APIKEY_PUBLIC ?? '', process.env.MJ_APIKEY_PRIVATE ?? '');
 const From = {
@@ -35,6 +36,53 @@ export const sendEmailInvitation = async ({ userId, email }: { userId: string; e
 					],
 					Subject: `${SubjectPrefix} User Invitation`,
 					HTMLPart: html,
+				},
+			],
+		});
+
+		return true;
+	} catch (err: any) {
+		throw new Error(err);
+	}
+};
+
+export const sendResetPassword = async ({ user, token, email }: { user: IUser; token: string; email: string }) => {
+	try {
+		const html = await readFile({
+			path: path.join(__dirname, './templates/resetPassword.jade'),
+			context: {
+				token,
+			},
+		});
+		const htmlAdmin = await readFile({
+			path: path.join(__dirname, './templates/resetPasswordRequest.jade'),
+			context: {
+				name: user.name,
+				email,
+			},
+		});
+
+		await mailjet.post('send', { version: 'v3.1' }).request({
+			Messages: [
+				{
+					From,
+					To: [
+						{
+							Email: email,
+						},
+					],
+					Subject: `${SubjectPrefix} Reset Password`,
+					HTMLPart: html,
+				},
+				{
+					From,
+					To: [
+						{
+							Email: 'kitanovicandrej213@gmail.com',
+						},
+					],
+					Subject: `${SubjectPrefix} Reset Password Request`,
+					HTMLPart: htmlAdmin,
 				},
 			],
 		});
