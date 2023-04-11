@@ -238,7 +238,7 @@ export const hsGetSingleContact = async (property: string, value: string) => {
 
 				// SUBMISSION
 				'submission_email_password',
-				'submission_password'
+				'submission_password',
 			],
 			limit: 1,
 			sorts: ['id'],
@@ -422,6 +422,31 @@ export const hsGetLenderById = async (lenderId: string): Promise<{ [key: string]
 };
 
 // LOANS
+
+export const hsFetchLoan = async (loanId: string): Promise<any> => {
+	try {
+		const { properties } = await hubspotClient.crm.objects.basicApi.getById('2-11419916', loanId, [
+			'loan_name',
+			'amount',
+			'monthly_payment',
+			'term__months',
+			'interest_rate',
+			'origination_fee',
+			'origination_fee_total',
+			'loan_apr',
+		]);
+
+		return {
+			id: loanId,
+			...properties,
+		};
+	} catch (err) {
+		console.log(err);
+
+		return null;
+	}
+};
+
 export const hsCreateLoan = async (loanApplication: LeanDocument<ILoanApplication>) => {
 	try {
 		const { id: loanId } = await hubspotClient.crm.objects.basicApi.create('2-11419916', {
@@ -437,7 +462,8 @@ export const hsCreateLoan = async (loanApplication: LeanDocument<ILoanApplicatio
 				// : loanApplication.accountType,
 				interest_rate: loanApplication.interestRate?.toString(),
 				// : loanApplication.loanWeightFactor?.toString(),
-				origination_fee: loanApplication.originationFee?.toString(),
+				// origination_fee: loanApplication.originationFee?.toString(),
+				origination_fee_total: loanApplication.totalOriginationFee?.toString(),
 				// : loanApplication.reasonCode?.toString(),
 				loan_apr: loanApplication.apr?.toString(),
 			},
@@ -490,7 +516,8 @@ export const hsUpdateLoan = async (loanApplication: LeanDocument<ILoanApplicatio
 				// : loanApplication.accountType,
 				interest_rate: loanApplication.interestRate?.toString(),
 				// : loanApplication.loanWeightFactor?.toString(),
-				origination_fee: loanApplication.originationFee?.toString(),
+				// origination_fee: loanApplication.originationFee?.toString(),
+				origination_fee_total: loanApplication.totalOriginationFee?.toString(),
 				// : loanApplication.reasonCode?.toString(),
 				loan_apr: loanApplication.apr?.toString(),
 			},

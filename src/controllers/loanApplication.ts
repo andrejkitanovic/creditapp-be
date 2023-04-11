@@ -5,18 +5,55 @@ import { queryFilter } from 'helpers/filters';
 import { createMeta } from 'helpers/meta';
 import CreditEvaluation from 'models/creditEvaluation';
 import { ICustomer } from 'models/customer';
-import LoanApplication from 'models/loanApplication';
+import LoanApplication, { ILoanApplication } from 'models/loanApplication';
 import { LeanDocument } from 'mongoose';
-import { hsDeleteLoan, hsGetLenderById } from './hubspot';
+import { hsDeleteLoan, hsFetchLoan, hsGetLenderById } from './hubspot';
 
 export const getLoanApplications: RequestHandler = async (req, res, next) => {
 	try {
-		const { data: loanApplications, count } = await queryFilter({
+		const { data: loanApplicationsRaw, count } = await queryFilter({
 			Model: LoanApplication,
 			query: req.query,
 			// populate: 'customer',
 			// searchFields: ['firstName', 'lastName', 'middleName'],
 		});
+
+		const loanApplications: LeanDocument<ILoanApplication>[] = [];
+
+		// Check if up to date
+		for await (let loanApplication of loanApplicationsRaw) {
+			if (loanApplication.hubspotId) {
+				const hsLoan = await hsFetchLoan(loanApplication.hubspotId);
+
+				if (hsLoan) {
+					loanApplication = await LoanApplication.findByIdAndUpdate(
+						loanApplication._id,
+						{
+							name: hsLoan.loan_name,
+							loanAmount: hsLoan.amount,
+							monthlyPayment: hsLoan.monthly_payment,
+							term: hsLoan.term___months,
+							interestRate: hsLoan.interest_rate,
+							originationFee: hsLoan.origination_fee,
+							totalOriginationFee: hsLoan.origination_fee_total,
+							apr: hsLoan.loan_apr,
+						},
+						{ new: true }
+					).lean();
+				} else {
+					loanApplication = await LoanApplication.findByIdAndUpdate(
+						loanApplication._id,
+						{
+							hubspotId: null,
+							upToDate: false,
+						},
+						{ new: true }
+					).lean();
+				}
+			}
+
+			loanApplications.push(loanApplication);
+		}
 
 		res.json({
 			data: loanApplications,

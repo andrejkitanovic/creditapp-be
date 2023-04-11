@@ -52,11 +52,13 @@ export const queryFilter = async ({ Model, query, populate, searchFields, defaul
 
 	if (q && searchFields) {
 		if (q.includes(' ')) {
-			q.split(' ').filter(singleQ => Boolean(singleQ)).forEach((singleQ) => {
-				searchFields.forEach((field) => {
-					search.push({ [field]: { $regex: new RegExp(singleQ, 'i') } });
+			q.split(' ')
+				.filter((singleQ) => Boolean(singleQ))
+				.forEach((singleQ) => {
+					searchFields.forEach((field) => {
+						search.push({ [field]: { $regex: new RegExp(singleQ, 'i') } });
+					});
 				});
-			});
 		} else {
 			searchFields.forEach((field) => {
 				search.push({ [field]: { $regex: new RegExp(q, 'i') } });
@@ -81,7 +83,8 @@ export const queryFilter = async ({ Model, query, populate, searchFields, defaul
 	const data = await modelQuery
 		.limit(limit)
 		.skip((page - 1) * limit)
-		.sort(sort);
+		.sort(sort)
+		.lean();
 	const count = (await Model.find(findBy)).length;
 
 	return { data, count };
