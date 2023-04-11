@@ -41,7 +41,7 @@ export const postLoanApplication: RequestHandler = async (req, res, next) => {
 			status,
 			accountType,
 			interestRate,
-			originationFee,
+			totalOriginationFee,
 			reasonCode,
 		} = req.body;
 
@@ -67,7 +67,7 @@ export const postLoanApplication: RequestHandler = async (req, res, next) => {
 			status,
 			accountType,
 			interestRate,
-			originationFee,
+			totalOriginationFee,
 			reasonCode,
 		});
 
@@ -92,7 +92,7 @@ export const putLoanApplication: RequestHandler = async (req, res, next) => {
 			status,
 			accountType,
 			interestRate,
-			originationFee,
+			totalOriginationFee,
 			reasonCode,
 		} = req.body;
 
@@ -116,7 +116,7 @@ export const putLoanApplication: RequestHandler = async (req, res, next) => {
 			status,
 			accountType,
 			interestRate,
-			originationFee,
+			totalOriginationFee,
 			reasonCode,
 			upToDate: false,
 		});
