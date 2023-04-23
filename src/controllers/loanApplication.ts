@@ -29,13 +29,19 @@ export const getLoanApplications: RequestHandler = async (req, res, next) => {
 					loanApplication = await LoanApplication.findByIdAndUpdate(
 						loanApplication._id,
 						{
+
+							// credit_inquiry: loanApplication.creditInquiry
+								// ?.map((creditInquiry) => LoanCreditInquiry[creditInquiry])
+								// .join(';'),
+							// application_date: dayjs(loanApplication.applicationDate).endOf('day').toDate().getTime().toString(),
+
 							name: hsLoan.loan_name,
 							loanAmount: hsLoan.amount,
 							monthlyPayment: hsLoan.monthly_payment,
 							term: hsLoan.term___months,
 							interestRate: hsLoan.interest_rate,
-							originationFee: hsLoan.origination_fee,
-							totalOriginationFee: hsLoan.origination_fee_total,
+							originationFee: hsLoan.origination_fee_amount,
+							originationFeePercentage: hsLoan.origination_fee_percentage,
 							apr: hsLoan.loan_apr,
 						},
 						{ new: true }
@@ -78,7 +84,7 @@ export const postLoanApplication: RequestHandler = async (req, res, next) => {
 			status,
 			accountType,
 			interestRate,
-			totalOriginationFee,
+			originationFee,
 			reasonCode,
 		} = req.body;
 
@@ -104,7 +110,7 @@ export const postLoanApplication: RequestHandler = async (req, res, next) => {
 			status,
 			accountType,
 			interestRate,
-			totalOriginationFee,
+			originationFee,
 			reasonCode,
 		});
 
@@ -129,7 +135,7 @@ export const putLoanApplication: RequestHandler = async (req, res, next) => {
 			status,
 			accountType,
 			interestRate,
-			totalOriginationFee,
+			originationFee,
 			reasonCode,
 		} = req.body;
 
@@ -153,7 +159,7 @@ export const putLoanApplication: RequestHandler = async (req, res, next) => {
 			status,
 			accountType,
 			interestRate,
-			totalOriginationFee,
+			originationFee,
 			reasonCode,
 			upToDate: false,
 		});

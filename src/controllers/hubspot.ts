@@ -7,9 +7,11 @@ import {
 import { RequestHandler } from 'express';
 import { ICustomer } from 'models/customer';
 import LoanPackage from 'models/loanPackage';
-import { ILoanApplication } from 'models/loanApplication';
+import { ILoanApplication, LoanApplicationAccountType, LoanApplicationStatus } from 'models/loanApplication';
 import { LeanDocument } from 'mongoose';
 import { filterObject } from 'utils/filterObject';
+import { CBCRequestTypeEnum } from './cbc';
+import dayjs from 'dayjs';
 
 const hubspotClient = new Client({ accessToken: process.env.HS_ACCESS_TOKEN });
 
@@ -431,8 +433,8 @@ export const hsFetchLoan = async (loanId: string): Promise<any> => {
 			'monthly_payment',
 			'term__months',
 			'interest_rate',
-			'origination_fee',
-			'origination_fee_total',
+			'origination_fee_amount',
+			'origination_fee_percentage',
 			'loan_apr',
 		]);
 
@@ -447,25 +449,62 @@ export const hsFetchLoan = async (loanId: string): Promise<any> => {
 	}
 };
 
+const LoanStatus = {
+	[LoanApplicationStatus.APPLICATION_PENDING_SUBMISSION]: 'Application Pending Submission',
+	[LoanApplicationStatus.APPLICATION_SUBMITTED]: 'Application Submitted',
+	[LoanApplicationStatus.APPLICATION_DOCUMENTS_REQUIRED]: 'Additional Documents Required',
+	[LoanApplicationStatus.LOAN_APPROVED]: 'Loan Approved',
+	[LoanApplicationStatus.LOAN_FUNDED]: 'Loan Funded',
+	// [LoanApplicationStatus]: "No Charge",
+	// [LoanApplicationStatus]: "Invoiced",
+	// [LoanApplicationStatus]: "Paid Invoice",
+	[LoanApplicationStatus.APPROVED_NOT_TAKEN]: 'Approved - Not Taken',
+	[LoanApplicationStatus.LOAN_DECLINED]: 'Loan Declined',
+	[LoanApplicationStatus.CANCEL_PROCESS]: 'Cancel Process',
+};
+
+const LoanAccountType = {
+	[LoanApplicationAccountType.UNSECURED_LOAN_INDIVIDUAL]: 'Unsecured Loan - Individual',
+	[LoanApplicationAccountType.UNSECURED_LOAN_JOINT]: 'Unsecured Loan - Joint',
+	[LoanApplicationAccountType.BUSINESS_LOAN_PERSONALLY_GUARANTEED]: 'Business Loan - Personally Guaranteed',
+};
+
+const LoanCreditInquiry = {
+	[CBCRequestTypeEnum.EXPERIAN]: 'Experian',
+	[CBCRequestTypeEnum.TRANSUNION]: 'Trans Union',
+	[CBCRequestTypeEnum.EQUIFAX]: 'Equifax',
+	[CBCRequestTypeEnum.CLARITY_SERVICES]: 'Soft-Pull',
+};
+
 export const hsCreateLoan = async (loanApplication: LeanDocument<ILoanApplication>) => {
 	try {
 		const { id: loanId } = await hubspotClient.crm.objects.basicApi.create('2-11419916', {
 			properties: {
 				loan_name: loanApplication.name,
 				amount: loanApplication.loanAmount?.toString(),
-
 				monthly_payment: loanApplication.monthlyPayment?.toString(),
 				term___months: loanApplication.term?.toString(),
-				// : loanApplication.creditInquiry,
-				// application_date: loanApplication.applicationDate,
-				// loan_stage: loanApplication.status,
-				// : loanApplication.accountType,
+				credit_inquiry: loanApplication.creditInquiry
+					?.map((creditInquiry) => LoanCreditInquiry[creditInquiry])
+					.join(';'),
+				application_date: dayjs(loanApplication.applicationDate)
+					.add(1, 'day')
+					.startOf('day')
+					.toDate()
+					.getTime()
+					.toString(),
+				loan_status: LoanStatus[loanApplication.status] ?? '',
+				//@ts-expect-error
+				account_type: LoanAccountType[loanApplication.accountType] ?? '',
 				interest_rate: loanApplication.interestRate?.toString(),
+				loan_purpose: loanApplication.reasonCode?.toString(),
+				loan_apr: loanApplication.apr?.toString(),
+				origination_fee_amount: loanApplication.originationFee?.toString(),
+
+				// loan_stage: loanApplication.status,
 				// : loanApplication.loanWeightFactor?.toString(),
 				// origination_fee: loanApplication.originationFee?.toString(),
-				origination_fee_total: loanApplication.totalOriginationFee?.toString(),
 				// : loanApplication.reasonCode?.toString(),
-				loan_apr: loanApplication.apr?.toString(),
 			},
 		});
 
@@ -507,19 +546,24 @@ export const hsUpdateLoan = async (loanApplication: LeanDocument<ILoanApplicatio
 			properties: {
 				loan_name: loanApplication.name,
 				amount: loanApplication.loanAmount?.toString(),
-
 				monthly_payment: loanApplication.monthlyPayment?.toString(),
 				term___months: loanApplication.term?.toString(),
-				// : loanApplication.creditInquiry,
-				// application_date: loanApplication.applicationDate,
-				// loan_stage: loanApplication.status,
-				// : loanApplication.accountType,
+				credit_inquiry: loanApplication.creditInquiry
+					?.map((creditInquiry) => LoanCreditInquiry[creditInquiry])
+					.join(';'),
+				application_date: dayjs(loanApplication.applicationDate)
+					.add(1, 'day')
+					.startOf('day')
+					.toDate()
+					.getTime()
+					.toString(),
+				loan_status: LoanStatus[loanApplication.status] ?? '',
+				//@ts-expect-error
+				account_type: LoanAccountType[loanApplication.accountType] ?? '',
 				interest_rate: loanApplication.interestRate?.toString(),
-				// : loanApplication.loanWeightFactor?.toString(),
-				// origination_fee: loanApplication.originationFee?.toString(),
-				origination_fee_total: loanApplication.totalOriginationFee?.toString(),
-				// : loanApplication.reasonCode?.toString(),
+				loan_purpose: loanApplication.reasonCode?.toString(),
 				loan_apr: loanApplication.apr?.toString(),
+				origination_fee_amount: loanApplication.originationFee?.toString(),
 			},
 		});
 

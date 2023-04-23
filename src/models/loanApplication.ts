@@ -65,7 +65,7 @@ interface ILoanApplication extends Document {
 	interestRate: number;
 	loanWeightFactor: number;
 	originationFee: number;
-	totalOriginationFee: number;
+	originationFeePercentage: number;
 	apr: number;
 	reasonCode: string;
 	upToDate: boolean;
@@ -138,15 +138,13 @@ const loanApplicationSchema: Schema = new Schema({
 	},
 	originationFee: {
 		type: Number,
-		required: true,
+		default: 0,
 	},
-	totalOriginationFee: {
+	originationFeePercentage: {
 		type: Number,
-		required: true,
 	},
 	apr: {
 		type: Number,
-		required: true,
 	},
 	reasonCode: {
 		type: String,
@@ -177,20 +175,12 @@ loanApplicationSchema.pre('findOneAndUpdate', async function (next) {
 		rawObject.originationFee
 	);
 
-	if (rawObject.totalOriginationFee) {
-		//@ts-expect-error
-		this._update.originationFee = (rawObject.totalOriginationFee / rawObject.loanAmount) * 100;
-	}
-
 	next();
 });
 loanApplicationSchema.pre('validate', function (next) {
 	this.loanWeightFactor = calculateLoanWeightFactor(this.loanAmount, this.interestRate);
 	this.apr = calculateAPR(this.loanAmount, this.term, this.interestRate, this.originationFee);
 
-	if (this.totalOriginationFee) {
-		this.originationFee = (this.totalOriginationFee / this.loanAmount) * 100;
-	}
 	next();
 });
 const objectModel = model<ILoanApplication>('Loan Application', loanApplicationSchema);
