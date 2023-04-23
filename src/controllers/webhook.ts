@@ -231,7 +231,6 @@ export const postWebhookCustomer: RequestHandler = async (req, res, next) => {
 			...creditReportResponse,
 		});
 	} catch (err) {
-		console.log(err);
 		next(err);
 	}
 };

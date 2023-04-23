@@ -2,6 +2,7 @@ import { ErrorRequestHandler } from 'express';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const error: ErrorRequestHandler = (err, req, res, next) => {
+	console.log(err)
 	const status = err.statusCode || 500;
 
 	if (err?.response?.data) {
