@@ -474,26 +474,33 @@ export const cbcReportToCreditEvaluation = (reportData: any) => {
 	];
 
 	// LOANS
-	const loans =
-		reportData.CC_ATTRIB.CCTRADELINES.ITEM_TRADELINE?.filter(
-			(tradelineData: any) =>
-				(tradelineData.CREDITLIMIT === '-1' && !tradelineData.FIRMNAME_ID.includes('AMEX')) ||
-				tradelineData.TRADETYPE?.CODE === '47'
-		).map((tradelineData: any) => {
-			return {
-				status: tradelineData.CLOSEDIND.CODE === 'C' ? 'closed' : 'opened',
-				creditor: tradelineData.FIRMNAME_ID,
-				balance: parseFloat(tradelineData.BALANCEPAYMENT) ?? undefined,
-				payment: parseFloat(tradelineData.MONTHLYPAYMENT) ?? undefined,
-				hpb: parseFloat(tradelineData.HIGHCREDIT) ?? undefined,
-				limit: cbcFormatMonths(tradelineData.TERMS),
-				opened: cbcFormatDate(tradelineData.DATEOPENED),
-				reportDate: cbcFormatDate(tradelineData.DATEREPORTED),
-				accountType: tradelineData.OWNERSHIP.DESCRIPTION,
-				debitToCreditRatio: tradelineData.BALANCEPAYMENT / tradelineData.HIGHCREDIT,
-				typeDetail: tradelineData.TRADETYPE?.DESCRIPTION,
-			};
-		}) || [];
+	let loans = reportData.CC_ATTRIB.CCTRADELINES.ITEM_TRADELINE;
+	if (Boolean(loans) && !Array.isArray(loans)) {
+		loans = [loans];
+	}
+
+	loans =
+		loans
+			?.filter(
+				(tradelineData: any) =>
+					(tradelineData.CREDITLIMIT === '-1' && !tradelineData.FIRMNAME_ID.includes('AMEX')) ||
+					tradelineData.TRADETYPE?.CODE === '47'
+			)
+			.map((tradelineData: any) => {
+				return {
+					status: tradelineData.CLOSEDIND.CODE === 'C' ? 'closed' : 'opened',
+					creditor: tradelineData.FIRMNAME_ID,
+					balance: parseFloat(tradelineData.BALANCEPAYMENT) ?? undefined,
+					payment: parseFloat(tradelineData.MONTHLYPAYMENT) ?? undefined,
+					hpb: parseFloat(tradelineData.HIGHCREDIT) ?? undefined,
+					limit: cbcFormatMonths(tradelineData.TERMS),
+					opened: cbcFormatDate(tradelineData.DATEOPENED),
+					reportDate: cbcFormatDate(tradelineData.DATEREPORTED),
+					accountType: tradelineData.OWNERSHIP.DESCRIPTION,
+					debitToCreditRatio: tradelineData.BALANCEPAYMENT / tradelineData.HIGHCREDIT,
+					typeDetail: tradelineData.TRADETYPE?.DESCRIPTION,
+				};
+			}) || [];
 
 	// COLLECTIONS
 	let reportCollections = reportData.CC_ATTRIB.CCCOLLECTIONS.ITEM_COLLECTION;
