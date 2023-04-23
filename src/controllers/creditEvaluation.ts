@@ -557,8 +557,13 @@ export const cbcReportToCreditEvaluation = (reportData: any) => {
 	}
 
 	// DEBT
-	const debtPayment =
-		reportData.CC_ATTRIB.CCTRADELINES.ITEM_TRADELINE?.reduce((prevValue: number, currValue: any) => {
+	let debtPayment = reportData.CC_ATTRIB.CCTRADELINES.ITEM_TRADELINE;
+	if (Boolean(debtPayment) && !Array.isArray(debtPayment)) {
+		debtPayment = [debtPayment];
+	}
+
+	debtPayment =
+		debtPayment?.reduce((prevValue: number, currValue: any) => {
 			if (currValue.OPENIND === 'O' && parseFloat(currValue.MONTHLYPAYMENT) > 0) {
 				prevValue += parseFloat(currValue.MONTHLYPAYMENT);
 			}
@@ -576,49 +581,62 @@ export const cbcReportToCreditEvaluation = (reportData: any) => {
 		2: '60',
 		3: '90',
 	};
+
 	// LATE PAYMENTS
-	const latePayments =
-		reportData.CC_ATTRIB.CCTRADELINES.ITEM_TRADELINE?.filter(
-			(tradelineData: any) =>
-				tradelineData.RATING_30 !== '0' || tradelineData.RATING_60 !== '0' || tradelineData.RATING_90 !== '0'
-		).map((tradelineData: any) => {
-			const reportDate = cbcFormatDate(tradelineData.DATEREPORTED);
+	let latePayments = reportData.CC_ATTRIB.CCTRADELINES.ITEM_TRADELINE;
+	if (Boolean(latePayments) && !Array.isArray(latePayments)) {
+		latePayments = [latePayments];
+	}
 
-			const paymentHistory = `${tradelineData.PAYMENTPATTERN1}${tradelineData.PAYMENTPATTERN2}`
-				.split('')
-				.map((payment) => (Object.keys(paymentCodes).includes(payment) ? payment : '-'));
-			const paymentPattern: string[] = [];
-			paymentHistory.forEach((payment, index) => {
-				if (payment !== '-') {
-					paymentPattern.push(
-						//@ts-expect-error
-						`${dayjs(reportDate).subtract(index, 'months').format('MM/YY')} - ${paymentCodes[payment]}`
-					);
-				}
-			});
+	latePayments =
+		latePayments
+			?.filter(
+				(tradelineData: any) =>
+					tradelineData.RATING_30 !== '0' || tradelineData.RATING_60 !== '0' || tradelineData.RATING_90 !== '0'
+			)
+			.map((tradelineData: any) => {
+				const reportDate = cbcFormatDate(tradelineData.DATEREPORTED);
 
-			return {
-				creditor: tradelineData.FIRMNAME_ID,
-				reportDate,
-				rating30: parseFloat(tradelineData.RATING_30) ?? 0,
-				rating60: parseFloat(tradelineData.RATING_60) ?? 0,
-				rating90: parseFloat(tradelineData.RATING_90) ?? 0,
-				paymentPattern,
-			};
-		}) || [];
+				const paymentHistory = `${tradelineData.PAYMENTPATTERN1}${tradelineData.PAYMENTPATTERN2}`
+					.split('')
+					.map((payment) => (Object.keys(paymentCodes).includes(payment) ? payment : '-'));
+				const paymentPattern: string[] = [];
+				paymentHistory.forEach((payment, index) => {
+					if (payment !== '-') {
+						paymentPattern.push(
+							//@ts-expect-error
+							`${dayjs(reportDate).subtract(index, 'months').format('MM/YY')} - ${paymentCodes[payment]}`
+						);
+					}
+				});
+
+				return {
+					creditor: tradelineData.FIRMNAME_ID,
+					reportDate,
+					rating30: parseFloat(tradelineData.RATING_30) ?? 0,
+					rating60: parseFloat(tradelineData.RATING_60) ?? 0,
+					rating90: parseFloat(tradelineData.RATING_90) ?? 0,
+					paymentPattern,
+				};
+			}) || [];
 
 	// CHARGEOFFS
-	const chargeOffs =
-		reportData.CC_ATTRIB.CCTRADELINES.ITEM_TRADELINE?.filter(
-			(tradelineData: any) => tradelineData.CHARGEOFFAMOUNT !== '-1'
-		).map((tradelineData: any) => {
-			return {
-				creditor: tradelineData.FIRMNAME_ID,
-				reportDate: cbcFormatDate(tradelineData.DATEREPORTED),
-				chargeoff: parseFloat(tradelineData.CHARGEOFFAMOUNT) ?? undefined,
-				pastdue: parseFloat(tradelineData.PASTDUE) ?? undefined,
-			};
-		}) || [];
+	let chargeOffs = reportData.CC_ATTRIB.CCTRADELINES.ITEM_TRADELINE;
+	if (Boolean(chargeOffs) && !Array.isArray(chargeOffs)) {
+		chargeOffs = [chargeOffs];
+	}
+
+	chargeOffs =
+		chargeOffs
+			?.filter((tradelineData: any) => tradelineData.CHARGEOFFAMOUNT !== '-1')
+			.map((tradelineData: any) => {
+				return {
+					creditor: tradelineData.FIRMNAME_ID,
+					reportDate: cbcFormatDate(tradelineData.DATEREPORTED),
+					chargeoff: parseFloat(tradelineData.CHARGEOFFAMOUNT) ?? undefined,
+					pastdue: parseFloat(tradelineData.PASTDUE) ?? undefined,
+				};
+			}) || [];
 
 	return {
 		reportDate: dayjs().toDate(),
