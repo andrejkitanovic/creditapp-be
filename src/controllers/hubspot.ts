@@ -7,10 +7,14 @@ import {
 import { RequestHandler } from 'express';
 import { ICustomer } from 'models/customer';
 import LoanPackage from 'models/loanPackage';
-import { ILoanApplication, LoanApplicationAccountType, LoanApplicationStatus } from 'models/loanApplication';
+import {
+	ILoanApplication,
+	LoanApplicationAccountType,
+	LoanApplicationCreditInquiry,
+	LoanApplicationStatus,
+} from 'models/loanApplication';
 import { LeanDocument } from 'mongoose';
 import { filterObject } from 'utils/filterObject';
-import { CBCRequestTypeEnum } from './cbc';
 import dayjs from 'dayjs';
 
 const hubspotClient = new Client({ accessToken: process.env.HS_ACCESS_TOKEN });
@@ -438,7 +442,7 @@ export const hsFetchLoan = async (loanId: string): Promise<any> => {
 			'loan_apr',
 			'loan_status',
 			'account_type',
-			'credit_inquiry'
+			'credit_inquiry',
 		]);
 
 		return {
@@ -473,10 +477,11 @@ export const LoanAccountType = {
 };
 
 export const LoanCreditInquiry = {
-	[CBCRequestTypeEnum.EXPERIAN]: 'Experian',
-	[CBCRequestTypeEnum.TRANSUNION]: 'Trans Union',
-	[CBCRequestTypeEnum.EQUIFAX]: 'Equifax',
-	// [CBCRequestTypeEnum.CLARITY_SERVICES]: 'Soft-Pull',
+	[LoanApplicationCreditInquiry.EXPERIAN]: 'Experian',
+	[LoanApplicationCreditInquiry.TRANSUNION]: 'Trans Union',
+	[LoanApplicationCreditInquiry.EQUIFAX]: 'Equifax',
+	[LoanApplicationCreditInquiry.TRI_MERGE]: 'Tri-Merge',
+	[LoanApplicationCreditInquiry.SOFT_PULL]: 'Soft-Pull',
 };
 
 export const hsCreateLoan = async (loanApplication: LeanDocument<ILoanApplication>) => {
@@ -488,9 +493,7 @@ export const hsCreateLoan = async (loanApplication: LeanDocument<ILoanApplicatio
 				monthly_payment: loanApplication.monthlyPayment?.toString(),
 				term___months: loanApplication.term?.toString(),
 				credit_inquiry: loanApplication.creditInquiry
-					?.filter((creditInquiry) => creditInquiry !== CBCRequestTypeEnum.CLARITY_SERVICES)
-					.map((creditInquiry) => {
-						//@ts-expect-error
+					?.map((creditInquiry) => {
 						return LoanCreditInquiry[creditInquiry];
 					})
 					.join(';'),
@@ -556,9 +559,7 @@ export const hsUpdateLoan = async (loanApplication: LeanDocument<ILoanApplicatio
 				monthly_payment: loanApplication.monthlyPayment?.toString(),
 				term___months: loanApplication.term?.toString(),
 				credit_inquiry: loanApplication.creditInquiry
-					?.filter((creditInquiry) => creditInquiry !== CBCRequestTypeEnum.CLARITY_SERVICES)
-					.map((creditInquiry) => {
-						//@ts-expect-error
+					?.map((creditInquiry) => {
 						return LoanCreditInquiry[creditInquiry];
 					})
 					.join(';'),

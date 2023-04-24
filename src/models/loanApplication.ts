@@ -1,5 +1,4 @@
 import { Schema, model, Document } from 'mongoose';
-import { CBCRequestTypeEnum } from 'controllers/cbc';
 import { calculateAPR, calculateLoanWeightFactor } from 'utils/loans/loansCalculations';
 
 export enum LoanApplicationStatus {
@@ -47,6 +46,14 @@ export enum LoanApplicationAccountType {
 	UTILITY_SELF_REPORTED = 'utility-self-reported',
 }
 
+export enum LoanApplicationCreditInquiry {
+	EXPERIAN = 'XPN',
+	TRANSUNION = 'TU',
+	EQUIFAX = 'EXF',
+	TRI_MERGE = 'TM',
+	SOFT_PULL = 'SP'
+}
+
 interface ILoanApplication extends Document {
 	customer: string;
 	creditEvaluation: string;
@@ -58,7 +65,7 @@ interface ILoanApplication extends Document {
 	loanAmount: number;
 	monthlyPayment: number;
 	term: number;
-	creditInquiry: CBCRequestTypeEnum[];
+	creditInquiry: LoanApplicationCreditInquiry[];
 	applicationDate: Date;
 	status: LoanApplicationStatus;
 	accountType: LoanApplicationAccountType;
@@ -112,7 +119,7 @@ const loanApplicationSchema: Schema = new Schema({
 	creditInquiry: [
 		{
 			type: String,
-			enum: CBCRequestTypeEnum,
+			enum: LoanApplicationCreditInquiry,
 			required: true,
 		},
 	],
