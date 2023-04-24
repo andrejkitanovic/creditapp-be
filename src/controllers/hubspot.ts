@@ -436,6 +436,9 @@ export const hsFetchLoan = async (loanId: string): Promise<any> => {
 			'origination_fee_amount',
 			'origination_fee_percentage',
 			'loan_apr',
+			'loan_status',
+			'account_type',
+			'credit_inquiry'
 		]);
 
 		return {
@@ -449,7 +452,7 @@ export const hsFetchLoan = async (loanId: string): Promise<any> => {
 	}
 };
 
-const LoanStatus = {
+export const LoanStatus = {
 	[LoanApplicationStatus.APPLICATION_PENDING_SUBMISSION]: 'Application Pending Submission',
 	[LoanApplicationStatus.APPLICATION_SUBMITTED]: 'Application Submitted',
 	[LoanApplicationStatus.APPLICATION_DOCUMENTS_REQUIRED]: 'Additional Documents Required',
@@ -463,17 +466,17 @@ const LoanStatus = {
 	[LoanApplicationStatus.CANCEL_PROCESS]: 'Cancel Process',
 };
 
-const LoanAccountType = {
+export const LoanAccountType = {
 	[LoanApplicationAccountType.UNSECURED_LOAN_INDIVIDUAL]: 'Unsecured Loan - Individual',
 	[LoanApplicationAccountType.UNSECURED_LOAN_JOINT]: 'Unsecured Loan - Joint',
 	[LoanApplicationAccountType.BUSINESS_LOAN_PERSONALLY_GUARANTEED]: 'Business Loan - Personally Guaranteed',
 };
 
-const LoanCreditInquiry = {
+export const LoanCreditInquiry = {
 	[CBCRequestTypeEnum.EXPERIAN]: 'Experian',
 	[CBCRequestTypeEnum.TRANSUNION]: 'Trans Union',
 	[CBCRequestTypeEnum.EQUIFAX]: 'Equifax',
-	[CBCRequestTypeEnum.CLARITY_SERVICES]: 'Soft-Pull',
+	// [CBCRequestTypeEnum.CLARITY_SERVICES]: 'Soft-Pull',
 };
 
 export const hsCreateLoan = async (loanApplication: LeanDocument<ILoanApplication>) => {
@@ -485,7 +488,11 @@ export const hsCreateLoan = async (loanApplication: LeanDocument<ILoanApplicatio
 				monthly_payment: loanApplication.monthlyPayment?.toString(),
 				term___months: loanApplication.term?.toString(),
 				credit_inquiry: loanApplication.creditInquiry
-					?.map((creditInquiry) => LoanCreditInquiry[creditInquiry])
+					?.filter((creditInquiry) => creditInquiry !== CBCRequestTypeEnum.CLARITY_SERVICES)
+					.map((creditInquiry) => {
+						//@ts-expect-error
+						return LoanCreditInquiry[creditInquiry];
+					})
 					.join(';'),
 				application_date: dayjs(loanApplication.applicationDate)
 					.add(1, 'day')
@@ -549,7 +556,11 @@ export const hsUpdateLoan = async (loanApplication: LeanDocument<ILoanApplicatio
 				monthly_payment: loanApplication.monthlyPayment?.toString(),
 				term___months: loanApplication.term?.toString(),
 				credit_inquiry: loanApplication.creditInquiry
-					?.map((creditInquiry) => LoanCreditInquiry[creditInquiry])
+					?.filter((creditInquiry) => creditInquiry !== CBCRequestTypeEnum.CLARITY_SERVICES)
+					.map((creditInquiry) => {
+						//@ts-expect-error
+						return LoanCreditInquiry[creditInquiry];
+					})
 					.join(';'),
 				application_date: dayjs(loanApplication.applicationDate)
 					.add(1, 'day')

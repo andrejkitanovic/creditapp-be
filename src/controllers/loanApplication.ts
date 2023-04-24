@@ -7,7 +7,7 @@ import CreditEvaluation from 'models/creditEvaluation';
 import { ICustomer } from 'models/customer';
 import LoanApplication, { ILoanApplication } from 'models/loanApplication';
 import { LeanDocument } from 'mongoose';
-import { hsDeleteLoan, hsFetchLoan, hsGetLenderById } from './hubspot';
+import { hsDeleteLoan, hsFetchLoan, hsGetLenderById, LoanAccountType, LoanCreditInquiry, LoanStatus } from './hubspot';
 
 export const getLoanApplications: RequestHandler = async (req, res, next) => {
 	try {
@@ -26,23 +26,43 @@ export const getLoanApplications: RequestHandler = async (req, res, next) => {
 				const hsLoan = await hsFetchLoan(loanApplication.hubspotId);
 
 				if (hsLoan) {
+					const enumFields: { status?: string; accountType?: string; creditInquiry?: string } = {};
+
+					if (hsLoan.loan_status) {
+						Object.entries(LoanStatus).forEach(([key, value]) => {
+							if (value === hsLoan.loan_status) {
+								enumFields.status = key;
+							}
+						});
+					}
+					if (hsLoan.account_type) {
+						Object.entries(LoanAccountType).forEach(([key, value]) => {
+							if (value === hsLoan.account_type) {
+								enumFields.accountType = key;
+							}
+						});
+					}
+					if (hsLoan.credit_inquiry) {
+						Object.entries(LoanCreditInquiry).forEach(([key, value]) => {
+							if (value === hsLoan.loan_status) {
+								enumFields.status = key;
+							}
+						});
+					}
+
 					loanApplication = await LoanApplication.findByIdAndUpdate(
 						loanApplication._id,
 						{
-
-							// credit_inquiry: loanApplication.creditInquiry
-								// ?.map((creditInquiry) => LoanCreditInquiry[creditInquiry])
-								// .join(';'),
 							// application_date: dayjs(loanApplication.applicationDate).endOf('day').toDate().getTime().toString(),
-
 							name: hsLoan.loan_name,
 							loanAmount: hsLoan.amount,
 							monthlyPayment: hsLoan.monthly_payment,
-							term: hsLoan.term___months,
+							term: hsLoan.term__months,
 							interestRate: hsLoan.interest_rate,
 							originationFee: hsLoan.origination_fee_amount,
 							originationFeePercentage: hsLoan.origination_fee_percentage,
 							apr: hsLoan.loan_apr,
+							...enumFields
 						},
 						{ new: true }
 					).lean();
