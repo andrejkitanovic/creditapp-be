@@ -59,6 +59,7 @@ export const hsGetContactById = async (contactId: string): Promise<{ [key: strin
 			'zip',
 			'phone',
 			'mobilephone',
+			'franchise_choice',
 
 			// PERSONAL INFORMATION
 			'driver_s_license_number',
@@ -73,6 +74,8 @@ export const hsGetContactById = async (contactId: string): Promise<{ [key: strin
 			'have_you_been_through_credit_repair_',
 			'judgements_liens_bankruptcy_',
 			'have_you_worked_with_a_finance_company_like_ours_before_',
+			'fraud_alert',
+			'number_on_fraud_alert_if_it_is_not_cell_phone_or_home_phone',
 
 			// HOUSING INFO
 			'housing_status',
@@ -167,6 +170,7 @@ export const hsGetSingleContact = async (property: string, value: string) => {
 				'zip',
 				'phone',
 				'mobilephone',
+				'franchise_choice',
 
 				// PERSONAL INFORMATION
 				'driver_s_license_number',
@@ -181,6 +185,8 @@ export const hsGetSingleContact = async (property: string, value: string) => {
 				'have_you_been_through_credit_repair_',
 				'judgements_liens_bankruptcy_',
 				'have_you_worked_with_a_finance_company_like_ours_before_',
+				'fraud_alert',
+				'number_on_fraud_alert_if_it_is_not_cell_phone_or_home_phone',
 
 				// HOUSING INFO
 				'housing_status',
@@ -299,6 +305,7 @@ export const hsUpdateContact = async (
 				phone: customer.phone,
 				mobilephone: customer.mobilePhone,
 				referral_company: customer.referralSource,
+				franchise_choice: customer.franchiseChoice,
 
 				// PERSONAL INFORMATION
 				driver_s_license_number: customer.personalInfo.driversLicenseId,
@@ -313,6 +320,8 @@ export const hsUpdateContact = async (
 				judgements_liens_bankruptcy_: customer.personalInfo.judgementsLiensBankruptcy,
 				have_you_worked_with_a_finance_company_like_ours_before_: customer.personalInfo.previoiusFinanceCompany,
 				marital_status: customer.personalInfo.maritalStatus,
+				fraud_alert: typeof customer.personalInfo.fraudAlert === "boolean" && Boolean(customer.personalInfo.fraudAlert) ? "true" : "false",
+				number_on_fraud_alert_if_it_is_not_cell_phone_or_home_phone: customer.personalInfo.numberOfFraudAlert,
 
 				// HOUSING INFO
 				housing_status: customer.housingInfo.houstingStatus,

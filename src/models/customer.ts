@@ -24,6 +24,7 @@ interface ICustomer extends Document {
 	associatedBrand?: string;
 	referralSource?: string;
 	leadSource?: string;
+	franchiseChoice?: string;
 
 	// Personal Information
 	personalInfo: {
@@ -42,6 +43,8 @@ interface ICustomer extends Document {
 		businessBank?: string;
 		businessBankRoutingNumber?: string;
 		businessBankAccountNumber?: string;
+		fraudAlert?: boolean;
+		numberOfFraudAlert?: string;
 	};
 
 	// Housing Information
@@ -184,6 +187,9 @@ const customerSchema: Schema = new Schema(
 		leadSource: {
 			type: String,
 		},
+		franchiseChoice: {
+			type: String,
+		},
 
 		// Personal Information
 		personalInfo: {
@@ -202,6 +208,8 @@ const customerSchema: Schema = new Schema(
 			businessBank: String,
 			businessBankRoutingNumber: String,
 			businessBankAccountNumber: String,
+			fraudAlert: Boolean,
+			numberOfFraudAlert: String,
 		},
 
 		// Housing Information

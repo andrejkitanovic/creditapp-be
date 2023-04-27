@@ -282,6 +282,7 @@ export const putCustomerSyncHubspot: RequestHandler = async (req, res, next) => 
 			phone: customer?.phone || contact?.phone,
 			mobilePhone: customer?.mobilePhone || contact.mobilephone,
 			referralSource: customer?.referralSource || contact.referral_company,
+			franchiseChoice: customer?.franchiseChoice || contact.franchise_Choice,
 
 			// PERSONAL INFORMATION
 			personalInfo: {
@@ -300,6 +301,12 @@ export const putCustomerSyncHubspot: RequestHandler = async (req, res, next) => 
 					customer?.personalInfo?.previoiusFinanceCompany ||
 					contact?.have_you_worked_with_a_finance_company_like_ours_before_,
 				maritalStatus: customer?.personalInfo?.maritalStatus || contact?.marital_status,
+				fraudAlert:
+					customer?.personalInfo?.fraudAlert ||
+					(typeof contact?.fraud_alert === 'string' && contact?.fraud_alert === 'true'),
+				numberOfFraudAlert:
+					customer?.personalInfo?.numberOfFraudAlert ||
+					contact?.number_on_fraud_alert_if_it_is_not_cell_phone_or_home_phone,
 			},
 			// HOUSING INFO
 			housingInfo: {
@@ -383,7 +390,6 @@ export const putCustomerSyncHubspot: RequestHandler = async (req, res, next) => 
 
 			submissionEmail: customer?.submissionEmail || contact?.submission_email_password,
 			submissionPassword: customer?.submissionPassword || contact?.submission_password,
-
 		});
 
 		res.json({});
