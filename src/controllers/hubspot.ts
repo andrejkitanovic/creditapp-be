@@ -16,11 +16,11 @@ import {
 import { LeanDocument } from 'mongoose';
 import { filterObject } from 'utils/filterObject';
 import dayjs from 'dayjs';
+import { RoleType } from 'models/user';
 
 const hubspotClient = new Client({ accessToken: process.env.HS_ACCESS_TOKEN });
 
 // Routes
-
 export const getHubspotLenders: RequestHandler = async (req, res, next) => {
 	try {
 		const { results: hsLenders } = await hubspotClient.crm.objects.basicApi.getPage('2-11419675', 100, undefined, [
@@ -39,6 +39,67 @@ export const getHubspotLenders: RequestHandler = async (req, res, next) => {
 		});
 	} catch (err) {
 		next(err);
+	}
+};
+
+// USERS
+export const hsGetUserById = async (userId: string): Promise<{ [key: string]: string | undefined }> => {
+	try {
+		const { id, email, roleId, primaryTeamId } = await hubspotClient.settings.users.usersApi.getById(userId);
+
+		return { id, email, roleId, primaryTeamId };
+	} catch (err) {
+		console.log(err);
+
+		return {};
+	}
+};
+
+export const hsGetUserByEmail = async (email: string) => {
+	try {
+		const res = await hubspotClient.apiRequest({
+			path: `/settings/v3/users/${email}`,
+			qs: {
+				idProperty: 'EMAIL',
+			},
+		});
+		const data = await res.json();
+
+		return data;
+	} catch (err) {
+		console.log(err);
+
+		return {};
+	}
+};
+
+export const hsCreateUser = async ({ email: userEmail, role }: { email: string; role: RoleType }) => {
+	try {
+		const roleProperties = {
+			admin: {
+				// roleId: "",
+				primaryTeamId: '32518302',
+			},
+			partner: {
+				roleId: '611058',
+				primaryTeamId: '32467381',
+			},
+		};
+		const { id, email, roleId, primaryTeamId } = await hubspotClient.settings.users.usersApi.create({
+			email: userEmail,
+			sendWelcomeEmail: false,
+			...roleProperties[role],
+		});
+
+		return {
+			id,
+			email,
+			roleId,
+			primaryTeamId,
+		};
+	} catch (err) {
+		console.log(err);
+		return;
 	}
 };
 
@@ -320,7 +381,10 @@ export const hsUpdateContact = async (
 				judgements_liens_bankruptcy_: customer.personalInfo.judgementsLiensBankruptcy,
 				have_you_worked_with_a_finance_company_like_ours_before_: customer.personalInfo.previoiusFinanceCompany,
 				marital_status: customer.personalInfo.maritalStatus,
-				fraud_alert: typeof customer.personalInfo.fraudAlert === "boolean" && Boolean(customer.personalInfo.fraudAlert) ? "true" : "false",
+				fraud_alert:
+					typeof customer.personalInfo.fraudAlert === 'boolean' && Boolean(customer.personalInfo.fraudAlert)
+						? 'true'
+						: 'false',
 				number_on_fraud_alert_if_it_is_not_cell_phone_or_home_phone: customer.personalInfo.numberOfFraudAlert,
 
 				// HOUSING INFO

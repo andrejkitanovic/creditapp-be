@@ -5,7 +5,8 @@ import { queryFilter } from 'helpers/filters';
 import { createMeta } from 'helpers/meta';
 import User from 'models/user';
 import { sendEmailInvitation } from 'utils/mailer';
-import { hsCreateContact, hsGetSingleContact } from './hubspot';
+import { hsCreateUser, hsGetUserByEmail } from './hubspot';
+// import { hsCreateUser, hsGetSingleUser } from './hubspot';
 
 export const getUsers: RequestHandler = async (req, res, next) => {
 	try {
@@ -31,22 +32,17 @@ export const postUser: RequestHandler = async (req, res, next) => {
 	try {
 		const { email, role } = req.body;
 
-		const { total, results } = await hsGetSingleContact('email', email);
+		let hsUser = await hsGetUserByEmail(email);
 
-		let user, hsUser;
-
-		if (total) {
-			hsUser = results[0].properties;
-
+		let user;
+		if (hsUser?.id) {
 			user = await User.create({
-				hubspotId: hsUser.hs_object_id,
+				hubspotId: hsUser.id,
 				email,
 				role,
-				name: `${hsUser.firstname} ${hsUser.lastname}`,
-				phone: hsUser.phone,
 			});
 		} else {
-			hsUser = await hsCreateContact({ properties: { email } });
+			hsUser = await hsCreateUser({ email, role });
 
 			user = await User.create({
 				hubspotId: hsUser.id,

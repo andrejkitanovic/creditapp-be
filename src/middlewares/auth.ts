@@ -18,6 +18,7 @@ const auth: (roles: RoleType[]) => RequestHandler = (roles) => async (req, res, 
 			} else if (!roles.includes(user.role)) {
 				if (user.role === 'partner') {
 					// Check is user still partner
+					// Referral Partner Hubspot ID => 611058
 				}
 
 				res.status(403).json({ message: i18n.__('MIDDLEWARE.AUTH.NOT_AUTHORIZED') });
