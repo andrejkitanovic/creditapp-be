@@ -5,7 +5,7 @@ import { Schema, model, Document } from 'mongoose';
 
 enum RolesEnum {
 	ADMIN = 'admin',
-	USER = 'user',
+	PARTNER = 'partner',
 }
 export type RoleType = `${RolesEnum}`;
 
@@ -41,7 +41,7 @@ const userSchema: Schema = new Schema({
 	role: {
 		type: String,
 		enum: RolesEnum,
-		default: RolesEnum.USER,
+		default: RolesEnum.PARTNER,
 	},
 	confirmed: {
 		type: Boolean,

@@ -17,14 +17,14 @@ defineRoutes(router, [
 	{
 		method: 'get',
 		route: '/',
-		roles: ['user', 'admin'],
+		roles: ['partner', 'admin'],
 		// permissions: ['read:distillation'],
 		controller: getLoanApplicationsController,
 	},
 	{
 		method: 'post',
 		route: '/',
-		roles: ['user', 'admin'],
+		roles: ['partner', 'admin'],
 		// permissions: ['write:distillation'],
 		// validator: postLoanApplicationValidator,
 		controller: postLoanApplicationController,
@@ -32,7 +32,7 @@ defineRoutes(router, [
 	{
 		method: 'put',
 		route: '/:id',
-		roles: ['user', 'admin'],
+		roles: ['partner', 'admin'],
 		// permissions: ['update:distillation'],
 		// validator: putLoanApplicationValidator,
 		controller: putLoanApplicationController,
@@ -40,7 +40,7 @@ defineRoutes(router, [
 	{
 		method: 'put',
 		route: '/status/:id',
-		roles: ['user', 'admin'],
+		roles: ['partner', 'admin'],
 		// permissions: ['update:distillation'],
 		// validator: putLoanApplicationValidator,
 		controller: putLoanApplicationStatusController,
@@ -48,7 +48,7 @@ defineRoutes(router, [
 	{
 		method: 'delete',
 		route: '/:id',
-		roles: ['user', 'admin'],
+		roles: ['partner', 'admin'],
 		// permissions: ['delete:distillation'],
 		// validator: deleteLoanApplicationValidator,
 		controller: deleteLoanApplicationController,
@@ -56,7 +56,7 @@ defineRoutes(router, [
 	{
 		method: 'get',
 		route: '/:id',
-		roles: ['user', 'admin'],
+		roles: ['partner', 'admin'],
 		// permissions: ['delete:distillation'],
 		controller: getSingleLoanApplicationController,
 	},
