@@ -294,6 +294,8 @@ const calculateLoanAffordability = async (creditEvaluation: LeanDocument<ICredit
 			(income) => income.type === creditEvaluation.selectedHouseholdIncome
 		) as CreditEvaluationIncomeOverview;
 
+		if (!selectedIncome) return [];
+
 		loanAffordabilitiesRaw.push({
 			source: CreditEvaluationLoanAffordabilityEnum.SELECTED_INCOME,
 			annual: selectedIncome.annual,

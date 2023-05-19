@@ -18,6 +18,15 @@ interface IUser extends Document {
 	role: RolesEnum;
 	confirmed: boolean;
 	permissions: PermissionsType[];
+
+	// Partners
+	active: boolean;
+	companyName: string;
+	leadSource: string;
+	// salesRepName: string;
+	// salesRepEmail: string;
+	brand: string[];
+	emailNotification: boolean;
 }
 
 const userSchema: Schema = new Schema({
