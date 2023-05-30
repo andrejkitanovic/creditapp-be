@@ -84,6 +84,14 @@ export const hsCreateUser = async ({ email: userEmail, role }: { email: string; 
 				roleId: '611058',
 				primaryTeamId: '32467381',
 			},
+			'partner-admin': {
+				roleId: '611058',
+				primaryTeamId: '32467381',
+			},
+			'partner-sales-rep': {
+				roleId: '611058',
+				primaryTeamId: '32467381',
+			},
 		};
 		const { id, email, roleId, primaryTeamId } = await hubspotClient.settings.users.usersApi.create({
 			email: userEmail,

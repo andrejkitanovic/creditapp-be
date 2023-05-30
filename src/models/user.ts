@@ -5,11 +5,14 @@ import { Schema, model, Document } from 'mongoose';
 
 enum RolesEnum {
 	ADMIN = 'admin',
+	PARTNER_ADMIN = 'partner-admin',
 	PARTNER = 'partner',
+	PARTNER_SALES_REP = 'partner-sales-rep',
 }
 export type RoleType = `${RolesEnum}`;
 
 interface IUser extends Document {
+	organisation: string;
 	hubspotId?: string;
 	name?: string;
 	email: string;
@@ -18,18 +21,14 @@ interface IUser extends Document {
 	role: RolesEnum;
 	confirmed: boolean;
 	permissions: PermissionsType[];
-
-	// Partners
-	active: boolean;
-	companyName: string;
-	leadSource: string;
-	// salesRepName: string;
-	// salesRepEmail: string;
-	brand: string[];
-	emailNotification: boolean;
 }
 
 const userSchema: Schema = new Schema({
+	organisation: {
+		type: Schema.Types.ObjectId,
+		ref: 'Organisation',
+		required: true,
+	},
 	hubspotId: {
 		type: String,
 	},
