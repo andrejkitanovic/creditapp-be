@@ -4,6 +4,7 @@ import { queryFilter } from 'helpers/filters';
 import i18n from 'helpers/i18n';
 import { createMeta } from 'helpers/meta';
 import Organisation from 'models/organisation';
+import { hsCreateUser, hsGetUserByEmail } from './hubspot';
 
 export const getMineOrganisation: RequestHandler = async (req, res, next) => {
 	try {
@@ -41,10 +42,18 @@ export const getOrganisations: RequestHandler = async (req, res, next) => {
 
 export const postOrganisation: RequestHandler = async (req, res, next) => {
 	try {
-		const { name, leadSource, brand, partnerPayout } = req.body;
+		const { name, email, leadSource, brand, partnerPayout } = req.body;
+
+		let hsUser = await hsGetUserByEmail(email);
+
+		if (!hsUser?.id) {
+			hsUser = await hsCreateUser({ email, role: 'partner' });
+		}
 
 		await Organisation.create({
+			hubspotId: hsUser?.id,
 			name,
+			email,
 			leadSource,
 			brand,
 			partnerPayout,

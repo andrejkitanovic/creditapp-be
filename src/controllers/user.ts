@@ -34,22 +34,15 @@ export const postUser: RequestHandler = async (req, res, next) => {
 
 		let hsUser = await hsGetUserByEmail(email);
 
-		let user;
-		if (hsUser?.id) {
-			user = await User.create({
-				hubspotId: hsUser.id,
-				email,
-				role,
-			});
-		} else {
+		if (!hsUser?.id && role === 'admin') {
 			hsUser = await hsCreateUser({ email, role });
-
-			user = await User.create({
-				hubspotId: hsUser.id,
-				email,
-				role,
-			});
 		}
+
+		const user = await User.create({
+			hubspotId: hsUser?.id,
+			email,
+			role,
+		});
 
 		await sendEmailInvitation({ userId: user._id, email });
 

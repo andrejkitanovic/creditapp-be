@@ -16,7 +16,6 @@ import {
 import { LeanDocument } from 'mongoose';
 import { filterObject } from 'utils/filterObject';
 import dayjs from 'dayjs';
-import { RoleType } from 'models/user';
 
 const hubspotClient = new Client({ accessToken: process.env.HS_ACCESS_TOKEN });
 
@@ -73,7 +72,7 @@ export const hsGetUserByEmail = async (email: string) => {
 	}
 };
 
-export const hsCreateUser = async ({ email: userEmail, role }: { email: string; role: RoleType }) => {
+export const hsCreateUser = async ({ email: userEmail, role }: { email: string; role: 'admin' | 'partner' }) => {
 	try {
 		const roleProperties = {
 			admin: {
@@ -84,15 +83,8 @@ export const hsCreateUser = async ({ email: userEmail, role }: { email: string; 
 				roleId: '611058',
 				primaryTeamId: '32467381',
 			},
-			'partner-admin': {
-				roleId: '611058',
-				primaryTeamId: '32467381',
-			},
-			'partner-sales-rep': {
-				roleId: '611058',
-				primaryTeamId: '32467381',
-			},
 		};
+		
 		const { id, email, roleId, primaryTeamId } = await hubspotClient.settings.users.usersApi.create({
 			email: userEmail,
 			sendWelcomeEmail: false,

@@ -1,8 +1,10 @@
 import { Schema, model, Document } from 'mongoose';
 
 interface IOrganisation extends Document {
+	hubspotId: string;
 	active: boolean;
 	name: string;
+	email: string;
 	leadSource: string;
 	brand: string[];
 	partnerPayout: {
@@ -14,7 +16,14 @@ interface IOrganisation extends Document {
 
 const organisationSchema: Schema = new Schema(
 	{
+		hubspotId: {
+			type: String,
+		},
 		name: {
+			type: String,
+			required: true,
+		},
+		email: {
 			type: String,
 			required: true,
 		},
