@@ -16,6 +16,7 @@ import {
 import { LeanDocument } from 'mongoose';
 import { filterObject } from 'utils/filterObject';
 import dayjs from 'dayjs';
+import { Property } from '@hubspot/api-client/lib/codegen/crm/properties';
 
 const hubspotClient = new Client({ accessToken: process.env.HS_ACCESS_TOKEN });
 
@@ -84,7 +85,7 @@ export const hsCreateUser = async ({ email: userEmail, role }: { email: string; 
 				primaryTeamId: '32467381',
 			},
 		};
-		
+
 		const { id, email, roleId, primaryTeamId } = await hubspotClient.settings.users.usersApi.create({
 			email: userEmail,
 			sendWelcomeEmail: false,
@@ -97,6 +98,82 @@ export const hsCreateUser = async ({ email: userEmail, role }: { email: string; 
 			roleId,
 			primaryTeamId,
 		};
+	} catch (err) {
+		console.log(err);
+		return;
+	}
+};
+
+export const hsCreateLeadSource = async (leadSource: string) => {
+	try {
+		const { properties: contactSchema } = await hubspotClient.crm.schemas.coreApi.getById('contact');
+		const { properties: dealSchema } = await hubspotClient.crm.schemas.coreApi.getById('deals');
+
+		const contactSchemaLeadSource = contactSchema.find((property) => property.name === 'lead_source') as Property;
+		const dealSchemaLeadSource = dealSchema.find(
+			(property) => property.name === 'lead_source___companies___li_and_fb'
+		) as Property;
+
+		if (
+			contactSchemaLeadSource.options.some((option) => option.value === leadSource) ||
+			dealSchemaLeadSource.options.some((option) => option.value === leadSource)
+		) {
+			return false;
+		}
+
+		// UPDATE CONTACT PROPERTY
+		await (
+			await hubspotClient.apiRequest({
+				path: `/properties/v1/contacts/properties/named/lead_source`,
+				method: 'PUT',
+				body: {
+					name: contactSchemaLeadSource.name,
+					groupName: contactSchemaLeadSource.groupName,
+					description: contactSchemaLeadSource.description,
+					fieldType: contactSchemaLeadSource.fieldType,
+					formField: contactSchemaLeadSource.formField,
+					type: contactSchemaLeadSource.type,
+					displayOrder: contactSchemaLeadSource.displayOrder,
+					label: contactSchemaLeadSource.label,
+					options: [
+						...contactSchemaLeadSource.options,
+						{
+							label: leadSource,
+							value: leadSource,
+							hidden: false,
+						},
+					],
+				},
+			})
+		).json();
+
+		// UPDATE DEAL PROPERTY
+		await (
+			await hubspotClient.apiRequest({
+				path: `/properties/v1/deals/properties/named/lead_source___companies___li_and_fb`,
+				method: 'PUT',
+				body: {
+					name: dealSchemaLeadSource.name,
+					groupName: dealSchemaLeadSource.groupName,
+					description: dealSchemaLeadSource.description,
+					fieldType: dealSchemaLeadSource.fieldType,
+					formField: dealSchemaLeadSource.formField,
+					type: dealSchemaLeadSource.type,
+					displayOrder: dealSchemaLeadSource.displayOrder,
+					label: dealSchemaLeadSource.label,
+					options: [
+						...dealSchemaLeadSource.options,
+						{
+							label: leadSource,
+							value: leadSource,
+							hidden: false,
+						},
+					],
+				},
+			})
+		).json();
+
+		return true;
 	} catch (err) {
 		console.log(err);
 		return;

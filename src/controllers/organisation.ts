@@ -4,7 +4,7 @@ import { queryFilter } from 'helpers/filters';
 import i18n from 'helpers/i18n';
 import { createMeta } from 'helpers/meta';
 import Organisation from 'models/organisation';
-import { hsCreateUser, hsGetUserByEmail } from './hubspot';
+import { hsCreateLeadSource, hsCreateUser, hsGetUserByEmail } from './hubspot';
 
 export const getMineOrganisation: RequestHandler = async (req, res, next) => {
 	try {
@@ -43,6 +43,9 @@ export const getOrganisations: RequestHandler = async (req, res, next) => {
 export const postOrganisation: RequestHandler = async (req, res, next) => {
 	try {
 		const { name, email, leadSource, brand, partnerPayout } = req.body;
+
+		const createLeadSource = await hsCreateLeadSource(leadSource);
+		if (!createLeadSource) throw new Error('Lead Source Already Exists!');
 
 		let hsUser = await hsGetUserByEmail(email);
 
