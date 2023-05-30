@@ -1,4 +1,9 @@
 enum Permissions {
+	ORGANISATIONS_READ = 'read:organisations',
+	ORGANISATIONS_WRITE = 'write:organisations',
+	ORGANISATIONS_UPDATE = 'update:organisations',
+	ORGANISATIONS_DELETE = 'delete:organisations',
+
 	USERS_READ = 'read:users',
 	USERS_WRITE = 'write:users',
 	USERS_UPDATE = 'update:users',
