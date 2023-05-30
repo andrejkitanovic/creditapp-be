@@ -135,7 +135,7 @@ export const postLoanApplication: RequestHandler = async (req, res, next) => {
 		});
 
 		res.json({
-			// message: i18n.__('CONTROLLER.LOAN_APPLICATION.POST_LOAN_APPLICATION.ADDED'),
+			message: i18n.__('CONTROLLER.LOAN_APPLICATION.POST_LOAN_APPLICATION.ADDED'),
 		});
 	} catch (err) {
 		next(err);
@@ -185,7 +185,7 @@ export const putLoanApplication: RequestHandler = async (req, res, next) => {
 		});
 
 		res.json({
-			// message: i18n.__('CONTROLLER.LOAN_APPLICATION.PUT_LOAN_APPLICATION.UPDATED'),
+			message: i18n.__('CONTROLLER.LOAN_APPLICATION.PUT_LOAN_APPLICATION.UPDATED'),
 		});
 	} catch (err) {
 		next(err);
@@ -203,7 +203,7 @@ export const putLoanApplicationStatus: RequestHandler = async (req, res, next) =
 		});
 
 		res.json({
-			// message: i18n.__('CONTROLLER.LOAN_APPLICATION.PUT_LOAN_APPLICATION.UPDATED'),
+			message: i18n.__('CONTROLLER.LOAN_APPLICATION_STATUS.PUT_LOAN_APPLICATION.UPDATED'),
 		});
 	} catch (err) {
 		next(err);
@@ -224,7 +224,7 @@ export const deleteLoanApplication: RequestHandler = async (req, res, next) => {
 		await LoanApplication.findByIdAndDelete(id);
 
 		res.json({
-			// message: i18n.__('CONTROLLER.LOAN_APPLICATION.DELETE_LOAN_APPLICATION.DELETED'),
+			message: i18n.__('CONTROLLER.LOAN_APPLICATION.DELETE_LOAN_APPLICATION.DELETED'),
 		});
 	} catch (err) {
 		next(err);

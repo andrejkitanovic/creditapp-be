@@ -40,7 +40,7 @@ export const postLoanPackage: RequestHandler = async (req, res, next) => {
 		await LoanPackage.create({ customer });
 
 		res.json({
-			// message: i18n.__('CONTROLLER.PARTNER.POST_PARTNER.ADDED'),
+			message: i18n.__('CONTROLLER.LOAN_PACKAGE.POST.LOAN_PACKAGE.ADDED'),
 		});
 	} catch (err) {
 		next(err);
@@ -55,7 +55,7 @@ export const putLoanPackage: RequestHandler = async (req, res, next) => {
 		await LoanPackage.findByIdAndUpdate(id, { customer });
 
 		res.json({
-			// message: i18n.__('CONTROLLER.PARTNER.PUT_PARTNER.UPDATED'),
+			message: i18n.__('CONTROLLER.LOAN_PACKAGE.PUT.LOAN_PACKAGE.ADDED'),
 		});
 	} catch (err) {
 		next(err);
@@ -69,7 +69,7 @@ export const deleteLoanPackage: RequestHandler = async (req, res, next) => {
 		await LoanPackage.findByIdAndDelete(id);
 
 		res.json({
-			// message: i18n.__('CONTROLLER.PARTNER.DELETE_PARTNER.DELETED'),
+			message: i18n.__('CONTROLLER.LOAN_PACKAGE.DELETE.LOAN_PACKAGE.DELETED'),
 		});
 	} catch (err) {
 		next(err);
