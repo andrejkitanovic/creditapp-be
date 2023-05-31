@@ -136,6 +136,7 @@ export const postWebhookCustomer: RequestHandler = async (req, res, next) => {
 
 				creditEvaluation = await CreditEvaluation.create({
 					customer: customer._id,
+					leadSource,
 					...creditEvaluationData,
 					html: reportLink,
 					pdf: reportPDFLink,
@@ -150,6 +151,7 @@ export const postWebhookCustomer: RequestHandler = async (req, res, next) => {
 					if (deal) {
 						loanPackage = await LoanPackage.create({
 							customer: customer._id,
+							leadSource,
 							creditEvaluation: creditEvaluation?._id,
 							hubspotId: deal?.id,
 							name: deal?.dealname,

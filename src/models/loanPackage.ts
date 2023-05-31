@@ -25,6 +25,9 @@ const loanPackageSchema: Schema = new Schema({
 		ref: 'Customer',
 		required: true,
 	},
+	leadSource: {
+		type: String,
+	},
 	creditEvaluation: {
 		type: Schema.Types.ObjectId,
 		ref: 'Credit Evaluation',

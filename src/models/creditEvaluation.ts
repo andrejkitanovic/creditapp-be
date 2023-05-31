@@ -284,6 +284,9 @@ const creditEvaluationSchema: Schema = new Schema(
 			ref: 'Customer',
 			required: true,
 		},
+		leadSource: {
+			type: String,
+		},
 		html: {
 			type: String,
 		},
@@ -600,7 +603,7 @@ const creditEvaluationSchema: Schema = new Schema(
 				rating30: Number,
 				rating60: Number,
 				rating90: Number,
-				paymentPattern: [String]
+				paymentPattern: [String],
 			},
 		],
 		chargeOffs: [
