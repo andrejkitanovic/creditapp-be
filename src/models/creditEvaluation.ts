@@ -220,6 +220,7 @@ export type CreditEvaluationChargeoffs = {
 
 interface ICreditEvaluation extends Document {
 	customer: string;
+	leadSource: string;
 	// HTML and PDF
 	html: string;
 	pdf: string;

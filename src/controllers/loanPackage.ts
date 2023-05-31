@@ -19,7 +19,7 @@ export const getLoanPackages: RequestHandler = async (req, res, next) => {
 
 		for await (const loanPackage of loanPackages) {
 			populatedLoanPackages.push({
-				...loanPackage._doc,
+				...loanPackage,
 				loanApplications: (await LoanApplication.find({ creditEvaluation: loanPackage.creditEvaluation._id })) || [],
 			});
 		}

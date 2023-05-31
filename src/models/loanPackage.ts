@@ -3,9 +3,10 @@ import { MongooseFindByReference } from 'mongoose-find-by-reference';
 import { calculateAPR, calculateLoanWeightFactor } from 'utils/loans/loansCalculations';
 
 interface ILoanPackage extends Document {
-	customer: string;
-	creditEvaluation: string;
 	hubspotId?: string;
+	customer: string;
+	leadSource: string;
+	creditEvaluation: string;
 
 	name: string;
 	loanAmount: number;
