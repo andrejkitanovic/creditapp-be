@@ -117,7 +117,7 @@ export const postCustomer: RequestHandler = async (req, res, next) => {
 		});
 
 		res.json({
-			// message: i18n.__('CONTROLLER.PARTNER.POST_PARTNER.ADDED'),
+			message: i18n.__('CONTROLLER.CUSTOMER.POST_CUSTOMER.ADDED'),
 		});
 	} catch (err) {
 		next(err);
@@ -178,7 +178,7 @@ export const putCustomer: RequestHandler = async (req, res, next) => {
 		});
 
 		res.json({
-			// message: i18n.__('CONTROLLER.PARTNER.PUT_PARTNER.UPDATED'),
+			message: i18n.__('CONTROLLER.CUSTOMER.PUT_CUSTOMER.UPDATED'),
 		});
 	} catch (err) {
 		next(err);
@@ -198,7 +198,7 @@ export const putCustomerSpouse: RequestHandler = async (req, res, next) => {
 		});
 
 		res.json({
-			// message: i18n.__('CONTROLLER.PARTNER.PUT_PARTNER.UPDATED'),
+			message: i18n.__('CONTROLLER.CUSTOMER.PUT_CUSTOMER.UPDATED'),
 		});
 	} catch (err) {
 		next(err);
@@ -219,7 +219,7 @@ export const deleteCustomerSpouse: RequestHandler = async (req, res, next) => {
 		});
 
 		res.json({
-			// message: i18n.__('CONTROLLER.PARTNER.PUT_PARTNER.UPDATED'),
+			message: i18n.__('CONTROLLER.CUSTOMER_SPOUSE.DELETE_CUSTOMER.DELETED'),
 		});
 	} catch (err) {
 		next(err);
@@ -240,7 +240,7 @@ export const deleteCustomer: RequestHandler = async (req, res, next) => {
 		await LoanPackage.remove({ customer: id });
 
 		res.json({
-			// message: i18n.__('CONTROLLER.PARTNER.DELETE_PARTNER.DELETED'),
+			message: i18n.__('CONTROLLER.CUSTOMER.DELETE_CUSTOMER.DELETED'),
 		});
 	} catch (err) {
 		next(err);

@@ -46,7 +46,7 @@ export const postCreditEvaluation: RequestHandler = async (req, res, next) => {
 		});
 
 		res.json({
-			// message: i18n.__('CONTROLLER.PARTNER.POST_PARTNER.ADDED'),
+			message: i18n.__('CONTROLLER.CREDIT_EVALUATION.POST.CREDIT_EVALUATION.ADDED'),
 		});
 	} catch (err) {
 		next(err);
@@ -61,7 +61,7 @@ export const putCreditEvaluation: RequestHandler = async (req, res, next) => {
 		await CreditEvaluation.findByIdAndUpdate(id, { customer });
 
 		res.json({
-			// message: i18n.__('CONTROLLER.PARTNER.PUT_PARTNER.UPDATED'),
+			message: i18n.__('CONTROLLER.CREDIT_EVALUATION.PUT.CREDIT_EVALUATION.UPDATED'),
 		});
 	} catch (err) {
 		next(err);
@@ -75,7 +75,7 @@ export const deleteCreditEvaluation: RequestHandler = async (req, res, next) => 
 		await CreditEvaluation.findByIdAndDelete(id);
 
 		res.json({
-			// message: i18n.__('CONTROLLER.PARTNER.DELETE_PARTNER.DELETED'),
+			message: i18n.__('CONTROLLER.CREDIT_EVALUATION.DELETE.CREDIT_EVALUATION.DELETED'),
 		});
 	} catch (err) {
 		next(err);
