@@ -48,7 +48,6 @@ export const postOrganisation: RequestHandler = async (req, res, next) => {
 		if (!createLeadSource) throw new Error('Lead Source Already Exists!');
 
 		let hsUser = await hsGetUserByEmail(email);
-
 		if (!hsUser?.id) {
 			hsUser = await hsCreateUser({ email, role: 'partner' });
 		}
