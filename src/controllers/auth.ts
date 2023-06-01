@@ -6,19 +6,19 @@ import i18n from 'helpers/i18n';
 import User, { IUser } from 'models/user';
 import { adminPermissions } from 'helpers/permissions';
 import { sendResetPassword } from 'utils/mailer';
+import { LeanDocument } from 'mongoose';
 
 export const getMe: RequestHandler = async (req, res, next) => {
 	try {
 		const { id } = req.auth;
 
-		const me = (await User.findById(id)) as IUser;
-
-		if (me) {
-			me.permissions = adminPermissions;
-		}
+		const me = (await User.findById(id).populate('organisation').lean()) as LeanDocument<IUser>;
 
 		res.json({
-			data: me,
+			data: {
+				...me,
+				permissions: adminPermissions,
+			},
 		});
 	} catch (err) {
 		next(err);
