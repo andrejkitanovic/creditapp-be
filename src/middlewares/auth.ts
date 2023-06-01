@@ -19,11 +19,13 @@ const auth: (roles: RoleType[]) => RequestHandler = (roles) => async (req, res, 
 			if (!user) {
 				res.status(403).json({ message: i18n.__('MIDDLEWARE.AUTH.USER_NOT_FOUND') });
 			} else if (!roles.includes(user.role)) {
-				if (organisation?.active) {
-					// Check is user still partner
-					// Referral Partner Hubspot ID => 611058
-				} else if (organisation && !organisation.active) {
-					res.status(403).json({ message: i18n.__('MIDDLEWARE.AUTH.ORGANISATION_INACTIVE') });
+				if (organisation.type === 'partner') {
+					if (organisation.active) {
+						// Check is user still partner
+						// Referral Partner Hubspot ID => 611058
+					} else if (!organisation.active) {
+						res.status(403).json({ message: i18n.__('MIDDLEWARE.AUTH.ORGANISATION_INACTIVE') });
+					}
 				}
 
 				res.status(403).json({ message: i18n.__('MIDDLEWARE.AUTH.NOT_AUTHORIZED') });
