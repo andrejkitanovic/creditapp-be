@@ -30,7 +30,7 @@ export const getUsers: RequestHandler = async (req, res, next) => {
 
 export const postUser: RequestHandler = async (req, res, next) => {
 	try {
-		const { email, role } = req.body;
+		const { organisation, email, role } = req.body;
 
 		let hsUser = await hsGetUserByEmail(email);
 
@@ -39,6 +39,7 @@ export const postUser: RequestHandler = async (req, res, next) => {
 		}
 
 		const user = await User.create({
+			organisation,
 			hubspotId: hsUser?.id,
 			email,
 			role,

@@ -2,6 +2,7 @@ import { Schema, model, Document } from 'mongoose';
 
 interface IOrganisation extends Document {
 	hubspotId: string;
+	type: 'admin' | 'partner';
 	active: boolean;
 	name: string;
 	email: string;
@@ -18,6 +19,11 @@ const organisationSchema: Schema = new Schema(
 	{
 		hubspotId: {
 			type: String,
+		},
+		type: {
+			type: String,
+			enum: ['admin', 'partner'],
+			default: 'partner',
 		},
 		name: {
 			type: String,

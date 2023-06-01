@@ -17,8 +17,9 @@ import { LeanDocument } from 'mongoose';
 import { filterObject } from 'utils/filterObject';
 import dayjs from 'dayjs';
 import { Property } from '@hubspot/api-client/lib/codegen/crm/properties';
+import { IOrganisation } from 'models/organisation';
 
-const hubspotClient = new Client({ accessToken: process.env.HS_ACCESS_TOKEN });
+export const hubspotClient = new Client({ accessToken: process.env.HS_ACCESS_TOKEN });
 
 // Routes
 export const getHubspotLenders: RequestHandler = async (req, res, next) => {
@@ -104,6 +105,7 @@ export const hsCreateUser = async ({ email: userEmail, role }: { email: string; 
 	}
 };
 
+// LEAD SOURCE
 export const hsCreateLeadSource = async (leadSource: string) => {
 	try {
 		const { properties: contactSchema } = await hubspotClient.crm.schemas.coreApi.getById('contact');
@@ -177,6 +179,29 @@ export const hsCreateLeadSource = async (leadSource: string) => {
 	} catch (err) {
 		console.log(err);
 		return;
+	}
+};
+
+// PARTNERS TABLE
+const PARTNERT_TABLE_ID = '6054171';
+export const hsUpdatePartnerTable = async (organisation: LeanDocument<IOrganisation>) => {
+	try {
+		await hubspotClient.cms.hubdb.tablesApi.unpublishTable(PARTNERT_TABLE_ID);
+
+		await hubspotClient.cms.hubdb.rowsApi.createTableRow(PARTNERT_TABLE_ID, {
+			values: {
+				partner_name: organisation.name,
+				team_name: '',
+				lead_source: organisation.leadSource,
+				brand: organisation.brand.join(', '),
+				referral_partner_payout: '',
+			},
+		});
+
+		await hubspotClient.cms.hubdb.tablesApi.unpublishTable(PARTNERT_TABLE_ID);
+	} catch (err) {
+		console.log(err);
+		return false;
 	}
 };
 

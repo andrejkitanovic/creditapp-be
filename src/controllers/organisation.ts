@@ -4,7 +4,7 @@ import { queryFilter } from 'helpers/filters';
 import i18n from 'helpers/i18n';
 import { createMeta } from 'helpers/meta';
 import Organisation from 'models/organisation';
-import { hsCreateLeadSource, hsCreateUser, hsGetUserByEmail } from './hubspot';
+import { hsCreateLeadSource, hsCreateUser, hsGetUserByEmail, hsUpdatePartnerTable } from './hubspot';
 
 export const getMineOrganisation: RequestHandler = async (req, res, next) => {
 	try {
@@ -44,15 +44,17 @@ export const postOrganisation: RequestHandler = async (req, res, next) => {
 	try {
 		const { name, email, leadSource, brand, partnerPayout } = req.body;
 
+		// Create Lead Source
 		const createLeadSource = await hsCreateLeadSource(leadSource);
 		if (!createLeadSource) throw new Error('Lead Source Already Exists!');
 
+		// Get or create User
 		let hsUser = await hsGetUserByEmail(email);
 		if (!hsUser?.id) {
 			hsUser = await hsCreateUser({ email, role: 'partner' });
 		}
 
-		await Organisation.create({
+		const organisation = await Organisation.create({
 			hubspotId: hsUser?.id,
 			name,
 			email,
@@ -60,6 +62,9 @@ export const postOrganisation: RequestHandler = async (req, res, next) => {
 			brand,
 			partnerPayout,
 		});
+
+		// Update Partner Table
+		await hsUpdatePartnerTable(organisation);
 
 		res.json({
 			message: i18n.__('CONTROLLER.ORGANISATION.POST_ORGANISATION.ADDED'),
@@ -72,11 +77,10 @@ export const postOrganisation: RequestHandler = async (req, res, next) => {
 export const putOrganisation: RequestHandler = async (req, res, next) => {
 	try {
 		const { id } = req.params;
-		const { name, leadSource, brand, partnerPayout } = req.body;
+		const { name, brand, partnerPayout } = req.body;
 
 		await Organisation.findByIdAndUpdate(id, {
 			name,
-			leadSource,
 			brand,
 			partnerPayout,
 		});
