@@ -21,11 +21,19 @@ import { hsCreateLoan, hsUpdateLoan } from './hubspot';
 
 export const getCreditEvaluations: RequestHandler = async (req, res, next) => {
 	try {
+		const { organisation } = req.auth;
+
+		let defaultFilters;
+		if (organisation.type === 'partner') {
+			defaultFilters = { leadSource: organisation.leadSource };
+		}
+
 		const { data: creditEvaluations, count } = await queryFilter({
 			Model: CreditEvaluation,
 			query: req.query,
 			populate: 'customer',
 			searchFields: ['customer.firstName', 'customer.lastName'],
+			defaultFilters,
 		});
 
 		res.json({

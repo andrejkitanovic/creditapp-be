@@ -1,8 +1,11 @@
+// import { LeanDocument } from "mongoose";
+// import { IOrganisation } from "models/organisation";
+
 declare namespace Express {
 	interface Request {
 		auth: {
 			id: string;
-			organisationId: string | undefined;
+			organisation: LeanDocument<IOrganisation> | undefined;
 		};
 	}
 }

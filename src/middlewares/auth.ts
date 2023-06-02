@@ -14,7 +14,7 @@ const auth: (roles: RoleType[]) => RequestHandler = (roles) => async (req, res, 
 
 			const { id } = decoded as { id: string };
 			const user = (await User.findById(id).lean()) as LeanDocument<IUser>;
-			const organisation = (await Organisation.findById(user.organisation)) as LeanDocument<IOrganisation>;
+			const organisation = (await Organisation.findById(user.organisation).lean()) as LeanDocument<IOrganisation>;
 
 			if (!user) {
 				res.status(403).json({ message: i18n.__('MIDDLEWARE.AUTH.USER_NOT_FOUND') });
@@ -32,7 +32,7 @@ const auth: (roles: RoleType[]) => RequestHandler = (roles) => async (req, res, 
 			} else {
 				req.auth = {
 					id,
-					organisationId: user.organisation,
+					organisation: user.organisation,
 				};
 				next();
 			}

@@ -19,14 +19,21 @@ import { cbcReportToCreditEvaluation } from './creditEvaluation';
 import dayjs from 'dayjs';
 import i18n from 'helpers/i18n';
 
-
 export const getCustomers: RequestHandler = async (req, res, next) => {
 	try {
+		const { organisation } = req.auth;
+
+		let defaultFilters;
+		if (organisation.type === 'partner') {
+			defaultFilters = { leadSource: organisation.leadSource };
+		}
+
 		const { data: customers, count } = await queryFilter({
 			Model: Customer,
 			query: req.query,
 			populate: 'spouse',
 			searchFields: ['firstName', 'lastName', 'middleName', 'address', 'email'],
+			defaultFilters
 		});
 
 		res.json({

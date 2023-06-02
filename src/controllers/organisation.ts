@@ -8,9 +8,7 @@ import { hsCreateLeadSource, hsCreateUser, hsGetUserByEmail, hsUpdatePartnerTabl
 
 export const getMineOrganisation: RequestHandler = async (req, res, next) => {
 	try {
-		const { organisationId } = req.auth;
-
-		const organisation = await Organisation.findById(organisationId);
+		const { organisation } = req.auth;
 
 		res.json({
 			data: organisation,
@@ -22,13 +20,13 @@ export const getMineOrganisation: RequestHandler = async (req, res, next) => {
 
 export const getOrganisations: RequestHandler = async (req, res, next) => {
 	try {
-		const { organisationId } = req.auth;
+		const { organisation } = req.auth;
 
 		const { data: organisations, count } = await queryFilter({
 			Model: Organisation,
 			query: req.query,
 			searchFields: ['name'],
-			defaultFilters: { _id: { $ne: organisationId } },
+			defaultFilters: { _id: { $ne: organisation._id } },
 		});
 
 		res.json({
