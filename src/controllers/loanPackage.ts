@@ -12,7 +12,7 @@ export const getLoanPackages: RequestHandler = async (req, res, next) => {
 
 		let defaultFilters;
 		if (organisation.type === 'partner') {
-			defaultFilters = { leadSource: organisation.leadSource };
+			defaultFilters = { leadSource: { $exists: true, $eq: organisation.leadSource } };
 		}
 
 		const { data: loanPackages, count } = await queryFilter({
@@ -20,7 +20,7 @@ export const getLoanPackages: RequestHandler = async (req, res, next) => {
 			query: req.query,
 			populate: 'customer creditEvaluation',
 			searchFields: ['customer.firstName', 'customer.lastName'],
-			defaultFilters
+			defaultFilters,
 		});
 
 		const populatedLoanPackages = [];

@@ -25,7 +25,7 @@ export const getCustomers: RequestHandler = async (req, res, next) => {
 
 		let defaultFilters;
 		if (organisation.type === 'partner') {
-			defaultFilters = { leadSource: organisation.leadSource };
+			defaultFilters = { leadSource: { $exists: true, $eq: organisation.leadSource } };
 		}
 
 		const { data: customers, count } = await queryFilter({
@@ -33,7 +33,7 @@ export const getCustomers: RequestHandler = async (req, res, next) => {
 			query: req.query,
 			populate: 'spouse',
 			searchFields: ['firstName', 'lastName', 'middleName', 'address', 'email'],
-			defaultFilters
+			defaultFilters,
 		});
 
 		res.json({

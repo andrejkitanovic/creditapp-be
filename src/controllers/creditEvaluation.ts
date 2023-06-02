@@ -25,7 +25,7 @@ export const getCreditEvaluations: RequestHandler = async (req, res, next) => {
 
 		let defaultFilters;
 		if (organisation.type === 'partner') {
-			defaultFilters = { leadSource: organisation.leadSource };
+			defaultFilters = { leadSource: { $exists: true, $eq: organisation.leadSource } };
 		}
 
 		const { data: creditEvaluations, count } = await queryFilter({
