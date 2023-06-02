@@ -20,7 +20,7 @@ defineRoutes(router, [
 	{
 		method: 'get',
 		route: '/mine',
-		roles: ['admin'],
+		roles: ['partner-admin', 'partner', 'partner-sales-rep', 'admin'],
 		controller: getMineOrganisationController,
 	},
 	{
