@@ -17,6 +17,8 @@ import { absoluteFilePath } from 'utils/absoluteFilePath';
 import { htmlToPDF } from 'utils/htmlToPdf';
 import { cbcReportToCreditEvaluation } from './creditEvaluation';
 import dayjs from 'dayjs';
+import i18n from 'helpers/i18n';
+
 
 export const getCustomers: RequestHandler = async (req, res, next) => {
 	try {

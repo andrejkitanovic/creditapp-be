@@ -48,7 +48,6 @@ const organisationSchema: Schema = new Schema(
 		partnerPayout: {
 			active: {
 				type: Boolean,
-				default: true,
 			},
 			type: {
 				type: String,

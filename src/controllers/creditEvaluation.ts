@@ -1,7 +1,7 @@
 import dayjs from 'dayjs';
 import { RequestHandler } from 'express';
 
-// import i18n from 'helpers/i18n';
+import i18n from 'helpers/i18n';
 import { queryFilter } from 'helpers/filters';
 import { createMeta } from 'helpers/meta';
 
