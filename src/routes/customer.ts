@@ -22,21 +22,21 @@ defineRoutes(router, [
 	{
 		method: 'get',
 		route: '/',
-		roles: ['partner', 'admin'],
+		roles: ['partner-admin', 'partner', 'partner-sales-rep', 'admin'],
 		permissions: ['read:customers'],
 		controller: getCustomersController,
 	},
 	{
 		method: 'get',
 		route: '/hubspot',
-		roles: ['partner', 'admin'],
+		roles: ['partner-admin', 'partner', 'partner-sales-rep', 'admin'],
 		permissions: ['read:customers'],
 		controller: getHSCustomerController,
 	},
 	{
 		method: 'post',
 		route: '/',
-		roles: ['partner', 'admin'],
+		roles: ['partner-admin', 'partner', 'partner-sales-rep', 'admin'],
 		permissions: ['write:customers'],
 		// validator: postCustomerValidator,
 		controller: postCustomerController,
@@ -44,7 +44,7 @@ defineRoutes(router, [
 	{
 		method: 'put',
 		route: '/:id',
-		roles: ['partner', 'admin'],
+		roles: ['partner-admin', 'partner', 'partner-sales-rep', 'admin'],
 		permissions: ['update:customers'],
 		// validator: putCustomerValidator,
 		controller: putCustomerController,
@@ -52,7 +52,7 @@ defineRoutes(router, [
 	{
 		method: 'put',
 		route: '/spouse/:id',
-		roles: ['partner', 'admin'],
+		roles: ['partner-admin', 'partner', 'partner-sales-rep', 'admin'],
 		permissions: ['update:customers'],
 		// validator: putCustomerSpouseValidator,
 		controller: putCustomerSpouseController,
@@ -60,7 +60,7 @@ defineRoutes(router, [
 	{
 		method: 'delete',
 		route: '/spouse/:id',
-		roles: ['partner', 'admin'],
+		roles: ['partner-admin', 'partner', 'partner-sales-rep', 'admin'],
 		permissions: ['update:customers'],
 		// validator: putCustomerSpouseValidator,
 		controller: deleteCustomerSpouseController,
@@ -68,7 +68,7 @@ defineRoutes(router, [
 	{
 		method: 'delete',
 		route: '/:id',
-		roles: ['partner', 'admin'],
+		roles: ['partner-admin', 'partner', 'partner-sales-rep', 'admin'],
 		permissions: ['delete:customers'],
 		// validator: deleteCustomerValidator,
 		controller: deleteCustomerController,
@@ -76,14 +76,14 @@ defineRoutes(router, [
 	{
 		method: 'get',
 		route: '/:id',
-		// roles: ['partner', 'admin'],
+		// roles: ['partner-admin', 'partner', 'partner-sales-rep', 'admin'],
 		// permissions: ['read:customers'],
 		controller: getSingleCustomerController,
 	},
 	{
 		method: 'put',
 		route: '/hubspot/sync/:id',
-		roles: ['partner', 'admin'],
+		roles: ['partner-admin', 'partner', 'partner-sales-rep', 'admin'],
 		permissions: ['update:customers'],
 		// validator: putCustomerValidator,
 		controller: putCustomerSyncHubspotController,
@@ -91,7 +91,7 @@ defineRoutes(router, [
 	{
 		method: 'put',
 		route: '/hubspot/push/:id',
-		roles: ['partner', 'admin'],
+		roles: ['partner-admin', 'partner', 'partner-sales-rep', 'admin'],
 		permissions: ['update:customers'],
 		// validator: putCustomerValidator,
 		controller: putCustomerPushHubspotController,
@@ -99,7 +99,7 @@ defineRoutes(router, [
 	{
 		method: 'put',
 		route: '/refetch/:id',
-		roles: ['partner', 'admin'],
+		roles: ['partner-admin', 'partner', 'partner-sales-rep', 'admin'],
 		permissions: ['update:customers'],
 		// validator: putCustomerValidator,
 		controller: putRefetchCustomerController,

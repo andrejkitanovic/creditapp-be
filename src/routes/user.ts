@@ -49,7 +49,7 @@ defineRoutes(router, [
 	{
 		method: 'get',
 		route: '/:id',
-		roles: ['partner', 'admin'],
+		roles: ['partner-admin', 'partner', 'partner-sales-rep', 'admin'],
 		permissions: ['read:users'],
 		controller: getSingleUserController,
 	},

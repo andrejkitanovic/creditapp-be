@@ -10,7 +10,7 @@ defineRoutes(router, [
 	{
 		method: 'get',
 		route: '/lenders',
-		roles: ['partner', 'admin'],
+		roles: ['partner-admin', 'partner', 'partner-sales-rep', 'admin'],
 		// permissions: ['read:distillation'],
 		controller: getHubspotLendersController,
 	},
