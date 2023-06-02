@@ -14,13 +14,14 @@ import {
 	postRegister as postRegisterValidator,
 	putMe as putMeValidator,
 } from 'validators/auth';
+import { RolesEnum } from 'models/user';
 
 const router = Router();
 defineRoutes(router, [
 	{
 		method: 'get',
 		route: '/me',
-		roles: ['partner-admin', 'partner', 'partner-sales-rep', 'admin'],
+		roles: Object.values(RolesEnum),
 		controller: getMeController,
 	},
 	{
@@ -44,14 +45,14 @@ defineRoutes(router, [
 	{
 		method: 'put',
 		route: '/me',
-		roles: ['partner-admin', 'partner', 'partner-sales-rep', 'admin'],
+		roles: Object.values(RolesEnum),
 		validator: putMeValidator,
 		controller: putMeController,
 	},
 	{
 		method: 'put',
 		route: '/me/password',
-		roles: ['partner-admin', 'partner', 'partner-sales-rep', 'admin'],
+		roles: Object.values(RolesEnum),
 		// validator: putMeValidator,
 		controller: putMePasswordController,
 	},

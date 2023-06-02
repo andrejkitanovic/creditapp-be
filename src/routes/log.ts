@@ -10,8 +10,7 @@ defineRoutes(router, [
 	{
 		method: 'get',
 		route: '/',
-		roles: ['admin'],
-		// permissions: ['read:customers'],
+		permissions: ['read:logs'],
 		controller: getLogsController,
 	},
 ]);

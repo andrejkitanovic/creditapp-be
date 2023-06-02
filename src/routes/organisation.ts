@@ -10,6 +10,7 @@ import {
 	getMineOrganisation as getMineOrganisationController,
 	getSingleOrganisation as getSingleOrganisationController,
 } from 'controllers/organisation';
+import { RolesEnum } from 'models/user';
 // import {
 // 	postOrganisation as postOrganisationValidator,
 // 	putOrganisation as putOrganisationValidator,
@@ -20,45 +21,40 @@ defineRoutes(router, [
 	{
 		method: 'get',
 		route: '/mine',
-		roles: ['partner-admin', 'partner', 'partner-sales-rep', 'admin'],
+		roles: Object.values(RolesEnum),
 		controller: getMineOrganisationController,
 	},
 	{
 		method: 'get',
 		route: '/',
-		roles: ['admin'],
-		// permissions: ['read:organisations'],
+		permissions: ['read:organisations'],
 		controller: getOrganisationsController,
 	},
 	{
 		method: 'post',
 		route: '/',
-		roles: ['admin'],
-		// permissions: ['write:organisations'],
+		permissions: ['write:organisations'],
 		// validator: postOrganisationValidator,
 		controller: postOrganisationController,
 	},
 	{
 		method: 'put',
 		route: '/:id',
-		roles: ['admin'],
-		// permissions: ['update:organisations'],
+		permissions: ['update:organisations'],
 		// validator: putOrganisationValidator,
 		controller: putOrganisationController,
 	},
 	{
 		method: 'delete',
 		route: '/:id',
-		roles: ['admin'],
-		// permissions: ['delete:organisations'],
+		permissions: ['delete:organisations'],
 		// validator: deleteOrganisationValidator,
 		controller: deleteOrganisationController,
 	},
 	{
 		method: 'get',
 		route: '/:id',
-		roles: ['admin'],
-		// permissions: ['read:organisations'],
+		permissions: ['read:organisations'],
 		controller: getSingleOrganisationController,
 	},
 ]);

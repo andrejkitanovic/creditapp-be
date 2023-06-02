@@ -2,6 +2,7 @@ import { Router } from 'express';
 import defineRoutes from 'helpers/defineRoutes';
 
 import { getHubspotLenders as getHubspotLendersController } from 'controllers/hubspot';
+import { RolesEnum } from 'models/user';
 // import {
 // } from 'validators/creditEvaluation';
 
@@ -10,7 +11,7 @@ defineRoutes(router, [
 	{
 		method: 'get',
 		route: '/lenders',
-		roles: ['partner-admin', 'partner', 'partner-sales-rep', 'admin'],
+		roles: Object.values(RolesEnum),
 		// permissions: ['read:distillation'],
 		controller: getHubspotLendersController,
 	},

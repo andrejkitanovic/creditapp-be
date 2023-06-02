@@ -1,6 +1,8 @@
 import { RolesEnum } from 'models/user';
 
 enum Permissions {
+	LOGS_READ = 'read:logs',
+	
 	ORGANISATIONS_READ = 'read:organisations',
 	ORGANISATIONS_WRITE = 'write:organisations',
 	ORGANISATIONS_UPDATE = 'update:organisations',
