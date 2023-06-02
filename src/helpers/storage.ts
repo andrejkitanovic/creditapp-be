@@ -23,6 +23,6 @@ export default function (app: Express) {
 	});
 
 	app.use('/public', express.static(path.join(__dirname, '../../public')));
-	app.use('/uploads', checkHeaders, auth(['admin', 'partner']), express.static(path.join(__dirname, '../../uploads')));
+	app.use('/uploads', checkHeaders, auth(undefined, undefined), express.static(path.join(__dirname, '../../uploads')));
 	app.use(multer({ storage }).single('file'));
 }
