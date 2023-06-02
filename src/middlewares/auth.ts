@@ -32,7 +32,7 @@ const auth: (roles: RoleType[]) => RequestHandler = (roles) => async (req, res, 
 			} else {
 				req.auth = {
 					id,
-					organisation: user.organisation,
+					organisation,
 				};
 				next();
 			}
