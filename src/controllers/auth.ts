@@ -4,7 +4,7 @@ import bcrypt from 'bcryptjs';
 
 import i18n from 'helpers/i18n';
 import User, { IUser } from 'models/user';
-import { adminPermissions } from 'helpers/permissions';
+import { rolePermissions } from 'helpers/permissions';
 import { sendResetPassword } from 'utils/mailer';
 import { LeanDocument } from 'mongoose';
 
@@ -17,7 +17,7 @@ export const getMe: RequestHandler = async (req, res, next) => {
 		res.json({
 			data: {
 				...me,
-				permissions: adminPermissions,
+				permissions: rolePermissions[me.role],
 			},
 		});
 	} catch (err) {

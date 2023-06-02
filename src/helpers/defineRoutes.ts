@@ -18,11 +18,11 @@ interface IRoute {
 }
 
 const defineRoutes = (router: IRouter, routes: IRoute[]) => {
-	routes.forEach(({ method, route, roles, middlewares, validator, controller }) => {
+	routes.forEach(({ method, route, roles, permissions, middlewares, validator, controller }) => {
 		const additionalRoutes = [];
 
-		if (roles) {
-			additionalRoutes.push(auth(roles));
+		if (roles || permissions) {
+			additionalRoutes.push(auth(roles, permissions));
 		}
 		if (validator) {
 			additionalRoutes.push(validator, validatorMiddleware);

@@ -18,14 +18,12 @@ defineRoutes(router, [
 	{
 		method: 'get',
 		route: '/',
-		roles: ['admin', 'partner-admin'],
 		permissions: ['read:users'],
 		controller: getUsersController,
 	},
 	{
 		method: 'post',
 		route: '/',
-		roles: ['admin', 'partner-admin'],
 		permissions: ['write:users'],
 		validator: postUserValidator,
 		controller: postUserController,
@@ -33,7 +31,6 @@ defineRoutes(router, [
 	{
 		method: 'put',
 		route: '/:id',
-		roles: ['admin', 'partner-admin'],
 		permissions: ['update:users'],
 		// validator: putUserValidator, // TODO | Validator missing
 		controller: putUserController,
@@ -41,7 +38,6 @@ defineRoutes(router, [
 	{
 		method: 'delete',
 		route: '/:id',
-		roles: ['admin', 'partner-admin'],
 		permissions: ['delete:users'],
 		// validator: deleteUserValidator, // TODO | Validator missing
 		controller: deleteUserController,
@@ -49,7 +45,6 @@ defineRoutes(router, [
 	{
 		method: 'get',
 		route: '/:id',
-		roles: ['partner-admin', 'partner', 'partner-sales-rep', 'admin'],
 		permissions: ['read:users'],
 		controller: getSingleUserController,
 	},

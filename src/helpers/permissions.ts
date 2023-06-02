@@ -1,3 +1,5 @@
+import { RolesEnum } from 'models/user';
+
 enum Permissions {
 	ORGANISATIONS_READ = 'read:organisations',
 	ORGANISATIONS_WRITE = 'write:organisations',
@@ -28,4 +30,22 @@ enum Permissions {
 export type PermissionsType = `${Permissions}`;
 
 // ADMIN PERMISSIONS
-export const adminPermissions = Object.values(Permissions);
+
+export const rolePermissions: { [x in RolesEnum]: PermissionsType[] } = {
+	admin: Object.values(Permissions),
+	'partner-admin': [
+		Permissions.USERS_READ,
+		Permissions.USERS_WRITE,
+		Permissions.USERS_UPDATE,
+		Permissions.USERS_DELETE,
+		Permissions.CUSTOMERS_READ,
+		Permissions.CREDIT_EVALUATIONS_READ,
+		Permissions.LOAN_PACKAGES_READ,
+	],
+	partner: [Permissions.CUSTOMERS_READ, Permissions.CREDIT_EVALUATIONS_READ, Permissions.LOAN_PACKAGES_READ],
+	'partner-sales-rep': [
+		Permissions.CUSTOMERS_READ,
+		Permissions.CREDIT_EVALUATIONS_READ,
+		Permissions.LOAN_PACKAGES_READ,
+	],
+};
