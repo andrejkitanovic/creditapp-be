@@ -3,7 +3,7 @@ import { Schema, model, Document } from 'mongoose';
 
 // type TypeWhiteLabeledDomains = 'gmail' | 'deckerdevs';
 
-enum RolesEnum {
+export enum RolesEnum {
 	ADMIN = 'admin',
 	PARTNER_ADMIN = 'partner-admin',
 	PARTNER = 'partner',

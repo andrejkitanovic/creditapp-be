@@ -1,7 +1,7 @@
 import { body, param } from 'express-validator';
 import i18n from 'helpers/i18n';
 
-import User from 'models/user';
+import User, { RolesEnum } from 'models/user';
 
 export const postUser = [
 	body('email', i18n.__('VALIDATOR.EMAIL.REQUIRED'))
@@ -17,7 +17,7 @@ export const postUser = [
 		}),
 	body('role', i18n.__('VALIDATOR.ROLE.REQUIRED'))
 		.notEmpty()
-		.isIn(['admin', 'partner'])
+		.isIn(Object.values(RolesEnum))
 		.withMessage(i18n.__('VALIDATOR.ROLE.ONE_OF')),
 ];
 
