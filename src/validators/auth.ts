@@ -10,7 +10,7 @@ export const postLogin = [
 		.isEmail()
 		.withMessage(i18n.__('VALIDATOR.EMAIL.NOT_VALID'))
 		.custom(async (value: string) => {
-			const userExists = await User.exists({ email: { $regex: new RegExp(value, 'i') } });
+			const userExists = await User.exists({ email: value.toLowerCase() });
 
 			if (!userExists) {
 				throw new Error(i18n.__('VALIDATOR.USER.NOT_FOUND'));

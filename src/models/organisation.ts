@@ -7,10 +7,10 @@ interface IOrganisation extends Document {
 	name: string;
 	email: string;
 	leadSource: string;
-	brand: string[];
+	brand: string;
 	partnerPayout: {
 		active: boolean;
-		type: 'percentage';
+		type: 'they-invoice' | 'percentage';
 		value: number;
 	};
 }
@@ -40,18 +40,17 @@ const organisationSchema: Schema = new Schema(
 		leadSource: {
 			type: String,
 		},
-		brand: [
-			{
-				type: String,
-			},
-		],
+		brand: {
+			type: String,
+		},
 		partnerPayout: {
 			active: {
 				type: Boolean,
 			},
 			type: {
 				type: String,
-				enum: ['percentage'],
+				enum: ['they-invoice', 'percentage'],
+				default: 'they-invoice',
 			},
 			value: {
 				type: Number,

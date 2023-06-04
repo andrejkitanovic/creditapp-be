@@ -41,7 +41,7 @@ export const postUser: RequestHandler = async (req, res, next) => {
 		const user = await User.create({
 			organisation,
 			hubspotId: hsUser?.id,
-			email,
+			email: email.toLowerCase(),
 			role,
 		});
 

@@ -29,7 +29,7 @@ export const postLogin: RequestHandler = async (req, res, next) => {
 	try {
 		const { email } = req.body;
 
-		const user = await User.findOne({ email: { $regex: new RegExp(email, 'i') } });
+		const user = await User.findOne({ email: email.toLowerCase() });
 
 		const token = jwt.sign({ id: user?._id }, process.env.DECODE_KEY || '', {
 			// expiresIn: "1h",
@@ -48,7 +48,7 @@ export const postForgotPassword: RequestHandler = async (req, res, next) => {
 	try {
 		const { email } = req.body;
 
-		const user = await User.findOne({ email: { $regex: new RegExp(email, 'i') } });
+		const user = await User.findOne({ email: email.toLowerCase() });
 
 		const token = jwt.sign({ id: user?._id }, process.env.DECODE_KEY || '', {
 			expiresIn: '1h',
