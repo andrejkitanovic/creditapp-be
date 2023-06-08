@@ -28,11 +28,11 @@ const isOrganisationActive = async (organisation: LeanDocument<IOrganisation>) =
 			const { roleId } = await hsGetUserById(organisation.hubspotId);
 
 			if (roleId !== '611058') {
-				await Organisation.findByIdAndUpdate(organisation._id, {
-					active: false,
-				});
+				// await Organisation.findByIdAndUpdate(organisation._id, {
+				// 	active: false,
+				// });
 				
-				return false;
+				// return false;
 			}
 
 			return true;
