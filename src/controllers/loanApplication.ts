@@ -62,7 +62,7 @@ export const getLoanApplications: RequestHandler = async (req, res, next) => {
 							originationFee: hsLoan.origination_fee_amount,
 							originationFeePercentage: hsLoan.origination_fee_percentage,
 							apr: hsLoan.loan_apr,
-							...enumFields
+							...enumFields,
 						},
 						{ new: true }
 					).lean();
@@ -96,15 +96,15 @@ export const postLoanApplication: RequestHandler = async (req, res, next) => {
 			creditEvaluation: creditEvaluationId,
 
 			lenderId,
-			loanAmount,
-			monthlyPayment,
-			term,
+			loanAmount = 0,
+			monthlyPayment = 0,
+			term = 0,
 			creditInquiry,
 			applicationDate,
 			status,
 			accountType,
-			interestRate,
-			originationFee,
+			interestRate = 0,
+			originationFee = 0,
 			reasonCode,
 		} = req.body;
 
