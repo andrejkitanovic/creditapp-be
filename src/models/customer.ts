@@ -287,6 +287,13 @@ const customerSchema: Schema = new Schema(
 		cbcErrorMessage: {
 			type: String,
 		},
+
+		submissionEmail: {
+			type: String,
+		},
+		submissionPassword: {
+			type: String,
+		},
 	},
 	{ timestamps: true }
 );

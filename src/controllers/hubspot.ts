@@ -507,7 +507,7 @@ export const hsUpdateContact = async (
 				calculated_length_of_employment: customer.employmentInfo.calculatedLengthOfEmployment,
 				occupation_position: customer.employmentInfo.occupationPosition,
 				monthly_gross_income: customer.employmentInfo.monthlyGrossIncome,
-				annual_personal_income: customer.employmentInfo.annualPersonalIncome,
+				// annual_personal_income: customer.employmentInfo.annualPersonalIncome, - CALCULATED PROPERTY
 				front_end_dti_ratio: customer.employmentInfo.frontEndRtiRatio,
 				total_annual_household_income: customer.employmentInfo.totalAnnualHouseholdIncome,
 				household_front_end_dti_ratio__cloned_: customer.employmentInfo.householdFrontEndDtiRatio,
@@ -530,7 +530,8 @@ export const hsUpdateContact = async (
 				college_university_attended: customer.educationInfo.collegeAttended,
 				field_of_study: customer.educationInfo.fieldOfStudy,
 				degree: customer.educationInfo.degree,
-				graduation_date: customer.educationInfo.graduatedDate,
+				graduation_date:
+					customer.educationInfo.graduatedDate && dayjs(customer.educationInfo.graduatedDate).format('YYYY'),
 				graduate_school_attended: customer.educationInfo.graduateSchoolAttended,
 				graduate_school_field_of_study: customer.educationInfo.graduateSchoolFieldOfStudy,
 				graduate_degree_received: customer.educationInfo.graduateDegreeReceived,
