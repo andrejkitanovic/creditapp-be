@@ -51,7 +51,7 @@ export enum LoanApplicationCreditInquiry {
 	TRANSUNION = 'TU',
 	EQUIFAX = 'EXF',
 	TRI_MERGE = 'TM',
-	SOFT_PULL = 'SP'
+	SOFT_PULL = 'SP',
 }
 
 interface ILoanApplication extends Document {
@@ -107,14 +107,17 @@ const loanApplicationSchema: Schema = new Schema({
 	loanAmount: {
 		type: Number,
 		required: true,
+		default: 0,
 	},
 	monthlyPayment: {
 		type: Number,
 		required: true,
+		default: 0,
 	},
 	term: {
 		type: Number,
 		required: true,
+		default: 0,
 	},
 	creditInquiry: [
 		{
@@ -138,6 +141,7 @@ const loanApplicationSchema: Schema = new Schema({
 	interestRate: {
 		type: Number,
 		required: true,
+		default: 0,
 	},
 	loanWeightFactor: {
 		type: Number,

@@ -94,17 +94,16 @@ export const postLoanApplication: RequestHandler = async (req, res, next) => {
 	try {
 		const {
 			creditEvaluation: creditEvaluationId,
-
 			lenderId,
-			loanAmount = 0,
-			monthlyPayment = 0,
-			term = 0,
+			loanAmount,
+			monthlyPayment,
+			term,
 			creditInquiry,
 			applicationDate,
 			status,
 			accountType,
-			interestRate = 0,
-			originationFee = 0,
+			interestRate,
+			originationFee,
 			reasonCode,
 		} = req.body;
 
