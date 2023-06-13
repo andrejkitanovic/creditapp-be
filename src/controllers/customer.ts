@@ -403,7 +403,7 @@ export const putCustomerSyncHubspot: RequestHandler = async (req, res, next) => 
 				calculatedEquity: customer?.primaryResidenceValuation?.calculatedEquity || contact?.calculated_equity,
 			},
 
-			submissionEmail: customer?.submissionEmail || contact?.submission_email_password,
+			submissionEmail: customer?.submissionEmail || contact?.submission_email,
 			submissionPassword: customer?.submissionPassword || contact?.submission_password,
 		});
 

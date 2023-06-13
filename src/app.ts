@@ -46,3 +46,15 @@ routing(app);
 app.use(errorMiddleware);
 
 connection(app);
+
+import Customer from 'models/customer';
+import { hsUpdateContact } from 'controllers/hubspot';
+
+(async function(){
+
+	const customer = await Customer.findById("63cfe2e6af47b7aadc7a3ef5");
+
+	if (customer?.hubspotId) {
+		await hsUpdateContact(customer.hubspotId, customer);
+	}
+}())
