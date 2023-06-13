@@ -159,6 +159,9 @@ export const putCustomer: RequestHandler = async (req, res, next) => {
 			housingInfo,
 			securityQuestions,
 			primaryResidenceValuation,
+			franchiseChoice,
+			submissionEmail,
+			submissionPassword,
 		} = req.body;
 
 		await Customer.findByIdAndUpdate(id, {
@@ -184,6 +187,9 @@ export const putCustomer: RequestHandler = async (req, res, next) => {
 			housingInfo,
 			securityQuestions,
 			primaryResidenceValuation,
+			franchiseChoice,
+			submissionEmail,
+			submissionPassword,
 		});
 
 		res.json({
