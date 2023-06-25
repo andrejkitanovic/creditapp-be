@@ -89,7 +89,7 @@ export const hsCreateUser = async ({ email: userEmail, role }: { email: string; 
 
 		const { id, email, roleId, primaryTeamId } = await hubspotClient.settings.users.usersApi.create({
 			email: userEmail,
-			sendWelcomeEmail: false,
+			sendWelcomeEmail: true,
 			...roleProperties[role],
 		});
 
@@ -110,11 +110,13 @@ export const hsCreateLeadSource = async (leadSource: string) => {
 	try {
 		const { properties: contactSchema } = await hubspotClient.crm.schemas.coreApi.getById('contact');
 		const { properties: dealSchema } = await hubspotClient.crm.schemas.coreApi.getById('deals');
+		const { properties: loanSchema } = await hubspotClient.crm.schemas.coreApi.getById('loans');
 
 		const contactSchemaLeadSource = contactSchema.find((property) => property.name === 'lead_source') as Property;
 		const dealSchemaLeadSource = dealSchema.find(
 			(property) => property.name === 'lead_source___companies___li_and_fb'
 		) as Property;
+		const loanSchemaLeadSource = loanSchema.find((property) => property.name === 'lead_source') as Property;
 
 		if (
 			contactSchemaLeadSource.options.some((option) => option.value === leadSource) ||
@@ -175,6 +177,32 @@ export const hsCreateLeadSource = async (leadSource: string) => {
 			})
 		).json();
 
+		// UPDATE LOAN PROPERTY
+		await (
+			await hubspotClient.apiRequest({
+				path: `/properties/v2/loans/properties/named/lead_source`,
+				method: 'PUT',
+				body: {
+					name: loanSchemaLeadSource.name,
+					groupName: loanSchemaLeadSource.groupName,
+					description: loanSchemaLeadSource.description,
+					fieldType: loanSchemaLeadSource.fieldType,
+					formField: loanSchemaLeadSource.formField,
+					type: loanSchemaLeadSource.type,
+					displayOrder: loanSchemaLeadSource.displayOrder,
+					label: loanSchemaLeadSource.label,
+					options: [
+						...loanSchemaLeadSource.options,
+						{
+							label: leadSource,
+							value: leadSource,
+							hidden: false,
+						},
+					],
+				},
+			})
+		).json();
+		
 		return true;
 	} catch (err) {
 		console.log(err);
@@ -194,11 +222,11 @@ export const hsUpdatePartnerTable = async (organisation: LeanDocument<IOrganisat
 				team_name: '',
 				lead_source: organisation.leadSource,
 				brand: organisation.brand,
-				referral_partner_payout: '',
+				referral_partner_payout: organisation.partnerPayout.value,
 			},
 		});
 
-		await hubspotClient.cms.hubdb.tablesApi.unpublishTable(PARTNERT_TABLE_ID);
+		await hubspotClient.cms.hubdb.tablesApi.publishDraftTable(PARTNERT_TABLE_ID);
 	} catch (err) {
 		console.log(err);
 		return false;

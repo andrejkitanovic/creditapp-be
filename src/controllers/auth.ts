@@ -49,6 +49,7 @@ export const postForgotPassword: RequestHandler = async (req, res, next) => {
 		const { email } = req.body;
 
 		const user = await User.findOne({ email: email.toLowerCase() });
+		if (!user) throw new Error('User not found!');
 
 		const token = jwt.sign({ id: user?._id }, process.env.DECODE_KEY || '', {
 			expiresIn: '1h',

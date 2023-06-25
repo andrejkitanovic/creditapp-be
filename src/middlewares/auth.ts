@@ -21,24 +21,20 @@ const hasPermissions = (permissions: PermissionsType[], role: RoleType) => {
 
 const isOrganisationActive = async (organisation: LeanDocument<IOrganisation>) => {
 	if (organisation.type === 'partner') {
-		if (organisation.active) {
-			// Check is user still partner
-			// Referral Partner Hubspot ID => 611058
+		// Check is user still partner
+		// Referral Partner Hubspot ID => 611058
 
-			const { roleId } = await hsGetUserById(organisation.hubspotId);
+		const { roleId } = await hsGetUserById(organisation.hubspotId);
 
-			if (roleId !== '611058') {
-				// await Organisation.findByIdAndUpdate(organisation._id, {
-				// 	active: false,
-				// });
-				
-				// return false;
-			}
+		if (roleId !== '611058') {
+			await Organisation.findByIdAndUpdate(organisation._id, {
+				active: false,
+			});
 
-			return true;
-		} else if (!organisation.active) {
 			return false;
 		}
+
+		return true;
 	}
 
 	return true;
