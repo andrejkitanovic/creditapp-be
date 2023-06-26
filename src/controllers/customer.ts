@@ -285,126 +285,106 @@ export const putCustomerSyncHubspot: RequestHandler = async (req, res, next) => 
 
 		await Customer.findByIdAndUpdate(id, {
 			// GENERAL INFORMATION
-			firstName: customer?.firstName || contact?.firstName,
-			middleName: customer?.middleName || contact?.middle_name_or_initial,
-			lastName: customer?.lastName || contact?.lastName,
-			salutation: customer?.salutation || contact?.salutation,
-			birthday: customer?.birthday || contact?.date_of_birth,
-			address: customer?.address || contact?.address,
-			city: customer?.city || contact?.city,
-			state: customer?.state || contact?.state,
-			zip: customer?.zip || contact?.zip,
-			phone: customer?.phone || contact?.phone,
-			mobilePhone: customer?.mobilePhone || contact.mobilephone,
-			referralSource: customer?.referralSource || contact.referral_company,
-			franchiseChoice: customer?.franchiseChoice || contact.franchise_Choice,
+			firstName: contact?.firstName,
+			middleName: contact?.middle_name_or_initial,
+			lastName: contact?.lastName,
+			salutation: contact?.salutation,
+			birthday: contact?.date_of_birth,
+			address: contact?.address,
+			city: contact?.city,
+			state: contact?.state,
+			zip: contact?.zip,
+			phone: contact?.phone,
+			mobilePhone: contact.mobilephone,
+			referralSource: contact.referral_company,
+			franchiseChoice: contact.franchise_Choice,
 
 			// PERSONAL INFORMATION
 			personalInfo: {
-				driversLicenseId: customer?.personalInfo?.driversLicenseId || contact?.driver_s_license_number,
-				driversLicenseIssueDate: customer?.personalInfo?.driversLicenseIssueDate || contact?.dl_issuance_date,
-				driversLicenseExpireDate: customer?.personalInfo?.driversLicenseExpireDate || contact?.dl_expiration_date,
-				creditUnion: customer?.personalInfo?.creditUnion || contact?.member_of_credit_union,
-				personalBank: customer?.personalInfo?.personalBank || contact?.personal_banking_relationship,
-				militaryStatus: customer?.personalInfo?.militaryStatus || contact?.current_military_affiliation,
-				bankRoutingNumber: customer?.personalInfo?.bankRoutingNumber || contact?.routing_number,
-				bankAccountNumber: customer?.personalInfo?.bankAccountNumber || contact?.account_number,
-				creditRepairBefore: customer?.personalInfo?.creditRepairBefore || contact?.have_you_been_through_credit_repair_,
-				judgementsLiensBankruptcy:
-					customer?.personalInfo?.judgementsLiensBankruptcy || contact?.judgements_liens_bankruptcy_,
-				previoiusFinanceCompany:
-					customer?.personalInfo?.previoiusFinanceCompany ||
-					contact?.have_you_worked_with_a_finance_company_like_ours_before_,
-				maritalStatus: customer?.personalInfo?.maritalStatus || contact?.marital_status,
-				fraudAlert:
-					customer?.personalInfo?.fraudAlert ||
-					(typeof contact?.fraud_alert === 'string' && contact?.fraud_alert === 'true'),
-				numberOfFraudAlert:
-					customer?.personalInfo?.numberOfFraudAlert ||
-					contact?.number_on_fraud_alert_if_it_is_not_cell_phone_or_home_phone,
+				driversLicenseId: contact?.driver_s_license_number,
+				driversLicenseIssueDate: contact?.dl_issuance_date,
+				driversLicenseExpireDate: contact?.dl_expiration_date,
+				creditUnion: contact?.member_of_credit_union,
+				personalBank: contact?.personal_banking_relationship,
+				militaryStatus: contact?.current_military_affiliation,
+				bankRoutingNumber: contact?.routing_number,
+				bankAccountNumber: contact?.account_number,
+				creditRepairBefore: contact?.have_you_been_through_credit_repair_,
+				judgementsLiensBankruptcy: contact?.judgements_liens_bankruptcy_,
+				previoiusFinanceCompany: contact?.have_you_worked_with_a_finance_company_like_ours_before_,
+				maritalStatus: contact?.marital_status,
+				fraudAlert: typeof contact?.fraud_alert === 'string' && contact?.fraud_alert === 'true',
+				numberOfFraudAlert: contact?.number_on_fraud_alert_if_it_is_not_cell_phone_or_home_phone,
 			},
 			// HOUSING INFO
 			housingInfo: {
-				houstingStatus: customer?.housingInfo?.houstingStatus || contact?.housing_status,
-				monthlyHousingPayment: customer?.housingInfo?.monthlyHousingPayment || contact?.monthly_housing_payment,
-				estimatedLengthOfTimeAtResidence:
-					customer?.housingInfo?.estimatedLengthOfTimeAtResidence || contact?.estimated_length_of_time_at_residence,
-				moveInDate: customer?.housingInfo?.moveInDate || contact?.move_in_date,
-				calculatedLengthOfTimeAtResidence:
-					customer?.housingInfo?.calculatedLengthOfTimeAtResidence || contact?.calculated_length_of_time_at_residence,
-				yearsAtCurrentAddress: customer?.housingInfo?.yearsAtCurrentAddress || contact?.years_at_current_address,
+				houstingStatus: contact?.housing_status,
+				monthlyHousingPayment: contact?.monthly_housing_payment,
+				estimatedLengthOfTimeAtResidence: contact?.estimated_length_of_time_at_residence,
+				moveInDate: contact?.move_in_date,
+				calculatedLengthOfTimeAtResidence: contact?.calculated_length_of_time_at_residence,
+				yearsAtCurrentAddress: contact?.years_at_current_address,
 			},
 			// EMPLOYMENT INFO
 			employmentInfo: {
-				incomeType: customer?.employmentInfo?.incomeType || contact?.income_type,
-				employerName: customer?.employmentInfo?.employerName || contact?.employer,
-				employerPhone: customer?.employmentInfo?.employerPhone || contact?.employer_phone_number,
-				employerAddress: customer?.employmentInfo?.employerAddress || contact?.employer_address,
-				estimatedTimeAtJob: customer?.employmentInfo?.estimatedTimeAtJob || contact?.estimated_time_at_job,
-				startDateWithEmployer: customer?.employmentInfo?.startDateWithEmployer || contact?.start_date_with_employer,
-				calculatedLengthOfEmployment:
-					customer?.employmentInfo?.calculatedLengthOfEmployment || contact?.calculated_length_of_employment,
-				occupationPosition: customer?.employmentInfo?.occupationPosition || contact?.occupation_position,
-				monthlyGrossIncome: customer?.employmentInfo?.monthlyGrossIncome || contact?.monthly_gross_income,
-				annualPersonalIncome: customer?.employmentInfo?.annualPersonalIncome || contact?.annual_personal_income,
-				frontEndRtiRatio: customer?.employmentInfo?.frontEndRtiRatio || contact?.front_end_dti_ratio,
-				totalAnnualHouseholdIncome:
-					customer?.employmentInfo?.totalAnnualHouseholdIncome || contact?.total_annual_household_income,
-				householdFrontEndDtiRatio:
-					customer?.employmentInfo?.householdFrontEndDtiRatio || contact?.household_front_end_dti_ratio__cloned_,
-				statedMonthlyIncome: customer?.employmentInfo?.statedMonthlyIncome || contact?.stated_monthly_income,
-				statedAnnualIncome: customer?.employmentInfo?.statedAnnualIncome || contact?.stated_annual_income,
-				statedAnnualHouseholdIncome:
-					customer?.employmentInfo?.statedAnnualHouseholdIncome || contact?.stated_annual_household_income,
+				incomeType: contact?.income_type,
+				employerName: contact?.employer,
+				employerPhone: contact?.employer_phone_number,
+				employerAddress: contact?.employer_address,
+				estimatedTimeAtJob: contact?.estimated_time_at_job,
+				startDateWithEmployer: contact?.start_date_with_employer,
+				calculatedLengthOfEmployment: contact?.calculated_length_of_employment,
+				occupationPosition: contact?.occupation_position,
+				monthlyGrossIncome: contact?.monthly_gross_income,
+				annualPersonalIncome: contact?.annual_personal_income,
+				frontEndRtiRatio: contact?.front_end_dti_ratio,
+				totalAnnualHouseholdIncome: contact?.total_annual_household_income,
+				householdFrontEndDtiRatio: contact?.household_front_end_dti_ratio__cloned_,
+				statedMonthlyIncome: contact?.stated_monthly_income,
+				statedAnnualIncome: contact?.stated_annual_income,
+				statedAnnualHouseholdIncome: contact?.stated_annual_household_income,
 			},
 			// SECURITY QUESTIONS
 			securityQuestions: {
-				birthCity: customer?.securityQuestions?.birthCity || contact?.birth_city,
-				bronInForeignCountry:
-					customer?.securityQuestions?.bronInForeignCountry || contact?.were_you_born_in_a_foreign_country_,
-				legalPermanentResident:
-					customer?.securityQuestions?.legalPermanentResident || contact?.are_you_a_legal_permanent_resident_,
-				greenCardExpirationDate:
-					customer?.securityQuestions?.greenCardExpirationDate || contact?.green_card_expiration_date,
-				mothersMaidenName: customer?.securityQuestions?.mothersMaidenName || contact?.mother_s_maiden_name,
-				highSchoolMascot: customer?.securityQuestions?.highSchoolMascot || contact?.high_school_mascot,
-				highSchoolCity: customer?.securityQuestions?.highSchoolCity || contact?.high_school_city,
-				nameOfStreetYouGrewUp:
-					customer?.securityQuestions?.nameOfStreetYouGrewUp || contact?.name_of_street_you_grew_up_on,
-				favoritePetsName: customer?.securityQuestions?.favoritePetsName || contact?.favorite_pet_s_name,
+				birthCity: contact?.birth_city,
+				bronInForeignCountry: contact?.were_you_born_in_a_foreign_country_,
+				legalPermanentResident: contact?.are_you_a_legal_permanent_resident_,
+				greenCardExpirationDate: contact?.green_card_expiration_date,
+				mothersMaidenName: contact?.mother_s_maiden_name,
+				highSchoolMascot: contact?.high_school_mascot,
+				highSchoolCity: contact?.high_school_city,
+				nameOfStreetYouGrewUp: contact?.name_of_street_you_grew_up_on,
+				favoritePetsName: contact?.favorite_pet_s_name,
 			},
 			// EDUCATION
 			educationInfo: {
-				collegeAttended: customer?.educationInfo?.collegeAttended || contact?.college_university_attended,
-				fieldOfStudy: customer?.educationInfo?.fieldOfStudy || contact?.field_of_study,
-				degree: customer?.educationInfo?.degree || contact?.degree,
-				graduatedDate: customer?.educationInfo?.graduatedDate || contact?.graduation_date,
-				graduateSchoolAttended: customer?.educationInfo?.graduateSchoolAttended || contact?.graduate_school_attended,
-				graduateSchoolFieldOfStudy:
-					customer?.educationInfo?.graduateSchoolFieldOfStudy || contact?.graduate_school_field_of_study,
-				graduateDegreeReceived: customer?.educationInfo?.graduateDegreeReceived || contact?.graduate_degree_received,
-				graduateGraduationDate: customer?.educationInfo?.graduateGraduationDate || contact?.graduate_graduation_date,
+				collegeAttended: contact?.college_university_attended,
+				fieldOfStudy: contact?.field_of_study,
+				degree: contact?.degree,
+				graduatedDate: contact?.graduation_date,
+				graduateSchoolAttended: contact?.graduate_school_attended,
+				graduateSchoolFieldOfStudy: contact?.graduate_school_field_of_study,
+				graduateDegreeReceived: contact?.graduate_degree_received,
+				graduateGraduationDate: contact?.graduate_graduation_date,
 			},
 			// ASSET INFORMATION
 			assetInfo: {
-				combinedCheckingSavingsBalance:
-					customer?.assetInfo?.combinedCheckingSavingsBalance || contact?.combined_checking_savings_balance,
-				stocksBondsMutualFunds: customer?.assetInfo?.stocksBondsMutualFunds || contact?.stocks_bonds_mutual_funds,
-				retirementAccountBalance: customer?.assetInfo?.retirementAccountBalance || contact?.retirement_account_balance,
+				combinedCheckingSavingsBalance: contact?.combined_checking_savings_balance,
+				stocksBondsMutualFunds: contact?.stocks_bonds_mutual_funds,
+				retirementAccountBalance: contact?.retirement_account_balance,
 			},
 			// PRIMARY RESIDENCE VALUATION
 			primaryResidenceValuation: {
-				avmValue: customer?.primaryResidenceValuation?.avmValue || contact?.avm_in_response_com,
-				marketValue: customer?.primaryResidenceValuation?.marketValue || contact?.market_value_in_response_com,
-				zillowValue: customer?.primaryResidenceValuation?.zillowValue || contact?.zillow_value,
-				estimatedPropertyValue:
-					customer?.primaryResidenceValuation?.estimatedPropertyValue || contact?.estimated_property_value,
-				calculatedValue: customer?.primaryResidenceValuation?.calculatedValue || contact?.calculated_value,
-				calculatedEquity: customer?.primaryResidenceValuation?.calculatedEquity || contact?.calculated_equity,
+				avmValue: contact?.avm_in_response_com,
+				marketValue: contact?.market_value_in_response_com,
+				zillowValue: contact?.zillow_value,
+				estimatedPropertyValue: contact?.estimated_property_value,
+				calculatedValue: contact?.calculated_value,
+				calculatedEquity: contact?.calculated_equity,
 			},
 
-			submissionEmail: customer?.submissionEmail || contact?.submission_email,
-			submissionPassword: customer?.submissionPassword || contact?.submission_password,
+			submissionEmail: contact?.submission_email,
+			submissionPassword: contact?.submission_password,
 		});
 
 		res.json({});
