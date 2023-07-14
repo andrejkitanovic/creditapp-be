@@ -11,7 +11,7 @@ import Customer from 'models/customer';
 
 import { absoluteFilePath } from 'utils/absoluteFilePath';
 import { cbcReportToCreditEvaluation } from './creditEvaluation';
-import { hsGetDealById } from './hubspot';
+import { hsGetDealById, hsGetDealstageById } from './hubspot';
 import { htmlToPDF } from 'utils/htmlToPdf';
 
 export const postWebhookCustomer: RequestHandler = async (req, res, next) => {
@@ -134,6 +134,16 @@ export const postWebhookCustomer: RequestHandler = async (req, res, next) => {
 
 				creditReportResponse.credit_score = parseInt(reportData.SCORES.SCORE) ?? 0;
 
+				let deal;
+				let dealstage;
+				if (dealId && dealId !== 'NODEALID') {
+					deal = await hsGetDealById(dealId);
+
+					if (deal?.dealstage) {
+						dealstage = hsGetDealstageById(deal.dealstage);
+					}
+				}
+
 				creditEvaluation = await CreditEvaluation.create({
 					customer: customer._id,
 					leadSource,
@@ -142,26 +152,28 @@ export const postWebhookCustomer: RequestHandler = async (req, res, next) => {
 					pdf: reportPDFLink,
 					state,
 					statedMonthlyIncome,
+
+					// Deal Related
+					hubspotDealId: deal?.id,
+					notes: deal?.underwriter_comments,
+					dealStatus: dealstage,
 				});
 
 				let loanPackage;
-				if (dealId && dealId !== 'NODEALID') {
-					const deal = await hsGetDealById(dealId);
 
-					if (deal) {
-						loanPackage = await LoanPackage.create({
-							customer: customer._id,
-							leadSource,
-							creditEvaluation: creditEvaluation?._id,
-							hubspotId: deal?.id,
-							name: deal?.dealname,
-							loanAmount: deal?.amount,
-							monthlyPayment: deal?.monthly_payment,
-							term: deal?.term_months,
-							interestRate: deal?.interest_rate,
-							originationFee: deal?.origination_fee,
-						});
-					}
+				if (deal) {
+					loanPackage = await LoanPackage.create({
+						customer: customer._id,
+						leadSource,
+						creditEvaluation: creditEvaluation?._id,
+						hubspotId: deal?.id,
+						name: deal?.dealname,
+						loanAmount: deal?.amount,
+						monthlyPayment: deal?.monthly_payment,
+						term: deal?.term_months,
+						interestRate: deal?.interest_rate,
+						originationFee: deal?.origination_fee,
+					});
 				}
 
 				if (creditEvaluation.declineReasonCodes) {

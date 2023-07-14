@@ -218,8 +218,17 @@ export type CreditEvaluationChargeoffs = {
 	pastdue: number;
 };
 
+export enum CreditEvaluationAffordabilityEnum {
+	PENDING_EVAL = 'pending-eval',
+	LOW = 'low',
+	MEDIUM = 'medium',
+	HIGH = 'high',
+}
+
 interface ICreditEvaluation extends Document {
 	customer: string;
+	hubspotDealId: string;
+
 	leadSource: string;
 	// HTML and PDF
 	html: string;
@@ -275,6 +284,13 @@ interface ICreditEvaluation extends Document {
 	latePayments: CreditEvaluationLatePayments[];
 	// Chargeoffs
 	chargeOffs: CreditEvaluationChargeoffs[];
+
+	// Affordability
+	affordability: CreditEvaluationAffordabilityEnum;
+	// Notes
+	notes: string;
+	// Deal Status
+	dealStatus: string;
 }
 
 const creditEvaluationSchema: Schema = new Schema(
@@ -283,6 +299,9 @@ const creditEvaluationSchema: Schema = new Schema(
 			type: Schema.Types.ObjectId,
 			ref: 'Customer',
 			required: true,
+		},
+		hubspotDealId: {
+			type: String,
 		},
 		leadSource: {
 			type: String,
@@ -614,6 +633,18 @@ const creditEvaluationSchema: Schema = new Schema(
 				pastdue: Number,
 			},
 		],
+
+		affordability: {
+			type: String,
+			enum: CreditEvaluationLoanAffordabilityEnum,
+			default: CreditEvaluationAffordabilityEnum.PENDING_EVAL,
+		},
+		notes: {
+			type: String,
+		},
+		dealStatus: {
+			type: String,
+		},
 	},
 
 	{ timestamps: true }

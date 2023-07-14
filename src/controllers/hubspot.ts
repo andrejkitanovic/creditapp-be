@@ -18,6 +18,7 @@ import { filterObject } from 'utils/filterObject';
 import dayjs from 'dayjs';
 import { Property } from '@hubspot/api-client/lib/codegen/crm/properties';
 import { IOrganisation } from 'models/organisation';
+import { PipelineStage } from '@hubspot/api-client/lib/codegen/crm/pipelines';
 
 export const hubspotClient = new Client({ accessToken: process.env.HS_ACCESS_TOKEN });
 
@@ -202,7 +203,7 @@ export const hsCreateLeadSource = async (leadSource: string) => {
 				},
 			})
 		).json();
-		
+
 		return true;
 	} catch (err) {
 		console.log(err);
@@ -695,11 +696,13 @@ export const hsGetDealById = async (dealId: string): Promise<{ [key: string]: st
 	try {
 		const { properties } = await hubspotClient.crm.deals.basicApi.getById(dealId, [
 			'dealname',
+			'dealstage',
 			'amount',
 			'monthly_payment',
 			'term_months',
 			'interest_rate',
 			'origination_fee',
+			'underwriter_comments',
 		]);
 
 		return {
@@ -710,6 +713,18 @@ export const hsGetDealById = async (dealId: string): Promise<{ [key: string]: st
 		console.log(err);
 
 		return {};
+	}
+};
+
+export const hsGetDealstageById = async (dealstageId: string): Promise<PipelineStage | undefined> => {
+	try {
+		const { results: dealnamePipelines } = await hubspotClient.crm.pipelines.pipelinesApi.getAll('deals');
+		const dealnameStages = dealnamePipelines.flatMap((dealnamePipeline) => dealnamePipeline.stages);
+
+		return dealnameStages.find((dealnameStage: PipelineStage) => dealnameStage.id === dealstageId);
+	} catch (err) {
+		console.log(err);
+		return;
 	}
 };
 
