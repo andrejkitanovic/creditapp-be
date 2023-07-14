@@ -2,7 +2,7 @@ import { RolesEnum } from 'models/user';
 
 enum Permissions {
 	LOGS_READ = 'read:logs',
-	
+
 	ORGANISATIONS_READ = 'read:organisations',
 	ORGANISATIONS_WRITE = 'write:organisations',
 	ORGANISATIONS_UPDATE = 'update:organisations',
@@ -34,20 +34,45 @@ export type PermissionsType = `${Permissions}`;
 // ADMIN PERMISSIONS
 
 export const rolePermissions: { [x in RolesEnum]: PermissionsType[] } = {
-	admin: Object.values(Permissions),
+	admin: [
+		Permissions.ORGANISATIONS_READ,
+		Permissions.ORGANISATIONS_WRITE,
+		Permissions.ORGANISATIONS_UPDATE,
+		Permissions.ORGANISATIONS_DELETE,
+
+		Permissions.USERS_READ,
+		Permissions.USERS_WRITE,
+		Permissions.USERS_UPDATE,
+		Permissions.USERS_DELETE,
+
+		Permissions.CUSTOMERS_READ,
+		Permissions.CUSTOMERS_WRITE,
+		Permissions.CUSTOMERS_UPDATE,
+		Permissions.CUSTOMERS_DELETE,
+
+		Permissions.CREDIT_EVALUATIONS_READ,
+		Permissions.CREDIT_EVALUATIONS_WRITE,
+		Permissions.CREDIT_EVALUATIONS_UPDATE,
+		Permissions.CREDIT_EVALUATIONS_DELETE,
+	],
 	'partner-admin': [
 		Permissions.USERS_READ,
 		Permissions.USERS_WRITE,
 		Permissions.USERS_UPDATE,
 		Permissions.USERS_DELETE,
-		Permissions.CUSTOMERS_READ,
+
 		Permissions.CREDIT_EVALUATIONS_READ,
-		Permissions.LOAN_PACKAGES_READ,
+		// Permissions.CUSTOMERS_READ,
+		// Permissions.LOAN_PACKAGES_READ,
 	],
-	partner: [Permissions.CUSTOMERS_READ, Permissions.CREDIT_EVALUATIONS_READ, Permissions.LOAN_PACKAGES_READ],
-	'partner-sales-rep': [
-		Permissions.CUSTOMERS_READ,
+	partner: [
 		Permissions.CREDIT_EVALUATIONS_READ,
-		Permissions.LOAN_PACKAGES_READ,
+		// Permissions.CUSTOMERS_READ,
+		// Permissions.LOAN_PACKAGES_READ
+	],
+	'partner-sales-rep': [
+		Permissions.CREDIT_EVALUATIONS_READ,
+		// Permissions.CUSTOMERS_READ,
+		// Permissions.LOAN_PACKAGES_READ,
 	],
 };
