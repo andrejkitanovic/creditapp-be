@@ -10,8 +10,8 @@ import {
 	deleteCustomerSpouse as deleteCustomerSpouseController,
 	deleteCustomer as deleteCustomerController,
 	getSingleCustomer as getSingleCustomerController,
-	putCustomerSyncHubspot as putCustomerSyncHubspotController,
-	putCustomerPushHubspot as putCustomerPushHubspotController,
+	// putCustomerSyncHubspot as putCustomerSyncHubspotController, - TO WORKFLOW
+	// putCustomerPushHubspot as putCustomerPushHubspotController, - AUTOMATIC
 	putRefetchCustomer as putRefetchCustomerController,
 } from 'controllers/customer';
 // import {
@@ -72,20 +72,20 @@ defineRoutes(router, [
 		// permissions: ['read:customers'],
 		controller: getSingleCustomerController,
 	},
-	{
-		method: 'put',
-		route: '/hubspot/sync/:id',
-		permissions: ['update:customers'],
-		// validator: putCustomerValidator,
-		controller: putCustomerSyncHubspotController,
-	},
-	{
-		method: 'put',
-		route: '/hubspot/push/:id',
-		permissions: ['update:customers'],
-		// validator: putCustomerValidator,
-		controller: putCustomerPushHubspotController,
-	},
+	// {
+	// 	method: 'put',
+	// 	route: '/hubspot/sync/:id',
+	// 	permissions: ['update:customers'],
+	// 	// validator: putCustomerValidator,
+	// 	controller: putCustomerSyncHubspotController,
+	// },
+	// {
+	// 	method: 'put',
+	// 	route: '/hubspot/push/:id',
+	// 	permissions: ['update:customers'],
+	// 	// validator: putCustomerValidator,
+	// 	controller: putCustomerPushHubspotController,
+	// },
 	{
 		method: 'put',
 		route: '/refetch/:id',

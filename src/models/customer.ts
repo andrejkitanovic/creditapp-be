@@ -1,3 +1,4 @@
+import { hsUpdateContact } from 'controllers/hubspot';
 import { Schema, model, Document } from 'mongoose';
 
 interface ICustomer extends Document {
@@ -298,6 +299,14 @@ const customerSchema: Schema = new Schema(
 	{ timestamps: true }
 );
 
+customerSchema.post('findOneAndUpdate', async function () {
+	// @ts-expect-error
+	const customer = await this.findOne({ _id: this._conditions._id }).clone();
+
+	if (customer?.hubspotId) {
+		await hsUpdateContact(customer.hubspotId, customer);
+	}
+});
 const objectModel = model<ICustomer>('Customer', customerSchema);
 
 export { ICustomer };
