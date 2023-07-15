@@ -379,6 +379,23 @@ export const putCreditEvaluationHouseholdIncome: RequestHandler = async (req, re
 	}
 };
 
+export const putCreditEvaluationAffordability: RequestHandler = async (req, res, next) => {
+	try {
+		const { id } = req.params;
+		const { affordability } = req.body;
+
+		await CreditEvaluation.findByIdAndUpdate(id, {
+			affordability,
+		});
+
+		res.json({
+			// data: result,
+		});
+	} catch (err) {
+		next(err);
+	}
+};
+
 export const putCreditEvaluationLoanAffordabilityRate: RequestHandler = async (req, res, next) => {
 	try {
 		const { id } = req.params;
