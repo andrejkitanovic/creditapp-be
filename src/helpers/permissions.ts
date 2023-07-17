@@ -35,6 +35,8 @@ export type PermissionsType = `${Permissions}`;
 
 export const rolePermissions: { [x in RolesEnum]: PermissionsType[] } = {
 	admin: [
+		Permissions.LOGS_READ,
+
 		Permissions.ORGANISATIONS_READ,
 		Permissions.ORGANISATIONS_WRITE,
 		Permissions.ORGANISATIONS_UPDATE,
