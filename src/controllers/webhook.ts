@@ -140,7 +140,7 @@ export const postWebhookCustomer: RequestHandler = async (req, res, next) => {
 					deal = await hsGetDealById(dealId);
 
 					if (deal?.dealstage) {
-						dealstage = hsGetDealstageById(deal.dealstage);
+						dealstage = await hsGetDealstageById(deal.dealstage);
 					}
 				}
 

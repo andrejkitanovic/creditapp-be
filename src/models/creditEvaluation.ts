@@ -636,7 +636,7 @@ const creditEvaluationSchema: Schema = new Schema(
 
 		affordability: {
 			type: String,
-			enum: CreditEvaluationLoanAffordabilityEnum,
+			enum: CreditEvaluationAffordabilityEnum,
 			default: CreditEvaluationAffordabilityEnum.PENDING_EVAL,
 		},
 		notes: {
