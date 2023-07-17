@@ -156,7 +156,7 @@ export const postWebhookCustomer: RequestHandler = async (req, res, next) => {
 					// Deal Related
 					hubspotDealId: deal?.id,
 					notes: deal?.underwriter_comments,
-					dealStatus: dealstage,
+					dealStatus: dealstage?.label,
 				});
 
 				let loanPackage;
