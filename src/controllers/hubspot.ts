@@ -223,7 +223,7 @@ export const hsUpdatePartnerTable = async (organisation: LeanDocument<IOrganisat
 				team_name: '',
 				lead_source: organisation.leadSource,
 				brand: organisation.brand,
-				referral_partner_payout: organisation.partnerPayout.value,
+				referral_partner_payout: organisation.partnerPayout?.value ?? undefined,
 			},
 		});
 
