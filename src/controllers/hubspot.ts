@@ -328,6 +328,10 @@ export const hsGetContactById = async (contactId: string): Promise<{ [key: strin
 			'estimated_property_value',
 			'calculated_value',
 			'calculated_equity',
+
+			// SUBMISSION
+			'submission_email',
+			'submission_password',
 		]);
 
 		return {
@@ -481,107 +485,6 @@ export const hsUpdateContact = async (
 	customer: LeanDocument<ICustomer>
 ): Promise<Record<string, never> | SimplePublicObject> => {
 	try {
-		console.log(
-			filterObject({
-				// GENERAL INFORMATION
-				firstname: customer.firstName,
-				middle_name_or_initial: customer.middleName,
-				lastname: customer.lastName,
-				salutation: customer.salutation,
-				email: customer.email,
-				// 'date_of_birth',
-				address: customer.address,
-				city: customer.city,
-				state: customer.state,
-				zip: customer.zip,
-				phone: customer.phone,
-				mobilephone: customer.mobilePhone,
-				referral_company: customer.referralSource,
-				franchise_choice: customer.franchiseChoice,
-
-				// PERSONAL INFORMATION
-				driver_s_license_number: customer.personalInfo.driversLicenseId,
-				// dl_issuance_date: customer.personalInfo.driversLicenseIssueDate,
-				// dl_expiration_date: customer.personalInfo.driversLicenseExpireDate,
-				member_of_credit_union: customer.personalInfo.creditUnion,
-				personal_banking_relationship: customer.personalInfo.personalBank,
-				current_military_affiliation: customer.personalInfo.militaryStatus,
-				routing_number: customer.personalInfo.bankRoutingNumber,
-				account_number: customer.personalInfo.bankAccountNumber,
-				have_you_been_through_credit_repair_: customer.personalInfo.creditRepairBefore,
-				judgements_liens_bankruptcy_: customer.personalInfo.judgementsLiensBankruptcy,
-				have_you_worked_with_a_finance_company_like_ours_before_: customer.personalInfo.previoiusFinanceCompany,
-				marital_status: customer.personalInfo.maritalStatus,
-				fraud_alert:
-					typeof customer.personalInfo.fraudAlert === 'boolean' && Boolean(customer.personalInfo.fraudAlert)
-						? 'true'
-						: 'false',
-				number_on_fraud_alert_if_it_is_not_cell_phone_or_home_phone: customer.personalInfo.numberOfFraudAlert,
-
-				// HOUSING INFO
-				housing_status: customer.housingInfo.houstingStatus,
-				monthly_housing_payment: customer.housingInfo.monthlyHousingPayment,
-				estimated_length_of_time_at_residence: customer.housingInfo.estimatedLengthOfTimeAtResidence,
-				// move_in_date: customer.housingInfo.moveInDate,
-				calculated_length_of_time_at_residence: customer.housingInfo.calculatedLengthOfTimeAtResidence,
-				years_at_current_address: customer.housingInfo.yearsAtCurrentAddress,
-
-				// EMPLOYMENT INFO
-				income_type: customer.employmentInfo.incomeType,
-				employer: customer.employmentInfo.employerName,
-				employer_phone_number: customer.employmentInfo.employerPhone,
-				employer_address: customer.employmentInfo.employerAddress,
-				estimated_time_at_job: customer.employmentInfo.estimatedTimeAtJob,
-				start_date_with_employer: customer.employmentInfo.startDateWithEmployer,
-				calculated_length_of_employment: customer.employmentInfo.calculatedLengthOfEmployment,
-				occupation_position: customer.employmentInfo.occupationPosition,
-				monthly_gross_income: customer.employmentInfo.monthlyGrossIncome,
-				annual_personal_income: customer.employmentInfo.annualPersonalIncome,
-				front_end_dti_ratio: customer.employmentInfo.frontEndRtiRatio,
-				total_annual_household_income: customer.employmentInfo.totalAnnualHouseholdIncome,
-				household_front_end_dti_ratio__cloned_: customer.employmentInfo.householdFrontEndDtiRatio,
-				stated_monthly_income: customer.employmentInfo.statedMonthlyIncome,
-				stated_annual_income: customer.employmentInfo.statedAnnualIncome,
-				stated_annual_household_income: customer.employmentInfo.statedAnnualHouseholdIncome,
-
-				// SECURITY QUESTIONS
-				birth_city: customer.securityQuestions.birthCity,
-				were_you_born_in_a_foreign_country_: customer.securityQuestions.bronInForeignCountry,
-				are_you_a_legal_permanent_resident_: customer.securityQuestions.legalPermanentResident,
-				green_card_expiration_date: customer.securityQuestions.greenCardExpirationDate,
-				mother_s_maiden_name: customer.securityQuestions.mothersMaidenName,
-				high_school_mascot: customer.securityQuestions.highSchoolMascot,
-				high_school_city: customer.securityQuestions.highSchoolCity,
-				name_of_street_you_grew_up_on: customer.securityQuestions.nameOfStreetYouGrewUp,
-				favorite_pet_s_name: customer.securityQuestions.favoritePetsName,
-
-				// EDUCATION
-				college_university_attended: customer.educationInfo.collegeAttended,
-				field_of_study: customer.educationInfo.fieldOfStudy,
-				degree: customer.educationInfo.degree,
-				graduation_date: customer.educationInfo.graduatedDate,
-				graduate_school_attended: customer.educationInfo.graduateSchoolAttended,
-				graduate_school_field_of_study: customer.educationInfo.graduateSchoolFieldOfStudy,
-				graduate_degree_received: customer.educationInfo.graduateDegreeReceived,
-				graduate_graduation_date: customer.educationInfo.graduateGraduationDate,
-
-				// ASSET INFORMATION
-				combined_checking_savings_balance: customer.assetInfo.combinedCheckingSavingsBalance,
-				stocks_bonds_mutual_funds: customer.assetInfo.stocksBondsMutualFunds,
-				retirement_account_balance: customer.assetInfo.retirementAccountBalance,
-
-				// PRIMARY RESIDENCE VALUATION
-				avm_in_response_com: customer.primaryResidenceValuation.avmValue,
-				market_value_in_response_com: customer.primaryResidenceValuation.marketValue,
-				zillow_value: customer.primaryResidenceValuation.zillowValue,
-				estimated_property_value: customer.primaryResidenceValuation.estimatedPropertyValue,
-				calculated_value: customer.primaryResidenceValuation.calculatedValue,
-				calculated_equity: customer.primaryResidenceValuation.calculatedEquity,
-
-				submission_email: customer.submissionEmail,
-				submission_password: customer.submissionPassword,
-			})
-		);
 		return await hubspotClient.crm.contacts.basicApi.update(contactId, {
 			properties: filterObject({
 				// GENERAL INFORMATION
