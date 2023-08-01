@@ -5,7 +5,7 @@ import { IUser } from 'models/user';
 
 const mailjet = nodeMailjet.connect(process.env.MJ_APIKEY_PUBLIC ?? '', process.env.MJ_APIKEY_PRIVATE ?? '');
 const From = {
-	Email: 'kitanovicandrej213@gmail.com',
+	Email: 'michael@cbfsolutionsgroup.com',
 	Name: 'Loanly | Notification',
 };
 const SubjectPrefix = 'Loanly |';
