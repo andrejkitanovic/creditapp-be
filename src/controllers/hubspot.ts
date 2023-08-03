@@ -223,7 +223,7 @@ export const hsUpdatePartnerTable = async (organisation: LeanDocument<IOrganisat
 				team_name: '',
 				lead_source: organisation.leadSource,
 				brand: organisation.brand,
-				referral_partner_payout: organisation.partnerPayout?.value ?? undefined,
+				referral_partner_payout: organisation.partnerPayout?.value ? `${organisation.partnerPayout?.value}` : undefined,
 			},
 		});
 
@@ -580,6 +580,7 @@ export const hsUpdateContact = async (
 				market_value_in_response_com: customer.primaryResidenceValuation.marketValue,
 				zillow_value: customer.primaryResidenceValuation.zillowValue,
 				estimated_property_value: customer.primaryResidenceValuation.estimatedPropertyValue,
+				estimated_equity_in_primary_residence: customer.primaryResidenceValuation.estimatedEquityPrimaryResidence,
 				calculated_value: customer.primaryResidenceValuation.calculatedValue,
 				calculated_equity: customer.primaryResidenceValuation.calculatedEquity,
 

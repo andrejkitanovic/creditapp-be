@@ -116,6 +116,7 @@ interface ICustomer extends Document {
 		marketValue?: number;
 		zillowValue?: number;
 		estimatedPropertyValue?: number;
+		estimatedEquityPrimaryResidence?: number;
 		calculatedValue?: number;
 		calculatedEquity?: number;
 	};
@@ -281,6 +282,7 @@ const customerSchema: Schema = new Schema(
 			marketValue: Number,
 			zillowValue: Number,
 			estimatedPropertyValue: Number,
+			estimatedEquityPrimaryResidence: Number,
 			calculatedValue: Number,
 			calculatedEquity: Number,
 		},

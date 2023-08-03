@@ -358,6 +358,7 @@ export const putSyncCustomer: RequestHandler = async (req, res, next) => {
 					marketValue: contact?.market_value_in_response_com,
 					zillowValue: contact?.zillow_value,
 					estimatedPropertyValue: contact?.estimated_property_value,
+					estimatedEquityPrimaryResidence: contact?.estimated_equity_in_primary_residence,
 					calculatedValue: contact?.calculated_value,
 					calculatedEquity: contact?.calculated_equity,
 				},
