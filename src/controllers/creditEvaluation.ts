@@ -674,7 +674,7 @@ export const cbcReportToCreditEvaluation = (reportData: any) => {
 		creditScores: [
 			{
 				type: 'XPN',
-				score: parseInt(reportData.SCORES.SCORE) ?? 0,
+				score: parseInt(reportData.SCORES?.SCORE) ?? 0,
 			},
 		],
 		recentInquiries,

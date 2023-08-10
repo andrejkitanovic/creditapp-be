@@ -132,7 +132,7 @@ export const postWebhookCustomer: RequestHandler = async (req, res, next) => {
 				// Create Credit Evaluation
 				const creditEvaluationData = cbcReportToCreditEvaluation(reportData);
 
-				creditReportResponse.credit_score = parseInt(reportData.SCORES.SCORE) ?? 0;
+				creditReportResponse.credit_score = parseInt(reportData.SCORES?.SCORE) ?? 0;
 
 				let deal;
 				let dealstage;
@@ -161,6 +161,7 @@ export const postWebhookCustomer: RequestHandler = async (req, res, next) => {
 
 				let loanPackage;
 
+				console.log(jsonResponse.XML_INTERFACE.CREDITREPORT.BUREAU_TYPE?.RAWDATA?.DATA);
 				if (deal) {
 					loanPackage = await LoanPackage.create({
 						customer: customer._id,

@@ -460,7 +460,12 @@ export const putRefetchCustomer: RequestHandler = async (req, res, next) => {
 
 		const htmlReport = jsonResponse.XML_INTERFACE?.CREDITREPORT?.REPORT;
 
-		if (htmlReport && jsonResponse.XML_INTERFACE.CREDITREPORT.BUREAU_TYPE?.NOHIT !== 'True') {
+		if (
+			htmlReport &&
+			jsonResponse.XML_INTERFACE.CREDITREPORT.BUREAU_TYPE?.NOHIT !== 'True' &&
+			!jsonResponse.XML_INTERFACE.CREDITREPORT.BUREAU_TYPE?.RAWDATA?.DATA?.includes('FILE FROZEN') &&
+			!jsonResponse.XML_INTERFACE.CREDITREPORT.BUREAU_TYPE?.RAWDATA?.DATA?.includes('FILE LOCKED')
+		) {
 			const nowUnix = dayjs().unix();
 			const reportName = `./uploads/${customer?.hubspotId}-${nowUnix}_credit-report.html`;
 			fs.writeFileSync(reportName, htmlReport);
@@ -511,6 +516,31 @@ export const putRefetchCustomer: RequestHandler = async (req, res, next) => {
 			});
 			res.json({});
 		} else {
+			let error = jsonResponse.XML_INTERFACE?.ERROR_DESCRIPT || 'Error';
+
+			if (htmlReport && jsonResponse.XML_INTERFACE.CREDITREPORT.BUREAU_TYPE?.NOHIT === 'True') {
+				// creditReportResponse.message = 'No hit';
+			} else if (
+				htmlReport &&
+				jsonResponse.XML_INTERFACE.CREDITREPORT.BUREAU_TYPE?.RAWDATA?.DATA?.includes('FILE FROZEN')
+			) {
+				// creditReportResponse.message = 'File frozen';
+				error = jsonResponse.XML_INTERFACE.CREDITREPORT.BUREAU_TYPE?.RAWDATA?.DATA;
+			} else if (
+				htmlReport &&
+				jsonResponse.XML_INTERFACE.CREDITREPORT.BUREAU_TYPE?.RAWDATA?.DATA?.includes('FILE LOCKED')
+			) {
+				// creditReportResponse.message = 'File locked';
+				error = jsonResponse.XML_INTERFACE.CREDITREPORT.BUREAU_TYPE?.RAWDATA?.DATA;
+			}
+			// creditReportResponse.message = 'Error while fetching report';
+
+			// creditReportResponse.credit_inquiry_error_bureau = 'XPN';
+			// creditReportResponse.loanly_status = 'Credit Report Error';
+
+			await Customer.findByIdAndUpdate(id, {
+				cbcErrorMessage: JSON.stringify(error),
+			});
 			res.json({});
 		}
 	} catch (err) {
