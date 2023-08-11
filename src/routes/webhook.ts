@@ -4,6 +4,7 @@ import defineRoutes from 'helpers/defineRoutes';
 import {
 	postWebhookCustomer as postWebhookCustomerController,
 	putSyncCustomer as putSyncCustomerController,
+	putSyncCreditEvaluationDeal as putSyncCreditEvaluationDealController,
 } from 'controllers/webhook';
 import createLogMiddleware from 'middlewares/createLog';
 // import {
@@ -21,6 +22,11 @@ defineRoutes(router, [
 		method: 'put',
 		route: `/sync/customer/:hubspotId`,
 		controller: putSyncCustomerController,
+	},
+	{
+		method: 'put',
+		route: `/sync/credit-evaluation/deal/:dealId`,
+		controller: putSyncCreditEvaluationDealController,
 	},
 ]);
 

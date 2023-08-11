@@ -6,13 +6,20 @@ import { RequestHandler } from 'express';
 import { CBCApplicant, cbcPullCreditReport } from './cbc';
 
 import LoanPackage from 'models/loanPackage';
-import CreditEvaluation from 'models/creditEvaluation';
+import CreditEvaluation, { CreditEvaluationAffordabilityEnum } from 'models/creditEvaluation';
 import Customer from 'models/customer';
 
 import { absoluteFilePath } from 'utils/absoluteFilePath';
 import { cbcReportToCreditEvaluation } from './creditEvaluation';
 import { hsGetContactById, hsGetDealById, hsGetDealstageById } from './hubspot';
 import { htmlToPDF } from 'utils/htmlToPdf';
+
+const hsAffordabilities = {
+	'Pending Eval': CreditEvaluationAffordabilityEnum.PENDING_EVAL,
+	Low: CreditEvaluationAffordabilityEnum.LOW,
+	Medium: CreditEvaluationAffordabilityEnum.MEDIUM,
+	High: CreditEvaluationAffordabilityEnum.HIGH,
+};
 
 export const postWebhookCustomer: RequestHandler = async (req, res, next) => {
 	try {
@@ -372,6 +379,47 @@ export const putSyncCustomer: RequestHandler = async (req, res, next) => {
 				message: 'Customer Updated!',
 			});
 		}
+	} catch (err) {
+		next(err);
+	}
+};
+
+export const putSyncCreditEvaluationDeal: RequestHandler = async (req, res, next) => {
+	try {
+		const { dealId } = req.params;
+
+		const creditEvaluation = await CreditEvaluation.findOne({ hubspotDealId: dealId });
+
+		if (!creditEvaluation) {
+			res.json({
+				message: 'No Credit Evaluation Found!',
+			});
+		} else {
+			let deal;
+			let dealstage;
+			if (dealId) {
+				deal = await hsGetDealById(dealId);
+
+				if (deal?.dealstage) {
+					dealstage = await hsGetDealstageById(deal.dealstage);
+				}
+			}
+
+			const affordability =
+				//@ts-expect-error
+				deal?.affordability ?? (hsAffordabilities[deal.affordability] as CreditEvaluationAffordabilityEnum);
+
+			await CreditEvaluation.findByIdAndUpdate(creditEvaluation._id, {
+				// Deal Related
+				notes: deal?.underwriter_comments,
+				affordability: affordability ?? creditEvaluation.affordability,
+				dealStatus: dealstage?.label,
+			});
+		}
+
+		res.json({
+			message: 'Credit Evaluation Updated!',
+		});
 	} catch (err) {
 		next(err);
 	}

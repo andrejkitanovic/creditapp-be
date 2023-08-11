@@ -637,6 +637,7 @@ export const hsGetDealById = async (dealId: string): Promise<{ [key: string]: st
 			'interest_rate',
 			'origination_fee',
 			'underwriter_comments',
+			'affordability'
 		]);
 
 		return {
