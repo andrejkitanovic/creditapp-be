@@ -112,16 +112,20 @@ export const hsCreateLeadSource = async (leadSource: string) => {
 		const { properties: contactSchema } = await hubspotClient.crm.schemas.coreApi.getById('contact');
 		const { properties: dealSchema } = await hubspotClient.crm.schemas.coreApi.getById('deals');
 		const { properties: loanSchema } = await hubspotClient.crm.schemas.coreApi.getById('loans');
+		const { properties: leaseSchema } = await hubspotClient.crm.schemas.coreApi.getById('leases');
 
 		const contactSchemaLeadSource = contactSchema.find((property) => property.name === 'lead_source') as Property;
 		const dealSchemaLeadSource = dealSchema.find(
 			(property) => property.name === 'lead_source___companies___li_and_fb'
 		) as Property;
 		const loanSchemaLeadSource = loanSchema.find((property) => property.name === 'lead_source') as Property;
+		const leaseSchemaLeadSource = leaseSchema.find((property) => property.name === 'lead_source') as Property;
 
 		if (
 			contactSchemaLeadSource.options.some((option) => option.value === leadSource) ||
-			dealSchemaLeadSource.options.some((option) => option.value === leadSource)
+			dealSchemaLeadSource.options.some((option) => option.value === leadSource) ||
+			loanSchemaLeadSource.options.some((option) => option.value === leadSource) ||
+			leaseSchemaLeadSource.options.some((option) => option.value === leadSource)
 		) {
 			return false;
 		}
@@ -194,6 +198,32 @@ export const hsCreateLeadSource = async (leadSource: string) => {
 					label: loanSchemaLeadSource.label,
 					options: [
 						...loanSchemaLeadSource.options,
+						{
+							label: leadSource,
+							value: leadSource,
+							hidden: false,
+						},
+					],
+				},
+			})
+		).json();
+
+		// UPDATE LEASE PROPERTY
+		await (
+			await hubspotClient.apiRequest({
+				path: `/properties/v2/leases/properties/named/lead_source`,
+				method: 'PUT',
+				body: {
+					name: leaseSchemaLeadSource.name,
+					groupName: leaseSchemaLeadSource.groupName,
+					description: leaseSchemaLeadSource.description,
+					fieldType: leaseSchemaLeadSource.fieldType,
+					formField: leaseSchemaLeadSource.formField,
+					type: leaseSchemaLeadSource.type,
+					displayOrder: leaseSchemaLeadSource.displayOrder,
+					label: leaseSchemaLeadSource.label,
+					options: [
+						...leaseSchemaLeadSource.options,
 						{
 							label: leadSource,
 							value: leadSource,
