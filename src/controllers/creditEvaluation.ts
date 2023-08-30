@@ -32,7 +32,7 @@ export const getCreditEvaluations: RequestHandler = async (req, res, next) => {
 			Model: CreditEvaluation,
 			query: req.query,
 			populate: 'customer',
-			searchFields: ['customer.firstName', 'customer.lastName'],
+			searchFields: ['customer.firstName', 'customer.lastName', 'leadSource'],
 			defaultFilters,
 		});
 
