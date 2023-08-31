@@ -109,15 +109,13 @@ export const postLoanApplication: RequestHandler = async (req, res, next) => {
 
 		const lender = await hsGetLenderById(lenderId);
 
-		const creditEvaluation = await CreditEvaluation.findById(creditEvaluationId)
-			.select('customer')
-			.populate('customer');
+		const creditEvaluation = await CreditEvaluation.findById(creditEvaluationId).populate('customer');
 
 		const customer = creditEvaluation?.customer as unknown as LeanDocument<ICustomer>;
 		await LoanApplication.create({
 			customer: customer._id,
 			creditEvaluation: creditEvaluationId,
-
+			leadSource: creditEvaluation?.leadSource,
 			name: `${lender?.lender_name} | ${customer.firstName} ${customer.lastName} | ${customer.leadSource ?? 'None'}`,
 			lenderId,
 			lender: lender?.lender_name,
@@ -161,12 +159,11 @@ export const putLoanApplication: RequestHandler = async (req, res, next) => {
 		const loanApplication = await LoanApplication.findById(id);
 
 		const lender = await hsGetLenderById(lenderId);
-		const creditEvaluation = await CreditEvaluation.findById(loanApplication?.creditEvaluation)
-			.select('customer')
-			.populate('customer');
+		const creditEvaluation = await CreditEvaluation.findById(loanApplication?.creditEvaluation).populate('customer');
 
 		const customer = creditEvaluation?.customer as unknown as LeanDocument<ICustomer>;
 		await LoanApplication.findByIdAndUpdate(id, {
+			leadSource: creditEvaluation?.leadSource,
 			name: `${lender?.lender_name} | ${customer.firstName} ${customer.lastName} | ${customer.leadSource ?? 'None'}`,
 			lenderId,
 			lender: lender?.lender_name,

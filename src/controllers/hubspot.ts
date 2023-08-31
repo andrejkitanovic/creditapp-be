@@ -637,7 +637,7 @@ export const hsGetDealById = async (dealId: string): Promise<{ [key: string]: st
 			'interest_rate',
 			'origination_fee',
 			'underwriter_comments',
-			'affordability'
+			'affordability',
 		]);
 
 		return {
@@ -759,6 +759,7 @@ export const hsCreateLoan = async (loanApplication: LeanDocument<ILoanApplicatio
 					.getTime()
 					.toString(),
 				loan_status: LoanStatus[loanApplication.status] ?? '',
+				lead_source: loanApplication.leadSource,
 				//@ts-expect-error
 				account_type: LoanAccountType[loanApplication.accountType] ?? '',
 				interest_rate: loanApplication.interestRate?.toString(),
@@ -824,6 +825,7 @@ export const hsUpdateLoan = async (loanApplication: LeanDocument<ILoanApplicatio
 					.toDate()
 					.getTime()
 					.toString(),
+				lead_source: loanApplication.leadSource,
 				loan_status: LoanStatus[loanApplication.status] ?? '',
 				//@ts-expect-error
 				account_type: LoanAccountType[loanApplication.accountType] ?? '',
