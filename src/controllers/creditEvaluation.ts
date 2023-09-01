@@ -5,6 +5,7 @@ import i18n from 'helpers/i18n';
 import { queryFilter } from 'helpers/filters';
 import { createMeta } from 'helpers/meta';
 
+import Customer from 'models/customer';
 import CreditEvaluation, {
 	CreditEvaluationIncome,
 	CreditEvaluationIncomePaystubsEnum,
@@ -369,7 +370,26 @@ export const putCreditEvaluationHouseholdIncome: RequestHandler = async (req, re
 		const { id } = req.params;
 		const { type } = req.body;
 
-		await CreditEvaluation.findByIdAndUpdate(id, { selectedHouseholdIncome: type });
+		let creditEvaluation = (await CreditEvaluation.findByIdAndUpdate(
+			id,
+			{
+				selectedHouseholdIncome: type,
+			},
+			{ new: true }
+		).lean()) as LeanDocument<ICreditEvaluation>;
+		creditEvaluation = await creditEvaluationCalculations(creditEvaluation);
+
+		const selectedIncome = creditEvaluation.incomesOverview.find(
+			(income) => income.type === creditEvaluation.selectedHouseholdIncome
+		);
+		const householdIncome = creditEvaluation.incomesOverview.find((income) => income.type === 'household-income');
+
+		// Update customer
+		await Customer.findByIdAndUpdate(creditEvaluation.customer, {
+			'employmentInfo.monthlyGrossIncome': selectedIncome?.monthly,
+			'employmentInfo.annualPersonalIncome': selectedIncome?.annual,
+			'employmentInfo.totalAnnualHouseholdIncome': householdIncome?.annual,
+		});
 
 		res.json({
 			// data: result,
