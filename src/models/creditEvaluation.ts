@@ -219,10 +219,11 @@ export type CreditEvaluationChargeoffs = {
 };
 
 export enum CreditEvaluationAffordabilityEnum {
-	PENDING_EVAL = 'pending-eval',
-	LOW = 'low',
-	MEDIUM = 'medium',
-	HIGH = 'high',
+	PENDING_EVAL = 'Pending Eval',
+	LOW = 'Low',
+	MEDIUM = 'Medium',
+	HIGH = 'High',
+	NONE = 'None'
 }
 
 interface ICreditEvaluation extends Document {
