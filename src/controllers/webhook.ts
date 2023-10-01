@@ -13,6 +13,7 @@ import { absoluteFilePath } from 'utils/absoluteFilePath';
 import { cbcReportToCreditEvaluation } from './creditEvaluation';
 import { hsGetContactById, hsGetDealById, hsGetDealstageById } from './hubspot';
 import { htmlToPDF } from 'utils/htmlToPdf';
+import { omitBy, isNil } from 'lodash';
 
 const hsAffordabilities = {
 	'Pending Eval': CreditEvaluationAffordabilityEnum.PENDING_EVAL,
@@ -168,7 +169,6 @@ export const postWebhookCustomer: RequestHandler = async (req, res, next) => {
 
 				let loanPackage;
 
-				console.log(jsonResponse.XML_INTERFACE.CREDITREPORT.BUREAU_TYPE?.RAWDATA?.DATA);
 				if (deal) {
 					loanPackage = await LoanPackage.create({
 						customer: customer._id,
@@ -270,110 +270,106 @@ export const putSyncCustomer: RequestHandler = async (req, res, next) => {
 		} else {
 			const contact = await hsGetContactById(hubspotId as string);
 
-			await Customer.findByIdAndUpdate(customer._id, {
-				// GENERAL INFORMATION
-				firstName: contact?.firstName,
-				middleName: contact?.middle_name_or_initial,
-				lastName: contact?.lastName,
-				salutation: contact?.salutation,
-				birthday: contact?.date_of_birth,
-				address: contact?.address,
-				city: contact?.city,
-				state: contact?.state,
-				zip: contact?.zip,
-				phone: contact?.phone,
-				mobilePhone: contact.mobilephone,
-				referralSource: contact.referral_company,
-				franchiseChoice: contact.franchise_Choice,
+			const updateContactProperties = omitBy(
+				{
+					// GENERAL INFORMATION
+					firstName: contact?.firstName,
+					middleName: contact?.middle_name_or_initial,
+					lastName: contact?.lastName,
+					salutation: contact?.salutation,
+					birthday: contact?.date_of_birth,
+					address: contact?.address,
+					city: contact?.city,
+					state: contact?.state,
+					zip: contact?.zip,
+					phone: contact?.phone,
+					mobilePhone: contact.mobilephone,
+					referralSource: contact.referral_company,
+					franchiseChoice: contact.franchise_Choice,
 
-				// PERSONAL INFORMATION
-				personalInfo: {
-					driversLicenseId: contact?.driver_s_license_number,
-					driversLicenseIssueDate: contact?.dl_issuance_date,
-					driversLicenseExpireDate: contact?.dl_expiration_date,
-					creditUnion: contact?.member_of_credit_union,
-					personalBank: contact?.personal_banking_relationship,
-					militaryStatus: contact?.current_military_affiliation,
-					bankRoutingNumber: contact?.routing_number,
-					bankAccountNumber: contact?.account_number,
-					creditRepairBefore: contact?.have_you_been_through_credit_repair_,
-					judgementsLiensBankruptcy: contact?.judgements_liens_bankruptcy_,
-					previoiusFinanceCompany: contact?.have_you_worked_with_a_finance_company_like_ours_before_,
-					maritalStatus: contact?.marital_status,
-					fraudAlert: typeof contact?.fraud_alert === 'string' && contact?.fraud_alert === 'true',
-					numberOfFraudAlert: contact?.number_on_fraud_alert_if_it_is_not_cell_phone_or_home_phone,
-				},
-				// HOUSING INFO
-				housingInfo: {
-					houstingStatus: contact?.housing_status,
-					monthlyHousingPayment: contact?.monthly_housing_payment,
-					estimatedLengthOfTimeAtResidence: contact?.estimated_length_of_time_at_residence,
-					moveInDate: contact?.move_in_date,
-					calculatedLengthOfTimeAtResidence: contact?.calculated_length_of_time_at_residence,
-					yearsAtCurrentAddress: contact?.years_at_current_address,
-				},
-				// EMPLOYMENT INFO
-				employmentInfo: {
-					incomeType: contact?.income_type,
-					employerName: contact?.employer,
-					employerPhone: contact?.employer_phone_number,
-					employerAddress: contact?.employer_address,
-					estimatedTimeAtJob: contact?.estimated_time_at_job,
-					startDateWithEmployer: contact?.start_date_with_employer,
-					calculatedLengthOfEmployment: contact?.calculated_length_of_employment,
-					occupationPosition: contact?.occupation_position,
-					monthlyGrossIncome: contact?.monthly_gross_income,
-					annualPersonalIncome: contact?.annual_personal_income,
-					frontEndRtiRatio: contact?.front_end_dti_ratio,
-					totalAnnualHouseholdIncome: contact?.total_annual_household_income,
-					householdFrontEndDtiRatio: contact?.household_front_end_dti_ratio__cloned_,
-					statedMonthlyIncome: contact?.stated_monthly_income,
-					statedAnnualIncome: contact?.stated_annual_income,
-					statedAnnualHouseholdIncome: contact?.stated_annual_household_income,
-				},
-				// SECURITY QUESTIONS
-				securityQuestions: {
-					birthCity: contact?.birth_city,
-					bronInForeignCountry: contact?.were_you_born_in_a_foreign_country_,
-					legalPermanentResident: contact?.are_you_a_legal_permanent_resident_,
-					greenCardExpirationDate: contact?.green_card_expiration_date,
-					mothersMaidenName: contact?.mother_s_maiden_name,
-					highSchoolMascot: contact?.high_school_mascot,
-					highSchoolCity: contact?.high_school_city,
-					nameOfStreetYouGrewUp: contact?.name_of_street_you_grew_up_on,
-					favoritePetsName: contact?.favorite_pet_s_name,
-				},
-				// EDUCATION
-				educationInfo: {
-					collegeAttended: contact?.college_university_attended,
-					fieldOfStudy: contact?.field_of_study,
-					degree: contact?.degree,
-					graduatedDate: contact?.graduation_date,
-					graduateSchoolAttended: contact?.graduate_school_attended,
-					graduateSchoolFieldOfStudy: contact?.graduate_school_field_of_study,
-					graduateDegreeReceived: contact?.graduate_degree_received,
-					graduateGraduationDate: contact?.graduate_graduation_date,
-				},
-				// ASSET INFORMATION
-				assetInfo: {
-					combinedCheckingSavingsBalance: contact?.combined_checking_savings_balance,
-					stocksBondsMutualFunds: contact?.stocks_bonds_mutual_funds,
-					retirementAccountBalance: contact?.retirement_account_balance,
-				},
-				// PRIMARY RESIDENCE VALUATION
-				primaryResidenceValuation: {
-					avmValue: contact?.avm_in_response_com,
-					marketValue: contact?.market_value_in_response_com,
-					zillowValue: contact?.zillow_value,
-					estimatedPropertyValue: contact?.estimated_property_value,
-					estimatedEquityPrimaryResidence: contact?.estimated_equity_in_primary_residence,
-					calculatedValue: contact?.calculated_value,
-					calculatedEquity: contact?.calculated_equity,
-				},
+					// PERSONAL INFORMATION
+					'personalInfo.driversLicenseId': contact?.driver_s_license_number,
+					'personalInfo.driversLicenseIssueDate': contact?.dl_issuance_date,
+					'personalInfo.driversLicenseExpireDate': contact?.dl_expiration_date,
+					'personalInfo.creditUnion': contact?.member_of_credit_union,
+					'personalInfo.personalBank': contact?.personal_banking_relationship,
+					'personalInfo.militaryStatus': contact?.current_military_affiliation,
+					'personalInfo.bankRoutingNumber': contact?.routing_number,
+					'personalInfo.bankAccountNumber': contact?.account_number,
+					'personalInfo.creditRepairBefore': contact?.have_you_been_through_credit_repair_,
+					'personalInfo.judgementsLiensBankruptcy': contact?.judgements_liens_bankruptcy_,
+					'personalInfo.previoiusFinanceCompany': contact?.have_you_worked_with_a_finance_company_like_ours_before_,
+					'personalInfo.maritalStatus': contact?.marital_status,
+					'personalInfo.fraudAlert': typeof contact?.fraud_alert === 'string' && contact?.fraud_alert === 'true',
+					'personalInfo.numberOfFraudAlert': contact?.number_on_fraud_alert_if_it_is_not_cell_phone_or_home_phone,
 
-				submissionEmail: contact?.submission_email,
-				submissionPassword: contact?.submission_password,
-			});
+					// HOUSING INFO
+					'housingInfo.houstingStatus': contact?.housing_status,
+					'housingInfo.monthlyHousingPayment': contact?.monthly_housing_payment,
+					'housingInfo.estimatedLengthOfTimeAtResidence': contact?.estimated_length_of_time_at_residence,
+					'housingInfo.moveInDate': contact?.move_in_date,
+					'housingInfo.calculatedLengthOfTimeAtResidence': contact?.calculated_length_of_time_at_residence,
+					'housingInfo.yearsAtCurrentAddress': contact?.years_at_current_address,
+
+					// EMPLOYMENT INFO
+					'employmentInfo.incomeType': contact?.income_type,
+					'employmentInfo.employerName': contact?.employer,
+					'employmentInfo.employerPhone': contact?.employer_phone_number,
+					'employmentInfo.employerAddress': contact?.employer_address,
+					'employmentInfo.estimatedTimeAtJob': contact?.estimated_time_at_job,
+					'employmentInfo.startDateWithEmployer': contact?.start_date_with_employer,
+					'employmentInfo.calculatedLengthOfEmployment': contact?.calculated_length_of_employment,
+					'employmentInfo.occupationPosition': contact?.occupation_position,
+					'employmentInfo.monthlyGrossIncome': contact?.monthly_gross_income,
+					'employmentInfo.annualPersonalIncome': contact?.annual_personal_income,
+					'employmentInfo.frontEndRtiRatio': contact?.front_end_dti_ratio,
+					'employmentInfo.totalAnnualHouseholdIncome': contact?.total_annual_household_income,
+					'employmentInfo.householdFrontEndDtiRatio': contact?.household_front_end_dti_ratio__cloned_,
+					'employmentInfo.statedMonthlyIncome': contact?.stated_monthly_income,
+					'employmentInfo.statedAnnualIncome': contact?.stated_annual_income,
+					'employmentInfo.statedAnnualHouseholdIncome': contact?.stated_annual_household_income,
+
+					// SECURITY QUESTIONS
+					'securityQuestions.birthCity': contact?.birth_city,
+					'securityQuestions.bronInForeignCountry': contact?.were_you_born_in_a_foreign_country_,
+					'securityQuestions.legalPermanentResident': contact?.are_you_a_legal_permanent_resident_,
+					'securityQuestions.greenCardExpirationDate': contact?.green_card_expiration_date,
+					'securityQuestions.mothersMaidenName': contact?.mother_s_maiden_name,
+					'securityQuestions.highSchoolMascot': contact?.high_school_mascot,
+					'securityQuestions.highSchoolCity': contact?.high_school_city,
+					'securityQuestions.nameOfStreetYouGrewUp': contact?.name_of_street_you_grew_up_on,
+					'securityQuestions.favoritePetsName': contact?.favorite_pet_s_name,
+
+					// EDUCATION
+					'educationInfo.collegeAttended': contact?.college_university_attended,
+					'educationInfo.fieldOfStudy': contact?.field_of_study,
+					'educationInfo.degree': contact?.degree,
+					'educationInfo.graduatedDate': contact?.graduation_date,
+					'educationInfo.graduateSchoolAttended': contact?.graduate_school_attended,
+					'educationInfo.graduateSchoolFieldOfStudy': contact?.graduate_school_field_of_study,
+					'educationInfo.graduateDegreeReceived': contact?.graduate_degree_received,
+					'educationInfo.graduateGraduationDate': contact?.graduate_graduation_date,
+
+					// ASSET INFORMATION
+					'assetInfo.combinedCheckingSavingsBalance': contact?.combined_checking_savings_balance,
+					'assetInfo.stocksBondsMutualFunds': contact?.stocks_bonds_mutual_funds,
+					'assetInfo.retirementAccountBalance': contact?.retirement_account_balance,
+
+					// PRIMARY RESIDENCE VALUATION
+					'primaryResidenceValuation.avmValue': contact?.avm_in_response_com,
+					'primaryResidenceValuation.marketValue': contact?.market_value_in_response_com,
+					'primaryResidenceValuation.zillowValue': contact?.zillow_value,
+					'primaryResidenceValuation.estimatedPropertyValue': contact?.estimated_property_value,
+					'primaryResidenceValuation.estimatedEquityPrimaryResidence': contact?.estimated_equity_in_primary_residence,
+					'primaryResidenceValuation.calculatedValue': contact?.calculated_value,
+					'primaryResidenceValuation.calculatedEquity': contact?.calculated_equity,
+
+					submissionEmail: contact?.submission_email,
+					submissionPassword: contact?.submission_password,
+				},
+				isNil
+			);
+			await Customer.findByIdAndUpdate(customer._id, updateContactProperties);
 
 			res.json({
 				message: 'Customer Updated!',
