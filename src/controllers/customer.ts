@@ -8,7 +8,7 @@ import CreditEvaluation from 'models/creditEvaluation';
 import LoanApplication from 'models/loanApplication';
 import LoanPackage from 'models/loanPackage';
 
-import { hsGetSingleContact, hsCreateContact, hsUpdateContact } from './hubspot';
+import { hsGetSingleContact, hsCreateContact } from './hubspot';
 import { dayjsUnix } from 'utils/dayjs';
 import { CBCApplicant, cbcPullCreditReport } from './cbc';
 import xmlToJson from 'xml2json';
@@ -103,7 +103,7 @@ export const postCustomer: RequestHandler = async (req, res, next) => {
 			hubspotId = hubspotUser.id;
 		}
 
-		const customer = await Customer.create({
+		await Customer.create({
 			hubspotId,
 			firstName,
 			lastName,
@@ -124,11 +124,6 @@ export const postCustomer: RequestHandler = async (req, res, next) => {
 			employmentInfo,
 			assetInfo,
 		});
-
-		// UPDATE HUBSPOT
-		if (hubspotId) {
-			await hsUpdateContact(hubspotId, customer);
-		}
 
 		res.json({
 			message: i18n.__('CONTROLLER.CUSTOMER.POST_CUSTOMER.ADDED'),

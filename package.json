@@ -9,7 +9,7 @@
 		"start": "node ./dist/app.js",
 		"watch": "nodemon ./src/app.ts",
 		"build": "tsc",
-		"test": "jest --passWithNoTests",
+		"test": "jest",
 		"format:check": "prettier --check ./src/**/*.ts",
 		"format:write": "prettier --write ./src/**/*.ts",
 		"lint:check": "eslint ./src/**/*.ts",
@@ -21,6 +21,7 @@
 	"author": "Andrej Kitanovic",
 	"license": "ISC",
 	"dependencies": {
+		"@faker-js/faker": "^8.1.0",
 		"@hubspot/api-client": "^7.1.0",
 		"axios": "^0.27.2",
 		"bcryptjs": "^2.4.3",
