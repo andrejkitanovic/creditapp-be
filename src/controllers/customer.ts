@@ -479,14 +479,20 @@ export const putRefetchCustomer: RequestHandler = async (req, res, next) => {
 
 			// Create Credit Evaluation
 			const creditEvaluationData = cbcReportToCreditEvaluation(reportData);
-			const creditEvaluation = await CreditEvaluation.create({
+			await CreditEvaluation.create({
 				customer: customer?._id,
 				...creditEvaluationData,
 				html: reportLink,
 				pdf: reportPDFLink,
+				leadSource: customer?.leadSource,
 				state,
+				statedMonthlyIncome: customer?.employmentInfo.statedMonthlyIncome,
+
+				// Deal Related
+				// hubspotDealId: deal?.id,
+				// notes: deal?.underwriter_comments,
+				// dealStatus: dealstage?.label,
 			});
-			console.log(creditEvaluation);
 
 			// if (dealId) {
 			// 	const deal = await hsGetDealById(dealId);
