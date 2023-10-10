@@ -181,13 +181,15 @@ loanApplicationSchema.pre('findOneAndUpdate', async function (next) {
 
 	//@ts-expect-error
 	this._update.loanWeightFactor = calculateLoanWeightFactor(rawObject.loanAmount, rawObject.interestRate);
-	//@ts-expect-error
-	this._update.apr = calculateAPR(
-		rawObject.loanAmount,
-		rawObject.term,
-		rawObject.interestRate,
-		rawObject.originationFee
-	);
+	if (!rawObject.apr) {
+		//@ts-expect-error
+		this._update.apr = calculateAPR(
+			rawObject.loanAmount,
+			rawObject.term,
+			rawObject.interestRate,
+			rawObject.originationFee
+		);
+	}
 
 	next();
 });

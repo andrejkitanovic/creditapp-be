@@ -7,7 +7,14 @@ import CreditEvaluation from 'models/creditEvaluation';
 import { ICustomer } from 'models/customer';
 import LoanApplication, { ILoanApplication } from 'models/loanApplication';
 import { LeanDocument } from 'mongoose';
-import { hsDeleteLoan, hsFetchLoan, hsGetLenderById, LoanAccountType, LoanCreditInquiry, LoanStatus } from './hubspot';
+import {
+	hsDeleteLoan,
+	hsGetLoanById,
+	hsGetLenderById,
+	LoanAccountType,
+	LoanCreditInquiry,
+	LoanStatus,
+} from './hubspot';
 
 export const getLoanApplications: RequestHandler = async (req, res, next) => {
 	try {
@@ -23,7 +30,7 @@ export const getLoanApplications: RequestHandler = async (req, res, next) => {
 		// Check if up to date
 		for await (let loanApplication of loanApplicationsRaw) {
 			if (loanApplication.hubspotId && loanApplication.upToDate) {
-				const hsLoan = await hsFetchLoan(loanApplication.hubspotId);
+				const hsLoan = await hsGetLoanById(loanApplication.hubspotId);
 
 				if (hsLoan) {
 					const enumFields: { status?: string; accountType?: string; creditInquiry?: string } = {};
@@ -57,11 +64,11 @@ export const getLoanApplications: RequestHandler = async (req, res, next) => {
 							name: hsLoan.loan_name,
 							loanAmount: hsLoan.amount,
 							monthlyPayment: hsLoan.monthly_payment,
-							term: hsLoan.term__months,
+							term: hsLoan.term___months,
 							interestRate: hsLoan.interest_rate,
 							originationFee: hsLoan.origination_fee_amount,
 							originationFeePercentage: hsLoan.origination_fee_percentage,
-							apr: hsLoan.loan_apr,
+							apr: hsLoan.loan_apr ? parseFloat(hsLoan.loan_apr) : undefined,
 							...enumFields,
 						},
 						{ new: true }

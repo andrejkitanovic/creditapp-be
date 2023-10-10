@@ -684,13 +684,13 @@ export const hsGetLenderById = async (lenderId: string): Promise<{ [key: string]
 
 // LOANS
 
-export const hsFetchLoan = async (loanId: string): Promise<any> => {
+export const hsGetLoanById = async (loanId: string): Promise<any> => {
 	try {
 		const { properties } = await hubspotClient.crm.objects.basicApi.getById('2-11419916', loanId, [
 			'loan_name',
 			'amount',
 			'monthly_payment',
-			'term__months',
+			'term___months',
 			'interest_rate',
 			'origination_fee_amount',
 			'origination_fee_percentage',
