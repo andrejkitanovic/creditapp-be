@@ -287,16 +287,18 @@ const customerSchema: Schema = new Schema(
 			calculatedEquity: Number,
 		},
 
-		cbcErrorMessage: {
-			type: String,
-		},
-
+		
 		submissionEmail: {
 			type: String,
 		},
 		submissionPassword: {
 			type: String,
 		},
+
+		cbcErrorMessage: {
+			type: String,
+		},
+
 	},
 	{ timestamps: true }
 );

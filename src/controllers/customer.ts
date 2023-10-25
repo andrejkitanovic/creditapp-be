@@ -4,11 +4,12 @@ import { queryFilter } from 'helpers/filters';
 import { createMeta } from 'helpers/meta';
 
 import Customer, { ICustomer } from 'models/customer';
+import Log from 'models/log';
 import CreditEvaluation from 'models/creditEvaluation';
 import LoanApplication from 'models/loanApplication';
 import LoanPackage from 'models/loanPackage';
 
-import { hsGetSingleContact, hsCreateContact } from './hubspot';
+import { hsGetSingleContact, hsCreateContact, hsGetDealById, hsGetDealstageById } from './hubspot';
 import { dayjsUnix } from 'utils/dayjs';
 import { CBCApplicant, cbcPullCreditReport } from './cbc';
 import xmlToJson from 'xml2json';
@@ -479,6 +480,24 @@ export const putRefetchCustomer: RequestHandler = async (req, res, next) => {
 
 			// Create Credit Evaluation
 			const creditEvaluationData = cbcReportToCreditEvaluation(reportData);
+
+			const latestLog = await Log.findOne({ body: { $regex: `${customer?.email}`, $options: 'i' } })
+				.sort('-createdAt')
+				.lean();
+			const latestLogBody = customer && latestLog && JSON.parse(latestLog.body);
+			const dealId = latestLogBody?.dealId;
+			// const leadSource = latestLogBody?.leadSource;
+
+			let deal;
+			let dealstage;
+			if (dealId && dealId !== 'NODEALID') {
+				deal = await hsGetDealById(dealId);
+
+				if (deal?.dealstage) {
+					dealstage = await hsGetDealstageById(deal.dealstage);
+				}
+			}
+
 			await CreditEvaluation.create({
 				customer: customer?._id,
 				...creditEvaluationData,
@@ -489,27 +508,26 @@ export const putRefetchCustomer: RequestHandler = async (req, res, next) => {
 				statedMonthlyIncome: customer?.employmentInfo.statedMonthlyIncome,
 
 				// Deal Related
-				// hubspotDealId: deal?.id,
-				// notes: deal?.underwriter_comments,
-				// dealStatus: dealstage?.label,
+				hubspotDealId: deal?.id,
+				notes: deal?.underwriter_comments,
+				dealStatus: dealstage?.label,
 			});
 
-			// if (dealId) {
-			// 	const deal = await hsGetDealById(dealId);
+			// let loanPackage;
 
-			// 	if (deal) {
-			// 		await LoanPackage.create({
-			// 			customer: customer?._id,
-			// 			creditEvaluation: creditEvaluation?._id,
-			// 			hubspotId: deal?.id,
-			// 			name: deal?.dealname,
-			// 			loanAmount: deal?.amount,
-			// 			monthlyPayment: deal?.monthly_payment,
-			// 			term: deal?.term_months,
-			// 			interestRate: deal?.interest_rate,
-			// 			originationFee: deal?.origination_fee,
-			// 		});
-			// 	}
+			// if (deal) {
+			// 	loanPackage = await LoanPackage.create({
+			// 		customer: customer?._id,
+			// 		leadSource,
+			// 		creditEvaluation: creditEvaluation?._id,
+			// 		hubspotId: deal?.id,
+			// 		name: deal?.dealname,
+			// 		loanAmount: deal?.amount,
+			// 		monthlyPayment: deal?.monthly_payment,
+			// 		term: deal?.term_months,
+			// 		interestRate: deal?.interest_rate,
+			// 		originationFee: deal?.origination_fee,
+			// 	});
 			// }
 
 			await Customer.findByIdAndUpdate(id, {
