@@ -439,7 +439,9 @@ export const putCreditEvaluationHubspotDealId: RequestHandler = async (req, res,
 		const { hubspotDealId } = req.body;
 
 		const deal = await hsGetDealById(hubspotDealId);
-		if (!deal) throw new Error('Deal not found');
+		if (!deal) {
+			return res.status(404).json({ message: 'Deal not found' });
+		}
 
 		const dealstage = await hsGetDealstageById(deal.dealstage);
 
