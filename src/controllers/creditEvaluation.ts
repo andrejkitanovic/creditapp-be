@@ -18,7 +18,7 @@ import { LeanDocument } from 'mongoose';
 import { creditEvaluationCalculations } from 'utils/creditEvaluation/creditEvaluationCalculations';
 import { startOfYear } from 'utils/dayjs';
 import { cbcFormatDate, cbcFormatMonths, cbcFormatString } from './cbc';
-import { hsCreateLoan, hsUpdateLoan } from './hubspot';
+import { hsCreateLoan, hsGetDealById, hsGetDealstageById, hsUpdateLoan } from './hubspot';
 
 export const getCreditEvaluations: RequestHandler = async (req, res, next) => {
 	try {
@@ -423,6 +423,30 @@ export const putCreditEvaluationLoanAffordabilityRate: RequestHandler = async (r
 
 		await CreditEvaluation.findByIdAndUpdate(id, {
 			loanAffordabilityRate: rate,
+		});
+
+		res.json({
+			// data: result,
+		});
+	} catch (err) {
+		next(err);
+	}
+};
+
+export const putCreditEvaluationHubspotDealId: RequestHandler = async (req, res, next) => {
+	try {
+		const { id } = req.params;
+		const { hubspotDealId } = req.body;
+
+		const deal = await hsGetDealById(hubspotDealId);
+		if (!deal) throw new Error('Deal not found');
+
+		const dealstage = await hsGetDealstageById(deal.dealstage);
+
+		await CreditEvaluation.findByIdAndUpdate(id, {
+			hubspotDealId: deal.id,
+			notes: deal.underwriter_comments,
+			dealStatus: dealstage?.label,
 		});
 
 		res.json({

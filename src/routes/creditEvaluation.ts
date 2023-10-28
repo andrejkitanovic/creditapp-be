@@ -15,6 +15,7 @@ import {
 	putCreditEvaluationHouseholdIncome as putCreditEvaluationHouseholdIncomeController,
 	putCreditEvaluationAffordability as putCreditEvaluationAffordabilityController,
 	putCreditEvaluationLoanAffordabilityRate as putCreditEvaluationLoanAffordabilityRateController,
+	putCreditEvaluationHubspotDealId as putCreditEvaluationHubspotDealIdController,
 } from 'controllers/creditEvaluation';
 // import {
 // } from 'validators/creditEvaluation';
@@ -101,6 +102,12 @@ defineRoutes(router, [
 		route: '/loan-affordability/rate/:id',
 		permissions: ['update:credit-evaluations'],
 		controller: putCreditEvaluationLoanAffordabilityRateController,
+	},
+	{
+		method: 'put',
+		route: '/hubspot-deal-id/:id',
+		permissions: ['update:credit-evaluations'],
+		controller: putCreditEvaluationHubspotDealIdController,
 	},
 ]);
 
