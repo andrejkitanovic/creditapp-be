@@ -626,7 +626,7 @@ export const hsUpdateContact = async (
 };
 
 // DEALS
-export const hsGetDealById = async (dealId: string): Promise<{ [key: string]: string }> => {
+export const hsGetDealById = async (dealId: string): Promise<{ [key: string]: string } | undefined> => {
 	try {
 		const { properties } = await hubspotClient.crm.deals.basicApi.getById(dealId, [
 			'dealname',
@@ -647,7 +647,7 @@ export const hsGetDealById = async (dealId: string): Promise<{ [key: string]: st
 	} catch (err) {
 		console.log(err);
 
-		return {};
+		return;
 	}
 };
 
