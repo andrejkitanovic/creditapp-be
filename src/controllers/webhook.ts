@@ -108,7 +108,7 @@ export const postWebhookCustomer: RequestHandler = async (req, res, next) => {
 
 			const htmlReport = jsonResponse.XML_INTERFACE?.CREDITREPORT?.REPORT;
 
-			creditReportResponse.loanly_customer = `https://app.loanly.ai/customers/${customer?._id}`;
+			creditReportResponse.loanly_customer = `https://app.lendzee.ai/customers/${customer?._id}`;
 
 			if (
 				htmlReport &&
@@ -188,10 +188,10 @@ export const postWebhookCustomer: RequestHandler = async (req, res, next) => {
 					creditReportResponse.decline_reason_codes = creditEvaluation.declineReasonCodes.join(';');
 				}
 
-				creditReportResponse.loanly_credit_evaluation = `https://app.loanly.ai/credit-evaluations/${creditEvaluation?._id}`;
+				creditReportResponse.loanly_credit_evaluation = `https://app.lendzee.ai/credit-evaluations/${creditEvaluation?._id}`;
 
 				if (loanPackage) {
-					creditReportResponse.loanly_loan_package = `https://app.loanly.ai/loan-packages/${loanPackage?._id}`;
+					creditReportResponse.loanly_loan_package = `https://app.lendzee.ai/loan-packages/${loanPackage?._id}`;
 				}
 			} else {
 				creditReportResponse.credit_inquiry_error = jsonResponse.XML_INTERFACE?.ERROR_DESCRIPT || 'Error';
@@ -227,7 +227,7 @@ export const postWebhookCustomer: RequestHandler = async (req, res, next) => {
 				reportDate: { $gte: dayjs().subtract(30, 'day').toDate() },
 			});
 
-			creditReportResponse.loanly_customer = `https://app.loanly.ai/customers/${customer?._id}`;
+			creditReportResponse.loanly_customer = `https://app.lendzee.ai/customers/${customer?._id}`;
 			creditReportResponse.message = 'Successfully recalled user';
 			creditReportResponse.credit_score =
 				creditEvaluation?.creditScores.find((creditScore) => creditScore.type === 'XPN')?.score ?? 0;
@@ -235,7 +235,7 @@ export const postWebhookCustomer: RequestHandler = async (req, res, next) => {
 			creditReportResponse.loanly_recent_report = creditEvaluation?.html;
 			creditReportResponse.loanly_recent_report_pdf = creditEvaluation?.pdf;
 
-			creditReportResponse.loanly_credit_evaluation = `https://app.loanly.ai/credit-evaluations/${creditEvaluation?._id}`;
+			creditReportResponse.loanly_credit_evaluation = `https://app.lendzee.ai/credit-evaluations/${creditEvaluation?._id}`;
 
 			if (creditEvaluation?.declineReasonCodes) {
 				creditReportResponse.decline_reason_codes = creditEvaluation.declineReasonCodes.join(';');
@@ -243,7 +243,7 @@ export const postWebhookCustomer: RequestHandler = async (req, res, next) => {
 
 			const loanPackage = await LoanPackage.findOne({ creditEvaluation: creditEvaluation?._id || '' });
 			if (loanPackage) {
-				creditReportResponse.loanly_loan_package = `https://app.loanly.ai/loan-packages/${loanPackage?._id}`;
+				creditReportResponse.loanly_loan_package = `https://app.lendzee.ai/loan-packages/${loanPackage?._id}`;
 			}
 
 			creditReportResponse.loanly_status = 'Credit Report Recalled';

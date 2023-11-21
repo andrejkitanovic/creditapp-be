@@ -4,7 +4,7 @@ import Customer, { ICustomer } from '../../models/customer';
 import { hsGetContactById, hsUpdateContact } from '../../controllers/hubspot';
 
 describe('hubspot contact sync', () => {
-	const customerEmail = 'test@loanly.io';
+	const customerEmail = 'test@lendzee.io';
 
 	beforeAll(async () => {
 		await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost/creditapp-be');
@@ -14,7 +14,7 @@ describe('hubspot contact sync', () => {
 		await mongoose.connection.close();
 	});
 
-	it('loanly -> hubspot contact sync', async () => {
+	it('lendzee -> hubspot contact sync', async () => {
 		let customer = await Customer.findOne({ email: customerEmail }).lean().orFail(new Error('Customer not found'));
 		expect(customer.email).toBe(customerEmail);
 
@@ -65,7 +65,7 @@ describe('hubspot contact sync', () => {
 		expect(contact.submission_password).toBe(customer.submissionPassword);
 	}, 60_000);
 
-	it('hubspot -> loanly customer sync', async () => {
+	it('hubspot -> lendzee customer sync', async () => {
 		let customer = await Customer.findOne({ email: customerEmail }).lean().orFail(new Error('Customer not found'));
 		expect(customer.email).toBe(customerEmail);
 

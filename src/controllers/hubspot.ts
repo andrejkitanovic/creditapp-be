@@ -20,12 +20,17 @@ import { Property } from '@hubspot/api-client/lib/codegen/crm/properties';
 import { IOrganisation } from 'models/organisation';
 import { PipelineStage } from '@hubspot/api-client/lib/codegen/crm/pipelines';
 
-export const hubspotClient = new Client({ accessToken: process.env.HS_ACCESS_TOKEN });
+export const hubspotClient = new Client({
+	accessToken: process.env.HS_ACCESS_TOKEN,
+});
+
+const HS_OBJECT_LENDERS = '2-11419675';
+const HS_OBJECT_LOAN = '2-11419916';
 
 // Routes
 export const getHubspotLenders: RequestHandler = async (req, res, next) => {
 	try {
-		const { results: hsLenders } = await hubspotClient.crm.objects.basicApi.getPage('2-11419675', 100, undefined, [
+		const { results: hsLenders } = await hubspotClient.crm.objects.basicApi.getPage(HS_OBJECT_LENDERS, 100, undefined, [
 			'lender_name',
 			'origination_fee',
 			'credit_bureau',
@@ -377,7 +382,11 @@ export const hsGetContactById = async (contactId: string): Promise<{ [key: strin
 
 export const hsGetSingleContact = async (property: string, value: string) => {
 	try {
-		const filter: ContactFilter = { propertyName: property, operator: 'EQ', value };
+		const filter: ContactFilter = {
+			propertyName: property,
+			operator: 'EQ',
+			value,
+		};
 		const filterGroup: ContactFilterGroup = { filters: [filter] };
 
 		const searchFilter = {
@@ -666,7 +675,7 @@ export const hsGetDealstageById = async (dealstageId: string): Promise<PipelineS
 // LENDERS
 export const hsGetLenderById = async (lenderId: string): Promise<{ [key: string]: string }> => {
 	try {
-		const { properties } = await hubspotClient.crm.objects.basicApi.getById('2-11419675', lenderId, [
+		const { properties } = await hubspotClient.crm.objects.basicApi.getById(HS_OBJECT_LENDERS, lenderId, [
 			'lender_name',
 			'credit_bureau',
 		]);
@@ -686,7 +695,7 @@ export const hsGetLenderById = async (lenderId: string): Promise<{ [key: string]
 
 export const hsGetLoanById = async (loanId: string): Promise<any> => {
 	try {
-		const { properties } = await hubspotClient.crm.objects.basicApi.getById('2-11419916', loanId, [
+		const { properties } = await hubspotClient.crm.objects.basicApi.getById(HS_OBJECT_LOAN, loanId, [
 			'loan_name',
 			'amount',
 			'monthly_payment',
@@ -741,7 +750,7 @@ export const LoanCreditInquiry = {
 
 export const hsCreateLoan = async (loanApplication: LeanDocument<ILoanApplication>) => {
 	try {
-		const { id: loanId } = await hubspotClient.crm.objects.basicApi.create('2-11419916', {
+		const { id: loanId } = await hubspotClient.crm.objects.basicApi.create(HS_OBJECT_LOAN, {
 			properties: {
 				loan_name: loanApplication.name,
 				amount: loanApplication.loanAmount?.toString(),
@@ -775,13 +784,24 @@ export const hsCreateLoan = async (loanApplication: LeanDocument<ILoanApplicatio
 		});
 
 		// Get Lender
-		const { id: lenderId } = await hubspotClient.crm.objects.basicApi.getById('2-11419675', loanApplication.lenderId);
+		const { id: lenderId } = await hubspotClient.crm.objects.basicApi.getById(
+			HS_OBJECT_LENDERS,
+			loanApplication.lenderId
+		);
 		if (lenderId) {
 			// Associate lender
-			await hubspotClient.crm.objects.associationsApi.create('2-11419916', loanId, '2-11419675', lenderId, 'lender');
+			await hubspotClient.crm.objects.associationsApi.create(
+				HS_OBJECT_LOAN,
+				loanId,
+				HS_OBJECT_LENDERS,
+				lenderId,
+				'lender'
+			);
 		}
 
-		const loanPackage = await LoanPackage.findOne({ creditEvaluation: loanApplication.creditEvaluation });
+		const loanPackage = await LoanPackage.findOne({
+			creditEvaluation: loanApplication.creditEvaluation,
+		});
 		if (loanPackage) {
 			// Get Deal
 			const { id: dealId } = await hubspotClient.crm.deals.basicApi.getById(loanPackage.hubspotId ?? '');
@@ -789,7 +809,7 @@ export const hsCreateLoan = async (loanApplication: LeanDocument<ILoanApplicatio
 			if (dealId) {
 				// Associate deal
 				await hubspotClient.crm.objects.associationsApi.create(
-					'2-11419916',
+					HS_OBJECT_LOAN,
 					loanId,
 					'deal',
 					dealId,
@@ -808,7 +828,7 @@ export const hsCreateLoan = async (loanApplication: LeanDocument<ILoanApplicatio
 
 export const hsUpdateLoan = async (loanApplication: LeanDocument<ILoanApplication>) => {
 	try {
-		const { id } = await hubspotClient.crm.objects.basicApi.update('2-11419916', loanApplication.hubspotId ?? '', {
+		const { id } = await hubspotClient.crm.objects.basicApi.update(HS_OBJECT_LOAN, loanApplication.hubspotId ?? '', {
 			properties: {
 				loan_name: loanApplication.name,
 				amount: loanApplication.loanAmount?.toString(),
@@ -846,7 +866,7 @@ export const hsUpdateLoan = async (loanApplication: LeanDocument<ILoanApplicatio
 
 export const hsDeleteLoan = async (loanApplicationId: string) => {
 	try {
-		await hubspotClient.crm.objects.basicApi.archive('2-11419916', loanApplicationId);
+		await hubspotClient.crm.objects.basicApi.archive(HS_OBJECT_LOAN, loanApplicationId);
 	} catch (err) {
 		console.log(err);
 	}

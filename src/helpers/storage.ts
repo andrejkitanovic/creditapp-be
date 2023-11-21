@@ -5,8 +5,8 @@ import multer from 'multer';
 import auth from 'middlewares/auth';
 
 const checkHeaders: RequestHandler = (req, res, next) => {
-	if (req.headers['origin-host'] !== 'https://app.loanly.ai') {
-		res.redirect('https://app.loanly.ai/file' + req.url);
+	if (req.headers['origin-host'] !== 'https://app.lendzee.ai') {
+		res.redirect('https://app.lendzee.ai/file' + req.url);
 	} else {
 		next();
 	}
