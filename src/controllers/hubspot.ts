@@ -24,8 +24,8 @@ export const hubspotClient = new Client({
 	accessToken: process.env.HS_ACCESS_TOKEN,
 });
 
-const HS_OBJECT_LENDERS = '2-11419675';
-const HS_OBJECT_LOAN = '2-11419916';
+const HS_OBJECT_LENDERS = '2-20617056';
+const HS_OBJECT_LOAN = '2-20617057';
 
 // Routes
 export const getHubspotLenders: RequestHandler = async (req, res, next) => {
