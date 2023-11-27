@@ -85,11 +85,11 @@ export const hsCreateUser = async ({ email: userEmail, role }: { email: string; 
 		const roleProperties = {
 			admin: {
 				// roleId: "",
-				primaryTeamId: '32518302',
+				// primaryTeamId: '32518302',
 			},
 			partner: {
-				roleId: '611058',
-				primaryTeamId: '32467381',
+				roleId: '913574',
+				primaryTeamId: '38607165',
 			},
 		};
 

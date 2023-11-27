@@ -22,11 +22,11 @@ const hasPermissions = (permissions: PermissionsType[], role: RoleType) => {
 const isOrganisationActive = async (organisation: LeanDocument<IOrganisation>) => {
 	if (organisation.type === 'partner') {
 		// Check is user still partner
-		// Referral Partner Hubspot ID => 611058
+		// Referral Partner Hubspot ID => 913574
 
 		const { roleId } = await hsGetUserById(organisation.hubspotId);
 
-		if (roleId !== '611058') {
+		if (roleId !== '913574') {
 			await Organisation.findByIdAndUpdate(organisation._id, {
 				active: false,
 			});
