@@ -247,12 +247,12 @@ export const hsCreateLeadSource = async (leadSource: string) => {
 };
 
 // PARTNERS TABLE
-const PARTNERT_TABLE_ID = '6054171';
+const PARTNER_TABLE_ID = '7580189';
 export const hsUpdatePartnerTable = async (organisation: LeanDocument<IOrganisation>) => {
 	try {
-		await hubspotClient.cms.hubdb.tablesApi.unpublishTable(PARTNERT_TABLE_ID);
+		await hubspotClient.cms.hubdb.tablesApi.unpublishTable(PARTNER_TABLE_ID);
 
-		await hubspotClient.cms.hubdb.rowsApi.createTableRow(PARTNERT_TABLE_ID, {
+		await hubspotClient.cms.hubdb.rowsApi.createTableRow(PARTNER_TABLE_ID, {
 			values: {
 				partner_name: organisation.name,
 				team_name: '',
@@ -262,7 +262,7 @@ export const hsUpdatePartnerTable = async (organisation: LeanDocument<IOrganisat
 			},
 		});
 
-		await hubspotClient.cms.hubdb.tablesApi.publishDraftTable(PARTNERT_TABLE_ID);
+		await hubspotClient.cms.hubdb.tablesApi.publishDraftTable(PARTNER_TABLE_ID);
 	} catch (err) {
 		console.log(err);
 		return false;
@@ -795,7 +795,7 @@ export const hsCreateLoan = async (loanApplication: LeanDocument<ILoanApplicatio
 				loanId,
 				HS_OBJECT_LENDERS,
 				lenderId,
-				'lender'
+				'association_lenders_loans_1'
 			);
 		}
 
@@ -813,7 +813,7 @@ export const hsCreateLoan = async (loanApplication: LeanDocument<ILoanApplicatio
 					loanId,
 					'deal',
 					dealId,
-					'loan_application'
+					'association_loans_deal_3'
 				);
 			}
 		}
