@@ -31,6 +31,7 @@ jobs:
           script: |
             cd ./creditapp-be
             git pull
+            source ~/.nvm/nvm.sh
             npm i --force
             npm run build
             npm run copy-templates
