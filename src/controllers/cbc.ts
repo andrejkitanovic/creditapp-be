@@ -2,7 +2,6 @@ import axios from 'axios';
 import crypto from 'crypto';
 import { bin2hex } from 'utils/bin2hex';
 import { jsonToXml } from 'utils/jsonToXML';
-import cron from 'node-cron';
 import CBC from 'models/cbc';
 import dayjs from 'dayjs';
 
@@ -48,9 +47,9 @@ export const cbcCheckAndChangePassword = async () => {
 	}
 };
 
-cron.schedule('0 0 * * *', async () => {
-	await cbcCheckAndChangePassword();
-});
+// cron.schedule('0 0 * * *', async () => {
+// 	await cbcCheckAndChangePassword();
+// });
 
 // GET PASSWORD
 const cbcPassword = async () => {
