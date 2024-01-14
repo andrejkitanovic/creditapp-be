@@ -15,7 +15,7 @@ import {
 } from 'models/loanApplication';
 import { LeanDocument } from 'mongoose';
 import { filterObject } from 'utils/filterObject';
-import dayjs from 'dayjs';
+import dayjs from 'utils/dayjs';
 import { Property } from '@hubspot/api-client/lib/codegen/crm/properties';
 import { IOrganisation } from 'models/organisation';
 import { PipelineStage } from '@hubspot/api-client/lib/codegen/crm/pipelines';
@@ -552,7 +552,7 @@ export const hsUpdateContact = async (
 				routing_number: customer.personalInfo.bankRoutingNumber,
 				account_number: customer.personalInfo.bankAccountNumber,
 				have_you_been_through_credit_repair_: customer.personalInfo.creditRepairBefore,
-				judgements_liens_bankruptcy_: customer.personalInfo.judgementsLiensBankruptcy,
+				// judgements_liens_bankruptcy_: customer.personalInfo.judgementsLiensBankruptcy,
 				have_you_worked_with_a_finance_company_like_ours_before_: customer.personalInfo.previoiusFinanceCompany,
 				marital_status: customer.personalInfo.maritalStatus,
 				fraud_alert:
@@ -565,7 +565,7 @@ export const hsUpdateContact = async (
 				housing_status: customer.housingInfo.houstingStatus,
 				monthly_housing_payment: customer.housingInfo.monthlyHousingPayment,
 				estimated_length_of_time_at_residence: customer.housingInfo.estimatedLengthOfTimeAtResidence,
-				// move_in_date: customer.housingInfo.moveInDate,
+				move_in_date: dayjs(customer.housingInfo.moveInDate).utc().startOf("day").toDate(),
 				calculated_length_of_time_at_residence: customer.housingInfo.calculatedLengthOfTimeAtResidence,
 				years_at_current_address: customer.housingInfo.yearsAtCurrentAddress,
 
@@ -575,7 +575,7 @@ export const hsUpdateContact = async (
 				employer_phone_number: customer.employmentInfo.employerPhone,
 				employer_address: customer.employmentInfo.employerAddress,
 				estimated_time_at_job: customer.employmentInfo.estimatedTimeAtJob,
-				start_date_with_employer: customer.employmentInfo.startDateWithEmployer,
+				start_date_with_employer: dayjs(customer.employmentInfo.startDateWithEmployer).utc().startOf("day").toDate(),
 				calculated_length_of_employment: customer.employmentInfo.calculatedLengthOfEmployment,
 				occupation_position: customer.employmentInfo.occupationPosition,
 				monthly_gross_income: customer.employmentInfo.monthlyGrossIncome,
@@ -591,7 +591,7 @@ export const hsUpdateContact = async (
 				birth_city: customer.securityQuestions.birthCity,
 				were_you_born_in_a_foreign_country_: customer.securityQuestions.bronInForeignCountry,
 				are_you_a_legal_permanent_resident_: customer.securityQuestions.legalPermanentResident,
-				green_card_expiration_date: customer.securityQuestions.greenCardExpirationDate,
+				green_card_expiration_date: dayjs(customer.securityQuestions.greenCardExpirationDate).utc().startOf("day").toDate(),
 				mother_s_maiden_name: customer.securityQuestions.mothersMaidenName,
 				high_school_mascot: customer.securityQuestions.highSchoolMascot,
 				high_school_city: customer.securityQuestions.highSchoolCity,
@@ -620,8 +620,8 @@ export const hsUpdateContact = async (
 				zillow_value: customer.primaryResidenceValuation.zillowValue,
 				estimated_property_value: customer.primaryResidenceValuation.estimatedPropertyValue,
 				estimated_equity_in_primary_residence: customer.primaryResidenceValuation.estimatedEquityPrimaryResidence,
-				calculated_value: customer.primaryResidenceValuation.calculatedValue,
-				calculated_equity: customer.primaryResidenceValuation.calculatedEquity,
+				// calculated_value: customer.primaryResidenceValuation.calculatedValue,
+				// calculated_equity: customer.primaryResidenceValuation.calculatedEquity,
 
 				submission_email: customer.submissionEmail,
 				submission_password: customer.submissionPassword,

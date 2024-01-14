@@ -14,3 +14,5 @@ export const dayjsUnix = (date: number | string | undefined) => {
 
 	return dayjs.tz(parseInt(date as string));
 };
+
+export default dayjs;
