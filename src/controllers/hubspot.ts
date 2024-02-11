@@ -287,6 +287,7 @@ export const hsGetContactById = async (contactId: string): Promise<{ [key: strin
 			'phone',
 			'mobilephone',
 			'franchise_choice',
+			'lead_source',
 
 			// PERSONAL INFORMATION
 			'driver_s_license_number',
@@ -422,6 +423,7 @@ export const hsGetSingleContact = async (property: string, value: string) => {
 				'have_you_worked_with_a_finance_company_like_ours_before_',
 				'fraud_alert',
 				'number_on_fraud_alert_if_it_is_not_cell_phone_or_home_phone',
+				'marital_status',
 
 				// HOUSING INFO
 				'housing_status',
@@ -541,6 +543,7 @@ export const hsUpdateContact = async (
 				mobilephone: customer.mobilePhone,
 				referral_company: customer.referralSource,
 				franchise_choice: customer.franchiseChoice,
+				lead_source: customer.leadSource,
 
 				// PERSONAL INFORMATION
 				driver_s_license_number: customer.personalInfo.driversLicenseId,

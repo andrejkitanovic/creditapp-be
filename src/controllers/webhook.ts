@@ -285,7 +285,9 @@ export const putSyncCustomer: RequestHandler = async (req, res, next) => {
 					phone: contact?.phone,
 					mobilePhone: contact.mobilephone,
 					referralSource: contact.referral_company,
-					franchiseChoice: contact.franchise_Choice,
+					franchiseChoice: contact.franchise_choice,
+					leadSource: contact.lead_source,
+
 
 					// PERSONAL INFORMATION
 					'personalInfo.driversLicenseId': contact?.driver_s_license_number,
