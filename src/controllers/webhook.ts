@@ -296,6 +296,7 @@ export const putSyncCustomer: RequestHandler = async (req, res, next) => {
 					'personalInfo.creditUnion': contact?.member_of_credit_union,
 					'personalInfo.personalBank': contact?.personal_banking_relationship,
 					'personalInfo.militaryStatus': contact?.current_military_affiliation,
+					'personalInfo.militaryAffiliation': contact?.military_affiliation,
 					'personalInfo.bankRoutingNumber': contact?.routing_number,
 					'personalInfo.bankAccountNumber': contact?.account_number,
 					'personalInfo.creditRepairBefore': contact?.have_you_been_through_credit_repair_,

@@ -297,6 +297,7 @@ export const hsGetContactById = async (contactId: string): Promise<{ [key: strin
 			// 'leadin_current_bank_relationship_a336c6175472fb581f1e7ca0877fd813', // archived
 			'personal_banking_relationship',
 			'current_military_affiliation',
+			'military_affiliation',
 			'routing_number',
 			'account_number',
 			'have_you_been_through_credit_repair_',
@@ -407,6 +408,7 @@ export const hsGetSingleContact = async (property: string, value: string) => {
 				'phone',
 				'mobilephone',
 				'franchise_choice',
+				'lead_source',
 
 				// PERSONAL INFORMATION
 				'driver_s_license_number',
@@ -416,6 +418,7 @@ export const hsGetSingleContact = async (property: string, value: string) => {
 				// 'leadin_current_bank_relationship_a336c6175472fb581f1e7ca0877fd813', // archived
 				'personal_banking_relationship',
 				'current_military_affiliation',
+				'military_affiliation',
 				'routing_number',
 				'account_number',
 				'have_you_been_through_credit_repair_',
@@ -552,6 +555,7 @@ export const hsUpdateContact = async (
 				member_of_credit_union: customer.personalInfo.creditUnion,
 				personal_banking_relationship: customer.personalInfo.personalBank,
 				current_military_affiliation: customer.personalInfo.militaryStatus,
+				military_affiliation: customer.personalInfo.militaryAffiliation,
 				routing_number: customer.personalInfo.bankRoutingNumber,
 				account_number: customer.personalInfo.bankAccountNumber,
 				have_you_been_through_credit_repair_: customer.personalInfo.creditRepairBefore,

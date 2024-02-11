@@ -35,6 +35,7 @@ interface ICustomer extends Document {
 		creditUnion?: string;
 		personalBank?: string;
 		militaryStatus?: string;
+		militaryAffiliation?: string;
 		bankRoutingNumber?: string;
 		bankAccountNumber?: string;
 		creditRepairBefore?: boolean;
@@ -201,6 +202,7 @@ const customerSchema: Schema = new Schema(
 			creditUnion: String,
 			personalBank: String,
 			militaryStatus: String,
+			militaryAffiliation: String,
 			bankRoutingNumber: String,
 			bankAccountNumber: String,
 			creditRepairBefore: Boolean,
