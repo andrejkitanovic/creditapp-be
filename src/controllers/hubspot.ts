@@ -30,11 +30,23 @@ const HS_OBJECT_LOAN = '2-20617057';
 // Routes
 export const getHubspotLenders: RequestHandler = async (req, res, next) => {
 	try {
-		const { results: hsLenders } = await hubspotClient.crm.objects.basicApi.getPage(HS_OBJECT_LENDERS, 100, undefined, [
-			'lender_name',
-			'origination_fee',
-			'credit_bureau',
-		]);
+		let hasMore = true;
+		let after = undefined;
+		const limit = 100;
+		const hsLenders: any[] = [];
+
+		while (hasMore) {
+			const { results, paging } = await hubspotClient.crm.objects.basicApi.getPage(HS_OBJECT_LENDERS, limit, after, [
+				'lender_name',
+				'origination_fee',
+				'credit_bureau',
+			]) as any;
+
+			hsLenders.push(...results);
+			hasMore = Boolean(paging?.next?.after);
+			after = paging?.next?.after ?? undefined;
+		}
+
 		const lenders =
 			hsLenders?.map((lender) => ({
 				id: lender.id,
