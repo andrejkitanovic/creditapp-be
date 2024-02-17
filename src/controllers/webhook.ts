@@ -373,6 +373,11 @@ export const putSyncCustomer: RequestHandler = async (req, res, next) => {
 				isNil
 			);
 			await Customer.findByIdAndUpdate(customer._id, updateContactProperties);
+			await CreditEvaluation.updateMany({ customer: customer._id }, {
+				$set: {
+					leadSource: contact?.lead_source,
+				},
+			});
 
 			res.json({
 				message: 'Customer Updated!',
