@@ -14,11 +14,57 @@ import Customer from 'models/customer';
 import { LeanDocument } from 'mongoose';
 
 export const creditEvaluationCalculations = async (creditEvaluation: LeanDocument<ICreditEvaluation>) => {
+	let spouseCreditEvaluation;
+	const customer = await Customer.findById(creditEvaluation.customer).select('spouse').lean();
+	if (customer?.spouse) {
+		spouseCreditEvaluation = await CreditEvaluation.findOne({ customer: customer.spouse }).sort('createdAt').lean();
+	}
+
+	creditEvaluation.tradelines = jointTradelines(creditEvaluation, spouseCreditEvaluation);
+	creditEvaluation.loans = jointLoans(creditEvaluation, spouseCreditEvaluation);
 	creditEvaluation.summaryOfIncomes = calculateSummaryOfIncomes(creditEvaluation);
 	creditEvaluation.debtDetails = await calculateDebtDetails(creditEvaluation, true);
 	creditEvaluation.incomesOverview = calculateIncomesOverview(creditEvaluation);
 	creditEvaluation.loanAffordability = await calculateLoanAffordability(creditEvaluation);
 	return creditEvaluation;
+};
+
+const jointTradelines = (
+	creditEvaluation: LeanDocument<ICreditEvaluation>,
+	spouseCreditEvaluation: LeanDocument<ICreditEvaluation> | null | undefined
+) => {
+	return creditEvaluation.tradelines.map((tradeline) => {
+		return {
+			joint:
+				tradeline.accountType === 'Joint Account' &&
+				spouseCreditEvaluation?.tradelines.some(
+					(spouseTradeline) =>
+						tradeline.creditor === spouseTradeline.creditor &&
+						dayjs(tradeline.opened).isSame(dayjs(spouseTradeline.opened)) &&
+						tradeline.creditLimit === spouseTradeline.creditLimit
+				),
+			...tradeline,
+		};
+	});
+};
+
+const jointLoans = (
+	creditEvaluation: LeanDocument<ICreditEvaluation>,
+	spouseCreditEvaluation: LeanDocument<ICreditEvaluation> | null | undefined
+) => {
+	return creditEvaluation.loans.map((loan) => {
+		return {
+			joint:
+				loan.accountType === 'Joint Account' &&
+				spouseCreditEvaluation?.loans.some(
+					(spouseLoan) =>
+						loan.creditor === spouseLoan.creditor &&
+						dayjs(loan.opened).isSame(dayjs(spouseLoan.opened)) &&
+						loan.hpb === spouseLoan.hpb
+				),
+			...loan,
+		};
+	});
 };
 
 // Single Credit Evaluation Calculations
@@ -142,7 +188,38 @@ const calculateDebtDetails = async (creditEvaluation: LeanDocument<ICreditEvalua
 					spouseCreditEval.incomesOverview.find((income) => income.type === spouseCreditEval.selectedHouseholdIncome)
 						?.monthly ?? 0;
 			}
+
 			debtDetails.spousalDebt = spouseCreditEval.debtDetails.totalDebtPayment;
+
+			const jointLoans = creditEvaluation.loans.filter((loan) => loan.status === 'opened' && loan.joint);
+			if (jointLoans.length) {
+				debtDetails.spousalDebt -= jointLoans.reduce((total, loan) => total + loan.payment, 0);
+			} else {
+				debtDetails.spousalDebt -=
+					creditEvaluation.loans
+						.filter((loan) => loan.status === 'opened' && loan.accountType === 'Joint Account')
+						?.sort((a, b) => {
+							const dateA = new Date(a.reportDate).getTime();
+							const dateB = new Date(b.reportDate).getTime();
+							return dateA > dateB ? -1 : 1;
+						})?.[0]?.payment ?? 0;
+			}
+
+			const jointTradelines = creditEvaluation.tradelines.filter(
+				(tradeline) => tradeline.status === 'opened' && tradeline.joint
+			);
+			if (jointTradelines.length) {
+				debtDetails.spousalDebt -= jointTradelines.reduce((total, tradeline) => total + tradeline.payment, 0);
+			} else {
+				debtDetails.spousalDebt -=
+					creditEvaluation.tradelines
+						.filter((tradeline) => tradeline.accountType === 'Joint Account')
+						?.sort((a, b) => {
+							const dateA = new Date(a.reportDate).getTime();
+							const dateB = new Date(b.reportDate).getTime();
+							return dateA > dateB ? 1 : -1;
+						})?.[0]?.payment ?? 0;
+			}
 		}
 
 		debtDetails.totalPayment =

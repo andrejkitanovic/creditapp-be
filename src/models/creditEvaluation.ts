@@ -3,6 +3,8 @@ import { MongooseFindByReference } from 'mongoose-find-by-reference';
 
 // TRADELINES
 type CreditEvaluationTradeline = {
+	joint?: boolean;
+
 	status: 'opened' | 'closed';
 	creditor: string;
 	balance: number;
@@ -18,6 +20,8 @@ type CreditEvaluationTradeline = {
 
 // LOANS
 type CreditEvaluationLoan = {
+	joint?: boolean;
+
 	status: 'opened' | 'closed';
 	creditor: string;
 	balance: number;
@@ -223,7 +227,7 @@ export enum CreditEvaluationAffordabilityEnum {
 	LOW = 'Low',
 	MEDIUM = 'Medium',
 	HIGH = 'High',
-	NONE = 'None'
+	NONE = 'None',
 }
 
 interface ICreditEvaluation extends Document {
