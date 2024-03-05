@@ -424,9 +424,10 @@ const calculateLoanAffordability = async (creditEvaluation: LeanDocument<ICredit
 					source: CreditEvaluationLoanAffordabilityEnum.HOUSEHOLD_INCOME,
 					annual: selectedIncome.annual + creditEvaluation.debtDetails.spouseIncome * 12,
 					debt:
-						creditEvaluation.debtDetails.debtPayment -
-						creditEvaluation.debtDetails.mortgagePayment / 2 +
-						(spouseCreditEval.debtDetails.debtPayment - creditEvaluation.debtDetails.mortgagePayment / 2),
+						creditEvaluation.debtDetails.debtPayment +
+						spouseCreditEval.debtDetails.debtPayment
+						// creditEvaluation.debtDetails.mortgagePayment / 2 +
+						// (spouseCreditEval.debtDetails.debtPayment - creditEvaluation.debtDetails.mortgagePayment / 2),
 				});
 			}
 
