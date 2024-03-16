@@ -132,7 +132,7 @@ const calculateSummaryOfIncomes = (creditEvaluation: LeanDocument<ICreditEvaluat
 						year: currentYear,
 						eoyExpected: 12 * (incomeSource.monthlyBenefit || 0),
 						type: income.type,
-						source: `${income.source} - ${incomeSource.source}`,
+						source: [income.source, incomeSource.source].filter((s) => Boolean(s)).join(' - '),
 					});
 
 					incomeSource.previousIncomes?.forEach((previousIncome) => {
@@ -142,7 +142,7 @@ const calculateSummaryOfIncomes = (creditEvaluation: LeanDocument<ICreditEvaluat
 								year: previousIncome.year,
 								eoyExpected: previousIncome.yearIncome,
 								type: income.type,
-								source: `${income.source} - ${incomeSource.source}`,
+								source: [income.source, incomeSource.source].filter((s) => Boolean(s)).join(' - '),
 							});
 						}
 					});
