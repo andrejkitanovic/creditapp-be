@@ -101,6 +101,7 @@ const calculateSummaryOfIncomes = (creditEvaluation: LeanDocument<ICreditEvaluat
 								year: dayjs(incomeSource.date).get('year'),
 								eoyExpected: incomeSource.endOfYearExpectedIncome || 0,
 								type: income.type,
+								source: income.source,
 							});
 						}
 					} else {
@@ -109,6 +110,7 @@ const calculateSummaryOfIncomes = (creditEvaluation: LeanDocument<ICreditEvaluat
 							year: dayjs(incomeSource.date).get('year'),
 							eoyExpected: incomeSource.endOfYearExpectedIncome || 0,
 							type: income.type,
+							source: income.source,
 						});
 					}
 
@@ -119,6 +121,7 @@ const calculateSummaryOfIncomes = (creditEvaluation: LeanDocument<ICreditEvaluat
 						year: dayjs(incomeSource.date).get('year'),
 						eoyExpected: (incomeSource.netProfit ?? 0) + (incomeSource.annualWages ?? 0),
 						type: income.type,
+						source: income.source,
 					});
 
 					break;
@@ -127,9 +130,9 @@ const calculateSummaryOfIncomes = (creditEvaluation: LeanDocument<ICreditEvaluat
 					summaryOfIncomes.incomeSources.push({
 						startDate: dayjs(incomeSource.date).toDate(),
 						year: currentYear,
-						source: incomeSource.source,
 						eoyExpected: 12 * (incomeSource.monthlyBenefit || 0),
 						type: income.type,
+						source: `${income.source} - ${incomeSource.source}`,
 					});
 
 					incomeSource.previousIncomes?.forEach((previousIncome) => {
@@ -139,6 +142,7 @@ const calculateSummaryOfIncomes = (creditEvaluation: LeanDocument<ICreditEvaluat
 								year: previousIncome.year,
 								eoyExpected: previousIncome.yearIncome,
 								type: income.type,
+								source: `${income.source} - ${incomeSource.source}`,
 							});
 						}
 					});
