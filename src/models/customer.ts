@@ -61,6 +61,7 @@ export type CustomerIncomeSource = {
 
 export type CustomerIncome = {
 	type: CustomerIncomeTypeEnum;
+	source?: string;
 	payStubs?: CustomerIncomePaystubsEnum;
 	period?: CustomerIncomePeriodsEnum;
 	averageCheckAmount?: number;
@@ -374,6 +375,7 @@ const customerSchema: Schema = new Schema(
 		incomes: [
 			{
 				type: { type: String, enum: CustomerIncomeTypeEnum },
+				source: { type: String },
 				payStubs: { type: String, enum: CustomerIncomePaystubsEnum },
 				period: { type: String, enum: CustomerIncomePeriodsEnum },
 				averageCheckAmount: { type: Number },
