@@ -169,6 +169,7 @@ export const calculateIncomes = (type: CustomerIncomeTypeEnum, source: string, p
 					numberOfPeriodsRemaining,
 					amountOfPayRemaining,
 					endOfYearExpectedIncome: income.ytd + amountOfPayRemaining,
+					calculatedIncome: income.ytd + amountOfPayRemaining,
 				};
 			});
 

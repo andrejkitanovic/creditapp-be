@@ -39,6 +39,7 @@ export type CustomerIncomeSource = {
 	numberOfPeriodsRemaining?: number;
 	amountOfPayRemaining?: number;
 	endOfYearExpectedIncome?: number;
+	calculatedIncome?: number;
 	// SELF EMPLOYMENT
 	grossRevenue?: number;
 	netProfit?: number;
@@ -393,6 +394,7 @@ const customerSchema: Schema = new Schema(
 						numberOfPeriodsRemaining: { type: Number },
 						amountOfPayRemaining: { type: Number },
 						endOfYearExpectedIncome: { type: Number },
+						calculatedIncome: { type: Number },
 						// SELF EMPLOYMENT
 						grossRevenue: { type: Number },
 						netProfit: { type: Number },
