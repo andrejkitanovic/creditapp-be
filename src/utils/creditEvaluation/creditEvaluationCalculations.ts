@@ -175,8 +175,9 @@ const calculateDebtDetails = async (creditEvaluation: LeanDocument<ICreditEvalua
 		debtDetails.deferredStudentLoans = parseFloat(debtDetails.calculatedDeferredStudentLoans.toFixed(2));
 	}
 
+	const debtPayment = debtDetails.overrideDebtPayment || debtDetails.debtPayment;
 	debtDetails.totalDebtPayment =
-		(debtDetails.debtPayment || 0) + (debtDetails.deferredStudentLoans || 0) + (debtDetails.rentPayment || 0);
+		(debtPayment || 0) + (debtDetails.deferredStudentLoans || 0) + (debtDetails.rentPayment || 0);
 	debtDetails.totalPayment =
 		debtDetails.totalDebtPayment - (debtDetails.mortgagePayment ? debtDetails.mortgagePayment / 2 : 0);
 
@@ -372,6 +373,7 @@ const calculateLoanAffordability = async (creditEvaluation: LeanDocument<ICredit
 	const loanAffordabilities: CreditEvaluationLoanAffordability[] = [];
 	const rate = creditEvaluation.loanAffordabilityRate || 14;
 	const dti = 43;
+	const debtPayment = creditEvaluation.debtDetails.overrideDebtPayment || creditEvaluation.debtDetails.debtPayment;
 
 	if (creditEvaluation.selectedHouseholdIncome) {
 		const selectedIncome = creditEvaluation.incomesOverview.find(
@@ -383,21 +385,21 @@ const calculateLoanAffordability = async (creditEvaluation: LeanDocument<ICredit
 		loanAffordabilitiesRaw.push({
 			source: CreditEvaluationLoanAffordabilityEnum.SELECTED_INCOME,
 			annual: selectedIncome.annual,
-			debt: creditEvaluation.debtDetails.debtPayment,
+			debt: debtPayment,
 		});
 
 		if (creditEvaluation.debtDetails.deferredStudentLoans) {
 			loanAffordabilitiesRaw.push({
 				source: CreditEvaluationLoanAffordabilityEnum.AFFORDABILITY_INCLUDING_STUDENT_LOAN_DEBT,
 				annual: selectedIncome.annual,
-				debt: creditEvaluation.debtDetails.debtPayment + creditEvaluation.debtDetails.deferredStudentLoans,
+				debt: debtPayment + creditEvaluation.debtDetails.deferredStudentLoans,
 			});
 		}
 		if (creditEvaluation.debtDetails.rentPayment) {
 			loanAffordabilitiesRaw.push({
 				source: CreditEvaluationLoanAffordabilityEnum.AFFORDABILITY_INCLUDING_RENT,
 				annual: selectedIncome.annual,
-				debt: creditEvaluation.debtDetails.debtPayment + creditEvaluation.debtDetails.rentPayment,
+				debt: debtPayment + creditEvaluation.debtDetails.rentPayment,
 			});
 		}
 		if (creditEvaluation.debtDetails.deferredStudentLoans && creditEvaluation.debtDetails.rentPayment) {
@@ -405,16 +407,14 @@ const calculateLoanAffordability = async (creditEvaluation: LeanDocument<ICredit
 				source: CreditEvaluationLoanAffordabilityEnum.AFFORDABILITY_INCLUDING_RENT_AND_DEFERRED_STUDENT_LOANS,
 				annual: selectedIncome.annual,
 				debt:
-					creditEvaluation.debtDetails.debtPayment +
-					creditEvaluation.debtDetails.rentPayment +
-					creditEvaluation.debtDetails.deferredStudentLoans,
+					debtPayment + creditEvaluation.debtDetails.rentPayment + creditEvaluation.debtDetails.deferredStudentLoans,
 			});
 		}
 		if (creditEvaluation.debtDetails.mortgagePayment) {
 			loanAffordabilitiesRaw.push({
 				source: CreditEvaluationLoanAffordabilityEnum.AFFRODABILITY_HALF_MORTAGE,
 				annual: selectedIncome.annual,
-				debt: creditEvaluation.debtDetails.debtPayment - creditEvaluation.debtDetails.mortgagePayment / 2,
+				debt: debtPayment - creditEvaluation.debtDetails.mortgagePayment / 2,
 			});
 		}
 
@@ -425,14 +425,14 @@ const calculateLoanAffordability = async (creditEvaluation: LeanDocument<ICredit
 			const spouseCreditEval = (await CreditEvaluation.findOne({
 				customer: customer.spouse,
 			}).lean()) as ICreditEvaluation;
+			const spouseDebtPayment =
+				spouseCreditEval.debtDetails.overrideDebtPayment || spouseCreditEval.debtDetails.debtPayment;
 
 			if (creditEvaluation.debtDetails.spouseIncome) {
 				loanAffordabilitiesRaw.push({
 					source: CreditEvaluationLoanAffordabilityEnum.HOUSEHOLD_INCOME,
 					annual: selectedIncome.annual + creditEvaluation.debtDetails.spouseIncome * 12,
-					debt: creditEvaluation.debtDetails.debtPayment + spouseCreditEval.debtDetails.debtPayment,
-					// creditEvaluation.debtDetails.mortgagePayment / 2 +
-					// (spouseCreditEval.debtDetails.debtPayment - creditEvaluation.debtDetails.mortgagePayment / 2),
+					debt: debtPayment + spouseDebtPayment,
 				});
 			}
 
@@ -445,9 +445,9 @@ const calculateLoanAffordability = async (creditEvaluation: LeanDocument<ICredit
 						CreditEvaluationLoanAffordabilityEnum.HOUSEHOLD_AFFORDABILITY_INCLUDING_RENT_AND_DEFERRED_STUDENT_LOANS,
 					annual: selectedIncome.annual + creditEvaluation.debtDetails.spouseIncome * 12,
 					debt:
-						creditEvaluation.debtDetails.debtPayment -
+						debtPayment -
 						creditEvaluation.debtDetails.mortgagePayment / 2 +
-						(spouseCreditEval.debtDetails.debtPayment - creditEvaluation.debtDetails.mortgagePayment / 2) +
+						(spouseDebtPayment - creditEvaluation.debtDetails.mortgagePayment / 2) +
 						(creditEvaluation.debtDetails.deferredStudentLoans || 0) +
 						(spouseCreditEval.debtDetails.deferredStudentLoans || 0),
 				});
@@ -460,9 +460,9 @@ const calculateLoanAffordability = async (creditEvaluation: LeanDocument<ICredit
 					source: CreditEvaluationLoanAffordabilityEnum.HOUSEHOLD_AFFORDABILITY_INCLUDING_RENT,
 					annual: selectedIncome.annual + creditEvaluation.debtDetails.spouseIncome * 12,
 					debt:
-						creditEvaluation.debtDetails.debtPayment -
+						debtPayment -
 						creditEvaluation.debtDetails.mortgagePayment / 2 +
-						(spouseCreditEval.debtDetails.debtPayment - creditEvaluation.debtDetails.mortgagePayment / 2) +
+						(spouseDebtPayment - creditEvaluation.debtDetails.mortgagePayment / 2) +
 						(creditEvaluation.debtDetails.rentPayment || 0) +
 						(spouseCreditEval.debtDetails.rentPayment || 0),
 				});
@@ -477,9 +477,9 @@ const calculateLoanAffordability = async (creditEvaluation: LeanDocument<ICredit
 						CreditEvaluationLoanAffordabilityEnum.HOUSEHOLD_AFFORDABILITY_INCLUDING_RENT_AND_DEFERRED_STUDENT_LOANS,
 					annual: selectedIncome.annual + creditEvaluation.debtDetails.spouseIncome * 12,
 					debt:
-						creditEvaluation.debtDetails.debtPayment -
+						debtPayment -
 						creditEvaluation.debtDetails.mortgagePayment / 2 +
-						(spouseCreditEval.debtDetails.debtPayment - creditEvaluation.debtDetails.mortgagePayment / 2) +
+						(spouseDebtPayment - creditEvaluation.debtDetails.mortgagePayment / 2) +
 						(creditEvaluation.debtDetails.deferredStudentLoans || 0) +
 						(spouseCreditEval.debtDetails.deferredStudentLoans || 0) +
 						(creditEvaluation.debtDetails.rentPayment || 0) +

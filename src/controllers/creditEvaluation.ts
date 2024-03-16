@@ -317,9 +317,10 @@ export const deleteCreditEvaluationIncome: RequestHandler = async (req, res, nex
 export const putCreditEvaluationDebt: RequestHandler = async (req, res, next) => {
 	try {
 		const { id } = req.params;
-		const { deferredStudentLoans, rentPayment, mortgagePayment } = req.body;
+		const { overrideDebtPayment, deferredStudentLoans, rentPayment, mortgagePayment } = req.body;
 
 		await CreditEvaluation.findByIdAndUpdate(id, {
+			'debtDetails.overrideDebtPayment': overrideDebtPayment,
 			'debtDetails.deferredStudentLoans': deferredStudentLoans,
 			'debtDetails.rentPayment': rentPayment,
 			'debtDetails.mortgagePayment': mortgagePayment,

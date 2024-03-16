@@ -65,6 +65,7 @@ type CreditEvaluationLoan = {
 // DEBTS
 export type CreditEvaluationDebtDetails = {
 	debtPayment: number;
+	overrideDebtPayment?: number;
 	calculatedDeferredStudentLoans: number;
 	deferredStudentLoans: number;
 	rentPayment: number;
@@ -502,6 +503,9 @@ const creditEvaluationSchema: Schema = new Schema(
 			debtPayment: {
 				type: Number,
 				default: 0,
+			},
+			overrideDebtPayment: {
+				type: Number,
 			},
 			calculatedDeferredStudentLoans: {
 				type: Number,
