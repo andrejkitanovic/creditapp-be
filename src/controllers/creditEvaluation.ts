@@ -109,13 +109,14 @@ export const getSingleCreditEvaluation: RequestHandler = async (req, res, next) 
 	}
 };
 
-export const calculateIncomes = (type: CustomerIncomeTypeEnum, period: string, incomes: any[]) => {
+export const calculateIncomes = (type: CustomerIncomeTypeEnum, source: string, period: string, incomes: any[]) => {
 	incomes = incomes.sort((incomeA: { date: Date }, incomeB: { date: Date }) =>
 		dayjs(incomeA.date).isAfter(dayjs(incomeB.date)) ? 1 : -1
 	);
 
 	const result: CustomerIncome = {
 		type,
+		source,
 		incomeSources: [],
 	};
 
@@ -252,10 +253,10 @@ export const calculateIncomes = (type: CustomerIncomeTypeEnum, period: string, i
 export const postCreditEvaluationIncome: RequestHandler = async (req, res, next) => {
 	try {
 		const { id } = req.params;
-		const { type, period } = req.body;
+		const { type, source, period } = req.body;
 		let { incomes } = req.body;
 
-		incomes = calculateIncomes(type, period, incomes);
+		incomes = calculateIncomes(type, source, period, incomes);
 
 		const creditEvaluation = await CreditEvaluation.findById(id).lean();
 		await Customer.findByIdAndUpdate(creditEvaluation?.customer, { $push: { incomes } });
@@ -271,10 +272,10 @@ export const postCreditEvaluationIncome: RequestHandler = async (req, res, next)
 export const putCreditEvaluationIncome: RequestHandler = async (req, res, next) => {
 	try {
 		const { id, incomeId } = req.params;
-		const { type, period } = req.body;
+		const { type, source, period } = req.body;
 		let { incomes } = req.body;
 
-		incomes = calculateIncomes(type, period, incomes);
+		incomes = calculateIncomes(type, source, period, incomes);
 
 		const creditEvaluation = await CreditEvaluation.findById(id).lean();
 		await Customer.findByIdAndUpdate(creditEvaluation?.customer, {
