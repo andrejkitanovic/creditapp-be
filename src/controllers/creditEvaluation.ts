@@ -142,36 +142,41 @@ export const calculateIncomes = (type: CustomerIncomeTypeEnum, source: string, p
 			// eslint-disable-next-line no-case-declarations
 			const minPeriodsToDateObject: { [year: string]: number } = {};
 
-			result.incomeSources = incomes.map((income: { date: Date; amount: number; ytd: number }) => {
-				const year = dayjs(income.date).get('year');
-				const dayDiff = Math.round(dayjs(income.date).diff(startOfYear(year), 'days', true));
+			result.incomeSources = incomes.map(
+				(income: { date: Date; amount: number; ytd: number; calculatedIncome?: number }) => {
+					const year = dayjs(income.date).get('year');
+					const dayDiff = Math.round(dayjs(income.date).diff(startOfYear(year), 'days', true));
 
-				if (minPeriodsToDateObject[year]) {
-					minPeriodsToDateObject[year] += 1;
-				} else minPeriodsToDateObject[year] = 1;
-				const minPeriodsToDate = minPeriodsToDateObject[year];
+					if (minPeriodsToDateObject[year]) {
+						minPeriodsToDateObject[year] += 1;
+					} else minPeriodsToDateObject[year] = 1;
+					const minPeriodsToDate = minPeriodsToDateObject[year];
 
-				const numberOfPeriodsToDate = Math.max((dayDiff / 365) * (result.payStubs || 1), minPeriodsToDate);
-				const avgPerPeriod = income.ytd / numberOfPeriodsToDate;
-				const numberOfPeriodsRemaining = (result.payStubs || 1) - numberOfPeriodsToDate;
-				const amountOfPayRemaining =
-					numberOfPeriodsRemaining *
-					(((result.averageCheckAmount || 0) + (result.averageCheckAmountBasedOnYTD || 0)) / 2);
+					const numberOfPeriodsToDate = Math.max((dayDiff / 365) * (result.payStubs || 1), minPeriodsToDate);
+					const avgPerPeriod = income.ytd / numberOfPeriodsToDate;
+					const numberOfPeriodsRemaining = (result.payStubs || 1) - numberOfPeriodsToDate;
+					const amountOfPayRemaining =
+						numberOfPeriodsRemaining *
+						(((result.averageCheckAmount || 0) + (result.averageCheckAmountBasedOnYTD || 0)) / 2);
 
-				return {
-					date: income.date,
-					amount: income.amount,
-					ytd: income.ytd,
-					averageAnnual: income.amount * (result.payStubs || 1),
-					numberOfPeriodsToDate,
-					avgPerPeriod,
-					averageAnnual2: avgPerPeriod * (result.payStubs || 1),
-					numberOfPeriodsRemaining,
-					amountOfPayRemaining,
-					endOfYearExpectedIncome: income.ytd + amountOfPayRemaining,
-					calculatedIncome: income.ytd + amountOfPayRemaining,
-				};
-			});
+					const endOfYearExpectedIncome = income.ytd + amountOfPayRemaining;
+					const calculatedIncome = income.calculatedIncome ?? endOfYearExpectedIncome;
+
+					return {
+						date: income.date,
+						amount: income.amount,
+						ytd: income.ytd,
+						averageAnnual: income.amount * (result.payStubs || 1),
+						numberOfPeriodsToDate,
+						avgPerPeriod,
+						averageAnnual2: avgPerPeriod * (result.payStubs || 1),
+						numberOfPeriodsRemaining,
+						amountOfPayRemaining,
+						endOfYearExpectedIncome,
+						calculatedIncome,
+					};
+				}
+			);
 
 			break;
 		case CustomerIncomeTypeEnum.SELF_EMPLOYMENT:
