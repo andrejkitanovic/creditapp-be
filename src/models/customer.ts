@@ -1,6 +1,73 @@
 import { hsUpdateContact } from 'controllers/hubspot';
 import { Schema, model, Document } from 'mongoose';
 
+// Income
+export enum CustomerIncomeTypeEnum {
+	PAYSTUB = 'paystub',
+	SELF_EMPLOYMENT = 'self-employment',
+	ADDITIONAL_INCOME = 'additional-income',
+	HOUSING_ALLOWANCE = 'housing-allowance',
+}
+
+export enum CustomerIncomePeriodsEnum {
+	WEEKLY = 'weekly',
+	BIWEEKLY = 'bi-weekly',
+	MONTHLY = 'mothly',
+	QUARTERLY = 'quarterly',
+	BIMONTHLY = 'bi-monthly',
+	ANNUAL = 'annual',
+}
+
+export enum CustomerIncomePaystubsEnum {
+	'weekly' = 52,
+	'bi-weekly' = 26,
+	'monthly' = 12,
+	'quarterly' = 4,
+	'bi-monthly' = 24,
+	'annual' = 1,
+}
+
+export type CustomerIncomeSource = {
+	date: Date;
+	// PAYSTUB
+	amount?: number;
+	ytd?: number;
+	averageAnnual?: number;
+	numberOfPeriodsToDate?: number;
+	avgPerPeriod?: number;
+	averageAnnual2?: number;
+	numberOfPeriodsRemaining?: number;
+	amountOfPayRemaining?: number;
+	endOfYearExpectedIncome?: number;
+	// SELF EMPLOYMENT
+	grossRevenue?: number;
+	netProfit?: number;
+	percentageOfProfit?: number;
+	averageMonthlyGrossRevenue?: number;
+	yearOverYearGrossGrowth?: number;
+	averageMonthlyNetProfit?: number;
+	yearOverYearNetGrowth?: number;
+	annualWages?: number;
+	mothlyWage?: number;
+	// ADDITIONAL
+	source?: string;
+	monthlyBenefit?: number;
+	previousIncomes?: {
+		year: number;
+		yearIncome: number;
+		months: number;
+	}[];
+};
+
+export type CustomerIncome = {
+	type: CustomerIncomeTypeEnum;
+	payStubs?: CustomerIncomePaystubsEnum;
+	period?: CustomerIncomePeriodsEnum;
+	averageCheckAmount?: number;
+	averageCheckAmountBasedOnYTD?: number;
+	incomeSources: CustomerIncomeSource[];
+};
+
 interface ICustomer extends Document {
 	hubspotId?: string;
 	// Spouse
@@ -127,6 +194,9 @@ interface ICustomer extends Document {
 	submissionPassword?: string;
 
 	cbcErrorMessage?: string;
+
+	// Incomes
+	incomes: CustomerIncome[];
 }
 
 const customerSchema: Schema = new Schema(
@@ -289,7 +359,6 @@ const customerSchema: Schema = new Schema(
 			calculatedEquity: Number,
 		},
 
-		
 		submissionEmail: {
 			type: String,
 		},
@@ -301,6 +370,51 @@ const customerSchema: Schema = new Schema(
 			type: String,
 		},
 
+		// Incomes
+		incomes: [
+			{
+				type: { type: String, enum: CustomerIncomeTypeEnum },
+				payStubs: { type: String, enum: CustomerIncomePaystubsEnum },
+				period: { type: String, enum: CustomerIncomePeriodsEnum },
+				averageCheckAmount: { type: Number },
+				averageCheckAmountBasedOnYTD: { type: Number },
+				incomeSources: [
+					{
+						date: { type: Date },
+						// PAYSTUB
+						amount: { type: Number },
+						ytd: { type: Number },
+						averageAnnual: { type: Number },
+						numberOfPeriodsToDate: { type: Number },
+						avgPerPeriod: { type: Number },
+						averageAnnual2: { type: Number },
+						numberOfPeriodsRemaining: { type: Number },
+						amountOfPayRemaining: { type: Number },
+						endOfYearExpectedIncome: { type: Number },
+						// SELF EMPLOYMENT
+						grossRevenue: { type: Number },
+						netProfit: { type: Number },
+						percentageOfProfit: { type: Number },
+						averageMonthlyGrossRevenue: { type: Number },
+						yearOverYearGrossGrowth: { type: Number },
+						averageMonthlyNetProfit: { type: Number },
+						yearOverYearNetGrowth: { type: Number },
+						annualWages: { type: Number },
+						mothlyWage: { type: Number },
+						// ADDITIONAL
+						source: { type: String },
+						monthlyBenefit: { type: Number },
+						previousIncomes: [
+							{
+								year: { type: Number },
+								yearIncome: { type: Number },
+								months: { type: Number },
+							},
+						],
+					},
+				],
+			},
+		],
 	},
 	{ timestamps: true }
 );

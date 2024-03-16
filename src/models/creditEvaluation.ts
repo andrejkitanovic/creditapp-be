@@ -1,5 +1,6 @@
 import { Schema, model, Document } from 'mongoose';
 import { MongooseFindByReference } from 'mongoose-find-by-reference';
+import { CustomerIncomeTypeEnum } from './customer';
 
 // TRADELINES
 type CreditEvaluationTradeline = {
@@ -36,30 +37,30 @@ type CreditEvaluationLoan = {
 };
 
 // INCOMES
-export enum CreditEvaluationIncomeTypeEnum {
-	PAYSTUB = 'paystub',
-	SELF_EMPLOYMENT = 'self-employment',
-	ADDITIONAL_INCOME = 'additional-income',
-	HOUSING_ALLOWANCE = 'housing-allowance',
-}
+// export enum CreditEvaluationIncomeTypeEnum {
+// 	PAYSTUB = 'paystub',
+// 	SELF_EMPLOYMENT = 'self-employment',
+// 	ADDITIONAL_INCOME = 'additional-income',
+// 	HOUSING_ALLOWANCE = 'housing-allowance',
+// }
 
-export enum CreditEvaluationIncomePeriodsEnum {
-	WEEKLY = 'weekly',
-	BIWEEKLY = 'bi-weekly',
-	MONTHLY = 'mothly',
-	QUARTERLY = 'quarterly',
-	BIMONTHLY = 'bi-monthly',
-	ANNUAL = 'annual',
-}
+// export enum CreditEvaluationIncomePeriodsEnum {
+// 	WEEKLY = 'weekly',
+// 	BIWEEKLY = 'bi-weekly',
+// 	MONTHLY = 'mothly',
+// 	QUARTERLY = 'quarterly',
+// 	BIMONTHLY = 'bi-monthly',
+// 	ANNUAL = 'annual',
+// }
 
-export enum CreditEvaluationIncomePaystubsEnum {
-	'weekly' = 52,
-	'bi-weekly' = 26,
-	'monthly' = 12,
-	'quarterly' = 4,
-	'bi-monthly' = 24,
-	'annual' = 1,
-}
+// export enum CreditEvaluationIncomePaystubsEnum {
+// 	'weekly' = 52,
+// 	'bi-weekly' = 26,
+// 	'monthly' = 12,
+// 	'quarterly' = 4,
+// 	'bi-monthly' = 24,
+// 	'annual' = 1,
+// }
 
 // DEBTS
 export type CreditEvaluationDebtDetails = {
@@ -81,7 +82,7 @@ export type CreditEvaluationSummaryOfIncomes = {
 		source?: string;
 		year: number;
 		eoyExpected: number;
-		type: CreditEvaluationIncomeTypeEnum;
+		type: CustomerIncomeTypeEnum;
 	}[];
 };
 
@@ -134,46 +135,46 @@ export type CreditEvaluationLoanAffordability = {
 	term144: number;
 };
 
-export type CreditEvaluationIncomeSource = {
-	date: Date;
-	// PAYSTUB
-	amount?: number;
-	ytd?: number;
-	averageAnnual?: number;
-	numberOfPeriodsToDate?: number;
-	avgPerPeriod?: number;
-	averageAnnual2?: number;
-	numberOfPeriodsRemaining?: number;
-	amountOfPayRemaining?: number;
-	endOfYearExpectedIncome?: number;
-	// SELF EMPLOYMENT
-	grossRevenue?: number;
-	netProfit?: number;
-	percentageOfProfit?: number;
-	averageMonthlyGrossRevenue?: number;
-	yearOverYearGrossGrowth?: number;
-	averageMonthlyNetProfit?: number;
-	yearOverYearNetGrowth?: number;
-	annualWages?: number;
-	mothlyWage?: number;
-	// ADDITIONAL
-	source?: string;
-	monthlyBenefit?: number;
-	previousIncomes?: {
-		year: number;
-		yearIncome: number;
-		months: number;
-	}[];
-};
+// export type CreditEvaluationIncomeSource = {
+// 	date: Date;
+// 	// PAYSTUB
+// 	amount?: number;
+// 	ytd?: number;
+// 	averageAnnual?: number;
+// 	numberOfPeriodsToDate?: number;
+// 	avgPerPeriod?: number;
+// 	averageAnnual2?: number;
+// 	numberOfPeriodsRemaining?: number;
+// 	amountOfPayRemaining?: number;
+// 	endOfYearExpectedIncome?: number;
+// 	// SELF EMPLOYMENT
+// 	grossRevenue?: number;
+// 	netProfit?: number;
+// 	percentageOfProfit?: number;
+// 	averageMonthlyGrossRevenue?: number;
+// 	yearOverYearGrossGrowth?: number;
+// 	averageMonthlyNetProfit?: number;
+// 	yearOverYearNetGrowth?: number;
+// 	annualWages?: number;
+// 	mothlyWage?: number;
+// 	// ADDITIONAL
+// 	source?: string;
+// 	monthlyBenefit?: number;
+// 	previousIncomes?: {
+// 		year: number;
+// 		yearIncome: number;
+// 		months: number;
+// 	}[];
+// };
 
-export type CreditEvaluationIncome = {
-	type: CreditEvaluationIncomeTypeEnum;
-	payStubs?: CreditEvaluationIncomePaystubsEnum;
-	period?: string;
-	averageCheckAmount?: number;
-	averageCheckAmountBasedOnYTD?: number;
-	incomeSources: CreditEvaluationIncomeSource[];
-};
+// export type CreditEvaluationIncome = {
+// 	type: CreditEvaluationIncomeTypeEnum;
+// 	payStubs?: CreditEvaluationIncomePaystubsEnum;
+// 	period?: string;
+// 	averageCheckAmount?: number;
+// 	averageCheckAmountBasedOnYTD?: number;
+// 	incomeSources: CreditEvaluationIncomeSource[];
+// };
 
 export type CreditEvaluationCollection = {
 	dateVerified: Date;
@@ -269,7 +270,7 @@ interface ICreditEvaluation extends Document {
 	// Loans
 	loans: CreditEvaluationLoan[];
 	// Incomes
-	incomes: CreditEvaluationIncome[];
+	// incomes: CreditEvaluationIncome[];
 	// Debt Details
 	debtDetails: CreditEvaluationDebtDetails;
 	// Summary of Incomes
@@ -453,50 +454,50 @@ const creditEvaluationSchema: Schema = new Schema(
 				},
 			},
 		],
-		incomes: [
-			{
-				type: { type: String, enum: CreditEvaluationIncomeTypeEnum },
-				payStubs: { type: String, enum: CreditEvaluationIncomePaystubsEnum },
-				period: { type: String, enum: CreditEvaluationIncomePeriodsEnum },
-				averageCheckAmount: { type: Number },
-				averageCheckAmountBasedOnYTD: { type: Number },
-				incomeSources: [
-					{
-						date: { type: Date },
-						// PAYSTUB
-						amount: { type: Number },
-						ytd: { type: Number },
-						averageAnnual: { type: Number },
-						numberOfPeriodsToDate: { type: Number },
-						avgPerPeriod: { type: Number },
-						averageAnnual2: { type: Number },
-						numberOfPeriodsRemaining: { type: Number },
-						amountOfPayRemaining: { type: Number },
-						endOfYearExpectedIncome: { type: Number },
-						// SELF EMPLOYMENT
-						grossRevenue: { type: Number },
-						netProfit: { type: Number },
-						percentageOfProfit: { type: Number },
-						averageMonthlyGrossRevenue: { type: Number },
-						yearOverYearGrossGrowth: { type: Number },
-						averageMonthlyNetProfit: { type: Number },
-						yearOverYearNetGrowth: { type: Number },
-						annualWages: { type: Number },
-						mothlyWage: { type: Number },
-						// ADDITIONAL
-						source: { type: String },
-						monthlyBenefit: { type: Number },
-						previousIncomes: [
-							{
-								year: { type: Number },
-								yearIncome: { type: Number },
-								months: { type: Number },
-							},
-						],
-					},
-				],
-			},
-		],
+		// incomes: [
+		// 	{
+		// 		type: { type: String, enum: CreditEvaluationIncomeTypeEnum },
+		// 		payStubs: { type: String, enum: CreditEvaluationIncomePaystubsEnum },
+		// 		period: { type: String, enum: CreditEvaluationIncomePeriodsEnum },
+		// 		averageCheckAmount: { type: Number },
+		// 		averageCheckAmountBasedOnYTD: { type: Number },
+		// 		incomeSources: [
+		// 			{
+		// 				date: { type: Date },
+		// 				// PAYSTUB
+		// 				amount: { type: Number },
+		// 				ytd: { type: Number },
+		// 				averageAnnual: { type: Number },
+		// 				numberOfPeriodsToDate: { type: Number },
+		// 				avgPerPeriod: { type: Number },
+		// 				averageAnnual2: { type: Number },
+		// 				numberOfPeriodsRemaining: { type: Number },
+		// 				amountOfPayRemaining: { type: Number },
+		// 				endOfYearExpectedIncome: { type: Number },
+		// 				// SELF EMPLOYMENT
+		// 				grossRevenue: { type: Number },
+		// 				netProfit: { type: Number },
+		// 				percentageOfProfit: { type: Number },
+		// 				averageMonthlyGrossRevenue: { type: Number },
+		// 				yearOverYearGrossGrowth: { type: Number },
+		// 				averageMonthlyNetProfit: { type: Number },
+		// 				yearOverYearNetGrowth: { type: Number },
+		// 				annualWages: { type: Number },
+		// 				mothlyWage: { type: Number },
+		// 				// ADDITIONAL
+		// 				source: { type: String },
+		// 				monthlyBenefit: { type: Number },
+		// 				previousIncomes: [
+		// 					{
+		// 						year: { type: Number },
+		// 						yearIncome: { type: Number },
+		// 						months: { type: Number },
+		// 					},
+		// 				],
+		// 			},
+		// 		],
+		// 	},
+		// ],
 		debtDetails: {
 			debtPayment: {
 				type: Number,
@@ -541,7 +542,7 @@ const creditEvaluationSchema: Schema = new Schema(
 					eoyExpected: {
 						type: Number,
 					},
-					type: { type: String, enum: CreditEvaluationIncomeTypeEnum },
+					type: { type: String, enum: CustomerIncomeTypeEnum },
 				},
 			],
 			total: {

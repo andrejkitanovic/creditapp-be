@@ -4,13 +4,12 @@ import CreditEvaluation, {
 	CreditEvaluationDebtDetails,
 	CreditEvaluationIncomeOverview,
 	CreditEvaluationIncomeOverviewEnum,
-	CreditEvaluationIncomeTypeEnum,
 	CreditEvaluationLoanAffordability,
 	CreditEvaluationLoanAffordabilityEnum,
 	CreditEvaluationSummaryOfIncomes,
 	ICreditEvaluation,
 } from 'models/creditEvaluation';
-import Customer from 'models/customer';
+import Customer, { CustomerIncome, CustomerIncomeTypeEnum } from 'models/customer';
 import { LeanDocument } from 'mongoose';
 
 export const creditEvaluationCalculations = async (creditEvaluation: LeanDocument<ICreditEvaluation>) => {
@@ -19,6 +18,9 @@ export const creditEvaluationCalculations = async (creditEvaluation: LeanDocumen
 	if (customer?.spouse) {
 		spouseCreditEvaluation = await CreditEvaluation.findOne({ customer: customer.spouse }).sort('createdAt').lean();
 	}
+
+	//@ts-expect-error
+	creditEvaluation.incomes = (customer?.incomes ?? []) as CustomerIncome[];
 
 	creditEvaluation.tradelines = jointTradelines(creditEvaluation, spouseCreditEvaluation);
 	creditEvaluation.loans = jointLoans(creditEvaluation, spouseCreditEvaluation);
@@ -77,12 +79,13 @@ const calculateSummaryOfIncomes = (creditEvaluation: LeanDocument<ICreditEvaluat
 	const currentYear = dayjs().get('year');
 	const last3Years = dayjs().subtract(3, 'year').get('year');
 
-	creditEvaluation.incomes?.forEach((income) => {
+	//@ts-expect-error
+	creditEvaluation.incomes?.forEach((income: CustomerIncome) => {
 		let paystubIncomes: CreditEvaluationSummaryOfIncomes['incomeSources'] = [];
 
 		income.incomeSources?.reverse().forEach((incomeSource) => {
 			switch (income.type) {
-				case CreditEvaluationIncomeTypeEnum.PAYSTUB:
+				case CustomerIncomeTypeEnum.PAYSTUB:
 					if (dayjs(incomeSource.date).get('year') < last3Years) {
 						break;
 					}
@@ -110,7 +113,7 @@ const calculateSummaryOfIncomes = (creditEvaluation: LeanDocument<ICreditEvaluat
 					}
 
 					break;
-				case CreditEvaluationIncomeTypeEnum.SELF_EMPLOYMENT:
+				case CustomerIncomeTypeEnum.SELF_EMPLOYMENT:
 					summaryOfIncomes.incomeSources.push({
 						startDate: dayjs(incomeSource.date).toDate(),
 						year: dayjs(incomeSource.date).get('year'),
@@ -119,8 +122,8 @@ const calculateSummaryOfIncomes = (creditEvaluation: LeanDocument<ICreditEvaluat
 					});
 
 					break;
-				case CreditEvaluationIncomeTypeEnum.ADDITIONAL_INCOME:
-				case CreditEvaluationIncomeTypeEnum.HOUSING_ALLOWANCE:
+				case CustomerIncomeTypeEnum.ADDITIONAL_INCOME:
+				case CustomerIncomeTypeEnum.HOUSING_ALLOWANCE:
 					summaryOfIncomes.incomeSources.push({
 						startDate: dayjs(incomeSource.date).toDate(),
 						year: currentYear,
@@ -423,11 +426,9 @@ const calculateLoanAffordability = async (creditEvaluation: LeanDocument<ICredit
 				loanAffordabilitiesRaw.push({
 					source: CreditEvaluationLoanAffordabilityEnum.HOUSEHOLD_INCOME,
 					annual: selectedIncome.annual + creditEvaluation.debtDetails.spouseIncome * 12,
-					debt:
-						creditEvaluation.debtDetails.debtPayment +
-						spouseCreditEval.debtDetails.debtPayment
-						// creditEvaluation.debtDetails.mortgagePayment / 2 +
-						// (spouseCreditEval.debtDetails.debtPayment - creditEvaluation.debtDetails.mortgagePayment / 2),
+					debt: creditEvaluation.debtDetails.debtPayment + spouseCreditEval.debtDetails.debtPayment,
+					// creditEvaluation.debtDetails.mortgagePayment / 2 +
+					// (spouseCreditEval.debtDetails.debtPayment - creditEvaluation.debtDetails.mortgagePayment / 2),
 				});
 			}
 

@@ -5,13 +5,8 @@ import i18n from 'helpers/i18n';
 import { queryFilter } from 'helpers/filters';
 import { createMeta } from 'helpers/meta';
 
-import Customer from 'models/customer';
-import CreditEvaluation, {
-	CreditEvaluationIncome,
-	CreditEvaluationIncomePaystubsEnum,
-	CreditEvaluationIncomeTypeEnum,
-	ICreditEvaluation,
-} from 'models/creditEvaluation';
+import Customer, { CustomerIncome, CustomerIncomePaystubsEnum, CustomerIncomeTypeEnum } from 'models/customer';
+import CreditEvaluation, { ICreditEvaluation } from 'models/creditEvaluation';
 import LoanApplication from 'models/loanApplication';
 
 import { LeanDocument } from 'mongoose';
@@ -114,22 +109,22 @@ export const getSingleCreditEvaluation: RequestHandler = async (req, res, next) 
 	}
 };
 
-export const calculateIncomes = (type: CreditEvaluationIncomeTypeEnum, period: string, incomes: any[]) => {
+export const calculateIncomes = (type: CustomerIncomeTypeEnum, period: string, incomes: any[]) => {
 	incomes = incomes.sort((incomeA: { date: Date }, incomeB: { date: Date }) =>
 		dayjs(incomeA.date).isAfter(dayjs(incomeB.date)) ? 1 : -1
 	);
 
-	const result: CreditEvaluationIncome = {
+	const result: CustomerIncome = {
 		type,
 		incomeSources: [],
 	};
 
 	switch (type) {
-		case CreditEvaluationIncomeTypeEnum.PAYSTUB:
+		case CustomerIncomeTypeEnum.PAYSTUB:
+			//@ts-expect-error
 			result.period = period;
-
-			// @ts-expect-error
-			result.payStubs = CreditEvaluationIncomePaystubsEnum[period];
+			//@ts-expect-error
+			result.payStubs = CustomerIncomePaystubsEnum[period];
 
 			result.averageCheckAmount =
 				incomes.reduce((prevValue: number, income: { amount: number }) => {
@@ -177,7 +172,7 @@ export const calculateIncomes = (type: CreditEvaluationIncomeTypeEnum, period: s
 			});
 
 			break;
-		case CreditEvaluationIncomeTypeEnum.SELF_EMPLOYMENT:
+		case CustomerIncomeTypeEnum.SELF_EMPLOYMENT:
 			result.incomeSources = incomes.map(
 				(income: { date: Date; grossRevenue: number; netProfit: number; annualWages: number }, index: number) => {
 					const averageMonthlyGrossRevenue = income.grossRevenue / 12;
@@ -210,8 +205,8 @@ export const calculateIncomes = (type: CreditEvaluationIncomeTypeEnum, period: s
 			);
 
 			break;
-		case CreditEvaluationIncomeTypeEnum.HOUSING_ALLOWANCE:
-		case CreditEvaluationIncomeTypeEnum.ADDITIONAL_INCOME:
+		case CustomerIncomeTypeEnum.HOUSING_ALLOWANCE:
+		case CustomerIncomeTypeEnum.ADDITIONAL_INCOME:
 			result.incomeSources = incomes.map((income: { date: Date; source: string; monthlyBenefit: number }) => {
 				const currentYear = dayjs().get('year');
 
@@ -262,7 +257,8 @@ export const postCreditEvaluationIncome: RequestHandler = async (req, res, next)
 
 		incomes = calculateIncomes(type, period, incomes);
 
-		await CreditEvaluation.findByIdAndUpdate(id, { $push: { incomes } });
+		const creditEvaluation = await CreditEvaluation.findById(id).lean();
+		await Customer.findByIdAndUpdate(creditEvaluation?.customer, { $push: { incomes } });
 
 		res.json({
 			// data: result,
@@ -280,12 +276,13 @@ export const putCreditEvaluationIncome: RequestHandler = async (req, res, next) 
 
 		incomes = calculateIncomes(type, period, incomes);
 
-		await CreditEvaluation.findByIdAndUpdate(id, {
+		const creditEvaluation = await CreditEvaluation.findById(id).lean();
+		await Customer.findByIdAndUpdate(creditEvaluation?.customer, {
 			$pull: {
 				incomes: { _id: incomeId },
 			},
 		});
-		await CreditEvaluation.findByIdAndUpdate(id, {
+		await Customer.findByIdAndUpdate(creditEvaluation?.customer, {
 			$push: { incomes },
 		});
 
@@ -301,7 +298,8 @@ export const deleteCreditEvaluationIncome: RequestHandler = async (req, res, nex
 	try {
 		const { id, incomeId } = req.params;
 
-		await CreditEvaluation.findByIdAndUpdate(id, {
+		const creditEvaluation = await CreditEvaluation.findById(id).lean();
+		await Customer.findByIdAndUpdate(creditEvaluation?.customer, {
 			$pull: {
 				incomes: { _id: incomeId },
 			},
