@@ -468,6 +468,30 @@ export const deleteCreditEvaluationIncome: RequestHandler = async (req, res, nex
 	}
 };
 
+export const putCreditEvaluationSummaryOfIncome: RequestHandler = async (req, res, next) => {
+	try {
+		const { id, incomeSourceId } = req.params;
+		const { selected } = req.body;
+
+		const creditEvaluation = await CreditEvaluation.findById(id).lean();
+		const customer = await Customer.findById(creditEvaluation?.customer).lean();
+		const summaryOfIncomes = customer?.summaryOfIncomes;
+		//@ts-expect-error
+		summaryOfIncomes.incomeSources = summaryOfIncomes?.incomeSources.map((incomeSource) => {
+			//@ts-expect-error
+			if (incomeSource._id.toString() === incomeSourceId) {
+				incomeSource.selected = selected;
+			}
+
+			return incomeSource
+		});
+		await Customer.findByIdAndUpdate(creditEvaluation?.customer, { summaryOfIncomes });
+
+	} catch (err) {
+		next(err);
+	}
+};
+
 export const putCreditEvaluationDebt: RequestHandler = async (req, res, next) => {
 	try {
 		const { id } = req.params;

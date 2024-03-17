@@ -11,6 +11,7 @@ import {
 	putCreditEvaluationIncome as putCreditEvaluationIncomeController,
 	putCreditEvaluationDebt as putCreditEvaluationDebtController,
 	deleteCreditEvaluationIncome as deleteCreditEvaluationIncomeController,
+	putCreditEvaluationSummaryOfIncome as putCreditEvaluationSummaryOfIncomeController,
 	putCreditEvaluationLoanApplicationsToHubspot as putCreditEvaluationLoanApplicationsToHubspotController,
 	putCreditEvaluationHouseholdIncome as putCreditEvaluationHouseholdIncomeController,
 	putCreditEvaluationAffordability as putCreditEvaluationAffordabilityController,
@@ -78,6 +79,12 @@ defineRoutes(router, [
 		route: '/income/:id/:incomeId',
 		permissions: ['update:credit-evaluations'],
 		controller: deleteCreditEvaluationIncomeController,
+	},
+	{
+		method: 'put',
+		route: '/summary-of-income/:id/:incomeSourceId',
+		permissions: ['update:credit-evaluations'],
+		controller: putCreditEvaluationSummaryOfIncomeController,
 	},
 	{
 		method: 'put',
