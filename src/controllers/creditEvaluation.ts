@@ -169,6 +169,8 @@ export const calculateIncomes = (type: CustomerIncomeTypeEnum, source: string, p
 					const calculatedIncome = income.calculatedIncome ?? endOfYearExpectedIncome;
 
 					return {
+						//@ts-expect-error
+						_id: income._id,
 						date: income.date,
 						amount: income.amount,
 						ytd: income.ytd,
@@ -203,6 +205,8 @@ export const calculateIncomes = (type: CustomerIncomeTypeEnum, source: string, p
 					}
 
 					return {
+						//@ts-expect-error
+						_id: income._id,
 						date: income.date,
 						grossRevenue: income.grossRevenue,
 						netProfit: income.netProfit,
@@ -245,6 +249,8 @@ export const calculateIncomes = (type: CustomerIncomeTypeEnum, source: string, p
 				}
 
 				return {
+					//@ts-expect-error
+					_id: income._id,
 					date: income.date,
 					source: income.source,
 					monthlyBenefit: income.monthlyBenefit,
