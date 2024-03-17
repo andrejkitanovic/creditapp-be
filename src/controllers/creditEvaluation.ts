@@ -10,6 +10,7 @@ import Customer, {
 	CustomerIncomePaystubsEnum,
 	CustomerIncomeTypeEnum,
 	CustomerSummaryOfIncomes,
+	ICustomer,
 } from 'models/customer';
 import CreditEvaluation, { ICreditEvaluation } from 'models/creditEvaluation';
 import LoanApplication from 'models/loanApplication';
@@ -261,7 +262,7 @@ export const calculateIncomes = (type: CustomerIncomeTypeEnum, source: string, p
 	return result;
 };
 
-const calculateSummaryOfIncomes = (incomes: CustomerIncome[]) => {
+const calculateSummaryOfIncomes = (customer: LeanDocument<ICustomer>) => {
 	const summaryOfIncomes: CustomerSummaryOfIncomes = {
 		incomeSources: [],
 	};
@@ -269,17 +270,30 @@ const calculateSummaryOfIncomes = (incomes: CustomerIncome[]) => {
 	const currentYear = dayjs().get('year');
 	const last3Years = dayjs().subtract(3, 'year').get('year');
 
-	incomes?.forEach((income) => {
+	const isSelected = (incomeId: string, year: number) => {
+		const prevSummary = customer.summaryOfIncomes?.incomeSources.find(
+			(income) => income.incomeId === incomeId && income.year === year
+		);
+
+		if (prevSummary) return prevSummary.selected;
+		return true;
+	};
+
+	customer.incomes?.forEach((income) => {
 		let paystubIncomes: CustomerSummaryOfIncomes['incomeSources'] = [];
+		let year;
+		let selected;
 
 		income.incomeSources?.reverse().forEach((incomeSource) => {
 			//@ts-expect-error
-			const incomeId = income._id;
+			const incomeId = incomeSource._id;
 			switch (income.type) {
 				case CustomerIncomeTypeEnum.PAYSTUB:
 					if (dayjs(incomeSource.date).get('year') < last3Years) {
 						break;
 					}
+					year = dayjs(incomeSource.date).get('year');
+					selected = isSelected(incomeId, year);
 
 					// eslint-disable-next-line no-case-declarations
 					const incomeSameYear = paystubIncomes.find((income) => income.year === dayjs(incomeSource.date).get('year'));
@@ -289,9 +303,9 @@ const calculateSummaryOfIncomes = (incomes: CustomerIncome[]) => {
 
 							paystubIncomes.push({
 								incomeId,
-								selected: true,
+								selected,
 								startDate: incomeSource.date && dayjs(incomeSource.date).toDate(),
-								year: dayjs(incomeSource.date).get('year'),
+								year,
 								eoyExpected: incomeSource.calculatedIncome || 0,
 								type: income.type,
 								source: income.source,
@@ -300,9 +314,9 @@ const calculateSummaryOfIncomes = (incomes: CustomerIncome[]) => {
 					} else {
 						paystubIncomes.push({
 							incomeId,
-							selected: true,
+							selected,
 							startDate: incomeSource.date && dayjs(incomeSource.date).toDate(),
-							year: dayjs(incomeSource.date).get('year'),
+							year,
 							eoyExpected: incomeSource.calculatedIncome || 0,
 							type: income.type,
 							source: income.source,
@@ -311,11 +325,14 @@ const calculateSummaryOfIncomes = (incomes: CustomerIncome[]) => {
 
 					break;
 				case CustomerIncomeTypeEnum.SELF_EMPLOYMENT:
+					year = dayjs(incomeSource.date).get('year');
+					selected = isSelected(incomeId, year);
+
 					summaryOfIncomes.incomeSources.push({
 						incomeId,
-						selected: true,
+						selected,
 						startDate: incomeSource.date && dayjs(incomeSource.date).toDate(),
-						year: dayjs(incomeSource.date).get('year'),
+						year,
 						eoyExpected: (incomeSource.netProfit ?? 0) + (incomeSource.annualWages ?? 0),
 						type: income.type,
 						source: income.source,
@@ -324,11 +341,14 @@ const calculateSummaryOfIncomes = (incomes: CustomerIncome[]) => {
 					break;
 				case CustomerIncomeTypeEnum.ADDITIONAL_INCOME:
 				case CustomerIncomeTypeEnum.HOUSING_ALLOWANCE:
+					year = currentYear;
+					selected = isSelected(incomeId, year);
+
 					summaryOfIncomes.incomeSources.push({
 						incomeId,
-						selected: true,
+						selected,
 						startDate: incomeSource.date && dayjs(incomeSource.date).toDate(),
-						year: currentYear,
+						year,
 						eoyExpected: 12 * (incomeSource.monthlyBenefit || 0),
 						type: income.type,
 						source: [income.source, incomeSource.source].filter((s) => Boolean(s)).join(' - '),
@@ -336,11 +356,14 @@ const calculateSummaryOfIncomes = (incomes: CustomerIncome[]) => {
 
 					incomeSource.previousIncomes?.forEach((previousIncome) => {
 						if (previousIncome.year >= last3Years && previousIncome.year < currentYear) {
+							year = previousIncome.year;
+							selected = isSelected(incomeId, year);
+
 							summaryOfIncomes.incomeSources.push({
 								incomeId,
-								selected: true,
+								selected,
 								startDate: incomeSource.date && dayjs(incomeSource.date).toDate(),
-								year: previousIncome.year,
+								year,
 								eoyExpected: previousIncome.yearIncome,
 								type: income.type,
 								source: [income.source, incomeSource.source].filter((s) => Boolean(s)).join(' - '),
@@ -372,7 +395,7 @@ export const postCreditEvaluationIncome: RequestHandler = async (req, res, next)
 
 		// Update Summary Of Incomes
 		const customer = await Customer.findById(creditEvaluation?.customer).lean();
-		const summaryOfIncomes = calculateSummaryOfIncomes(customer?.incomes || []);
+		const summaryOfIncomes = calculateSummaryOfIncomes(customer as LeanDocument<ICustomer>);
 		await Customer.findByIdAndUpdate(creditEvaluation?.customer, { summaryOfIncomes });
 
 		res.json({
@@ -404,7 +427,7 @@ export const putCreditEvaluationIncome: RequestHandler = async (req, res, next) 
 
 		// Update Summary Of Incomes
 		const customer = await Customer.findById(creditEvaluation?.customer).lean();
-		const summaryOfIncomes = calculateSummaryOfIncomes(customer?.incomes || []);
+		const summaryOfIncomes = calculateSummaryOfIncomes(customer as LeanDocument<ICustomer>);
 		await Customer.findByIdAndUpdate(creditEvaluation?.customer, { summaryOfIncomes });
 
 		res.json({
@@ -428,7 +451,7 @@ export const deleteCreditEvaluationIncome: RequestHandler = async (req, res, nex
 
 		// Update Summary Of Incomes
 		const customer = await Customer.findById(creditEvaluation?.customer).lean();
-		const summaryOfIncomes = calculateSummaryOfIncomes(customer?.incomes || []);
+		const summaryOfIncomes = calculateSummaryOfIncomes(customer as LeanDocument<ICustomer>);
 		await Customer.findByIdAndUpdate(creditEvaluation?.customer, { summaryOfIncomes });
 
 		res.json({
