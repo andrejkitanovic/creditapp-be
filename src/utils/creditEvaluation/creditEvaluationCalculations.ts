@@ -13,7 +13,7 @@ import { LeanDocument } from 'mongoose';
 
 export const creditEvaluationCalculations = async (creditEvaluation: LeanDocument<ICreditEvaluation>) => {
 	let spouseCreditEvaluation;
-	const customer = await Customer.findById(creditEvaluation.customer).select('spouse incomes').lean();
+	const customer = await Customer.findById(creditEvaluation.customer).select('spouse incomes summaryOfIncomes').lean();
 	if (customer?.spouse) {
 		spouseCreditEvaluation = await CreditEvaluation.findOne({ customer: customer.spouse }).sort('createdAt').lean();
 	}
