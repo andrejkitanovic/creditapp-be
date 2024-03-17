@@ -1,6 +1,5 @@
 import { Schema, model, Document } from 'mongoose';
 import { MongooseFindByReference } from 'mongoose-find-by-reference';
-import { CustomerIncomeTypeEnum } from './customer';
 
 // TRADELINES
 type CreditEvaluationTradeline = {
@@ -74,17 +73,6 @@ export type CreditEvaluationDebtDetails = {
 	spousalDebt: number;
 	totalPayment: number;
 	mortgagePayment: number;
-};
-
-// SUMMARY OF INCOMES
-export type CreditEvaluationSummaryOfIncomes = {
-	incomeSources: {
-		startDate?: Date;
-		source?: string;
-		year: number;
-		eoyExpected: number;
-		type: CustomerIncomeTypeEnum;
-	}[];
 };
 
 export enum CreditEvaluationIncomeOverviewEnum {
@@ -270,12 +258,8 @@ interface ICreditEvaluation extends Document {
 	tradelines: CreditEvaluationTradeline[];
 	// Loans
 	loans: CreditEvaluationLoan[];
-	// Incomes
-	// incomes: CreditEvaluationIncome[];
 	// Debt Details
 	debtDetails: CreditEvaluationDebtDetails;
-	// Summary of Incomes
-	summaryOfIncomes: CreditEvaluationSummaryOfIncomes;
 	// Income Overview
 	incomesOverview: CreditEvaluationIncomeOverview[];
 	selectedHouseholdIncome?: CreditEvaluationIncomeOverviewEnum;
@@ -455,50 +439,6 @@ const creditEvaluationSchema: Schema = new Schema(
 				},
 			},
 		],
-		// incomes: [
-		// 	{
-		// 		type: { type: String, enum: CreditEvaluationIncomeTypeEnum },
-		// 		payStubs: { type: String, enum: CreditEvaluationIncomePaystubsEnum },
-		// 		period: { type: String, enum: CreditEvaluationIncomePeriodsEnum },
-		// 		averageCheckAmount: { type: Number },
-		// 		averageCheckAmountBasedOnYTD: { type: Number },
-		// 		incomeSources: [
-		// 			{
-		// 				date: { type: Date },
-		// 				// PAYSTUB
-		// 				amount: { type: Number },
-		// 				ytd: { type: Number },
-		// 				averageAnnual: { type: Number },
-		// 				numberOfPeriodsToDate: { type: Number },
-		// 				avgPerPeriod: { type: Number },
-		// 				averageAnnual2: { type: Number },
-		// 				numberOfPeriodsRemaining: { type: Number },
-		// 				amountOfPayRemaining: { type: Number },
-		// 				endOfYearExpectedIncome: { type: Number },
-		// 				// SELF EMPLOYMENT
-		// 				grossRevenue: { type: Number },
-		// 				netProfit: { type: Number },
-		// 				percentageOfProfit: { type: Number },
-		// 				averageMonthlyGrossRevenue: { type: Number },
-		// 				yearOverYearGrossGrowth: { type: Number },
-		// 				averageMonthlyNetProfit: { type: Number },
-		// 				yearOverYearNetGrowth: { type: Number },
-		// 				annualWages: { type: Number },
-		// 				mothlyWage: { type: Number },
-		// 				// ADDITIONAL
-		// 				source: { type: String },
-		// 				monthlyBenefit: { type: Number },
-		// 				previousIncomes: [
-		// 					{
-		// 						year: { type: Number },
-		// 						yearIncome: { type: Number },
-		// 						months: { type: Number },
-		// 					},
-		// 				],
-		// 			},
-		// 		],
-		// 	},
-		// ],
 		debtDetails: {
 			debtPayment: {
 				type: Number,
@@ -535,22 +475,6 @@ const creditEvaluationSchema: Schema = new Schema(
 			mortgagePayment: {
 				type: Number,
 				default: 0,
-			},
-		},
-		summaryOfIncomes: {
-			incomeSources: [
-				{
-					year: {
-						type: Number,
-					},
-					eoyExpected: {
-						type: Number,
-					},
-					type: { type: String, enum: CustomerIncomeTypeEnum },
-				},
-			],
-			total: {
-				type: Number,
 			},
 		},
 		// Income Overview

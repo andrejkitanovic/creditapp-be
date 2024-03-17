@@ -5,7 +5,12 @@ import i18n from 'helpers/i18n';
 import { queryFilter } from 'helpers/filters';
 import { createMeta } from 'helpers/meta';
 
-import Customer, { CustomerIncome, CustomerIncomePaystubsEnum, CustomerIncomeTypeEnum } from 'models/customer';
+import Customer, {
+	CustomerIncome,
+	CustomerIncomePaystubsEnum,
+	CustomerIncomeTypeEnum,
+	CustomerSummaryOfIncomes,
+} from 'models/customer';
 import CreditEvaluation, { ICreditEvaluation } from 'models/creditEvaluation';
 import LoanApplication from 'models/loanApplication';
 
@@ -256,6 +261,97 @@ export const calculateIncomes = (type: CustomerIncomeTypeEnum, source: string, p
 	return result;
 };
 
+const calculateSummaryOfIncomes = (incomes: CustomerIncome[]) => {
+	const summaryOfIncomes: CustomerSummaryOfIncomes = {
+		incomeSources: [],
+	};
+
+	const currentYear = dayjs().get('year');
+	const last3Years = dayjs().subtract(3, 'year').get('year');
+
+	incomes?.forEach((income) => {
+		let paystubIncomes: CustomerSummaryOfIncomes['incomeSources'] = [];
+
+		income.incomeSources?.reverse().forEach((incomeSource) => {
+			switch (income.type) {
+				case CustomerIncomeTypeEnum.PAYSTUB:
+					if (dayjs(incomeSource.date).get('year') < last3Years) {
+						break;
+					}
+
+					// eslint-disable-next-line no-case-declarations
+					const incomeSameYear = paystubIncomes.find((income) => income.year === dayjs(incomeSource.date).get('year'));
+					if (incomeSameYear) {
+						if (!dayjs(incomeSameYear.startDate).isAfter(incomeSource.date)) {
+							paystubIncomes = paystubIncomes.filter((income) => income.startDate !== incomeSameYear.startDate);
+
+							paystubIncomes.push({
+								selected: true,
+								startDate: incomeSource.date && dayjs(incomeSource.date).toDate(),
+								year: dayjs(incomeSource.date).get('year'),
+								eoyExpected: incomeSource.calculatedIncome || 0,
+								type: income.type,
+								source: income.source,
+							});
+						}
+					} else {
+						paystubIncomes.push({
+							selected: true,
+							startDate: incomeSource.date && dayjs(incomeSource.date).toDate(),
+							year: dayjs(incomeSource.date).get('year'),
+							eoyExpected: incomeSource.calculatedIncome || 0,
+							type: income.type,
+							source: income.source,
+						});
+					}
+
+					break;
+				case CustomerIncomeTypeEnum.SELF_EMPLOYMENT:
+					summaryOfIncomes.incomeSources.push({
+						selected: true,
+						startDate: incomeSource.date && dayjs(incomeSource.date).toDate(),
+						year: dayjs(incomeSource.date).get('year'),
+						eoyExpected: (incomeSource.netProfit ?? 0) + (incomeSource.annualWages ?? 0),
+						type: income.type,
+						source: income.source,
+					});
+
+					break;
+				case CustomerIncomeTypeEnum.ADDITIONAL_INCOME:
+				case CustomerIncomeTypeEnum.HOUSING_ALLOWANCE:
+					summaryOfIncomes.incomeSources.push({
+						selected: true,
+						startDate: incomeSource.date && dayjs(incomeSource.date).toDate(),
+						year: currentYear,
+						eoyExpected: 12 * (incomeSource.monthlyBenefit || 0),
+						type: income.type,
+						source: [income.source, incomeSource.source].filter((s) => Boolean(s)).join(' - '),
+					});
+
+					incomeSource.previousIncomes?.forEach((previousIncome) => {
+						if (previousIncome.year >= last3Years && previousIncome.year < currentYear) {
+							summaryOfIncomes.incomeSources.push({
+								selected: true,
+								startDate: incomeSource.date && dayjs(incomeSource.date).toDate(),
+								year: previousIncome.year,
+								eoyExpected: previousIncome.yearIncome,
+								type: income.type,
+								source: [income.source, incomeSource.source].filter((s) => Boolean(s)).join(' - '),
+							});
+						}
+					});
+					break;
+				default:
+					break;
+			}
+		});
+
+		summaryOfIncomes.incomeSources.push(...paystubIncomes);
+	});
+
+	return summaryOfIncomes;
+};
+
 export const postCreditEvaluationIncome: RequestHandler = async (req, res, next) => {
 	try {
 		const { id } = req.params;
@@ -266,6 +362,11 @@ export const postCreditEvaluationIncome: RequestHandler = async (req, res, next)
 
 		const creditEvaluation = await CreditEvaluation.findById(id).lean();
 		await Customer.findByIdAndUpdate(creditEvaluation?.customer, { $push: { incomes } });
+
+		// Update Summary Of Incomes
+		const customer = await Customer.findById(creditEvaluation?.customer).lean();
+		const summaryOfIncomes = calculateSummaryOfIncomes(customer?.incomes || []);
+		await Customer.findByIdAndUpdate(creditEvaluation?.customer, { summaryOfIncomes });
 
 		res.json({
 			// data: result,
@@ -293,6 +394,11 @@ export const putCreditEvaluationIncome: RequestHandler = async (req, res, next) 
 			$push: { incomes },
 		});
 
+		// Update Summary Of Incomes
+		const customer = await Customer.findById(creditEvaluation?.customer).lean();
+		const summaryOfIncomes = calculateSummaryOfIncomes(customer?.incomes || []);
+		await Customer.findByIdAndUpdate(creditEvaluation?.customer, { summaryOfIncomes });
+
 		res.json({
 			// data: result,
 		});
@@ -311,6 +417,11 @@ export const deleteCreditEvaluationIncome: RequestHandler = async (req, res, nex
 				incomes: { _id: incomeId },
 			},
 		});
+
+		// Update Summary Of Incomes
+		const customer = await Customer.findById(creditEvaluation?.customer).lean();
+		const summaryOfIncomes = calculateSummaryOfIncomes(customer?.incomes || []);
+		await Customer.findByIdAndUpdate(creditEvaluation?.customer, { summaryOfIncomes });
 
 		res.json({
 			// data: result,

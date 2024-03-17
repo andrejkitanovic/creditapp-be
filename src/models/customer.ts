@@ -70,6 +70,18 @@ export type CustomerIncome = {
 	incomeSources: CustomerIncomeSource[];
 };
 
+// Summary Of Incomes
+export type CustomerSummaryOfIncomes = {
+	incomeSources: {
+		selected: boolean;
+		startDate?: Date;
+		source?: string;
+		year: number;
+		eoyExpected: number;
+		type: CustomerIncomeTypeEnum;
+	}[];
+};
+
 interface ICustomer extends Document {
 	hubspotId?: string;
 	// Spouse
@@ -199,6 +211,7 @@ interface ICustomer extends Document {
 
 	// Incomes
 	incomes: CustomerIncome[];
+	summaryOfIncomes: CustomerSummaryOfIncomes;
 }
 
 const customerSchema: Schema = new Schema(
@@ -419,6 +432,31 @@ const customerSchema: Schema = new Schema(
 				],
 			},
 		],
+
+		// Summary Of Incomes
+		summaryOfIncomes: {
+			incomeSources: [
+				{
+					selected: {
+						type: Boolean,
+						default: true,
+					},
+					startDate: {
+						type: Date,
+					},
+					source: {
+						type: String,
+					},
+					year: {
+						type: Number,
+					},
+					eoyExpected: {
+						type: Number,
+					},
+					type: { type: String, enum: CustomerIncomeTypeEnum },
+				},
+			],
+		},
 	},
 	{ timestamps: true }
 );

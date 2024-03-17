@@ -6,10 +6,9 @@ import CreditEvaluation, {
 	CreditEvaluationIncomeOverviewEnum,
 	CreditEvaluationLoanAffordability,
 	CreditEvaluationLoanAffordabilityEnum,
-	CreditEvaluationSummaryOfIncomes,
 	ICreditEvaluation,
 } from 'models/creditEvaluation';
-import Customer, { CustomerIncome, CustomerIncomeTypeEnum } from 'models/customer';
+import Customer, { CustomerIncome } from 'models/customer';
 import { LeanDocument } from 'mongoose';
 
 export const creditEvaluationCalculations = async (creditEvaluation: LeanDocument<ICreditEvaluation>) => {
@@ -20,11 +19,12 @@ export const creditEvaluationCalculations = async (creditEvaluation: LeanDocumen
 	}
 
 	//@ts-expect-error
-	creditEvaluation.incomes = (customer?.incomes ?? []) as CustomerIncome[];
+	creditEvaluation.incomes = (customer.incomes ?? []) as CustomerIncome[];
+	//@ts-expect-error
+	creditEvaluation.summaryOfIncomes = customer?.summaryOfIncomes;
 
 	creditEvaluation.tradelines = jointTradelines(creditEvaluation, spouseCreditEvaluation);
 	creditEvaluation.loans = jointLoans(creditEvaluation, spouseCreditEvaluation);
-	creditEvaluation.summaryOfIncomes = calculateSummaryOfIncomes(creditEvaluation);
 	creditEvaluation.debtDetails = await calculateDebtDetails(creditEvaluation, true);
 	creditEvaluation.incomesOverview = calculateIncomesOverview(creditEvaluation);
 	creditEvaluation.loanAffordability = await calculateLoanAffordability(creditEvaluation);
@@ -70,94 +70,6 @@ const jointLoans = (
 };
 
 // Single Credit Evaluation Calculations
-
-const calculateSummaryOfIncomes = (creditEvaluation: LeanDocument<ICreditEvaluation>) => {
-	const summaryOfIncomes: CreditEvaluationSummaryOfIncomes = {
-		incomeSources: [],
-	};
-
-	const currentYear = dayjs().get('year');
-	const last3Years = dayjs().subtract(3, 'year').get('year');
-
-	//@ts-expect-error
-	creditEvaluation.incomes?.forEach((income: CustomerIncome) => {
-		let paystubIncomes: CreditEvaluationSummaryOfIncomes['incomeSources'] = [];
-
-		income.incomeSources?.reverse().forEach((incomeSource) => {
-			switch (income.type) {
-				case CustomerIncomeTypeEnum.PAYSTUB:
-					if (dayjs(incomeSource.date).get('year') < last3Years) {
-						break;
-					}
-
-					// eslint-disable-next-line no-case-declarations
-					const incomeSameYear = paystubIncomes.find((income) => income.year === dayjs(incomeSource.date).get('year'));
-					if (incomeSameYear) {
-						if (!dayjs(incomeSameYear.startDate).isAfter(incomeSource.date)) {
-							paystubIncomes = paystubIncomes.filter((income) => income.startDate !== incomeSameYear.startDate);
-
-							paystubIncomes.push({
-								startDate: dayjs(incomeSource.date).toDate(),
-								year: dayjs(incomeSource.date).get('year'),
-								eoyExpected: incomeSource.calculatedIncome || 0,
-								type: income.type,
-								source: income.source,
-							});
-						}
-					} else {
-						paystubIncomes.push({
-							startDate: dayjs(incomeSource.date).toDate(),
-							year: dayjs(incomeSource.date).get('year'),
-							eoyExpected: incomeSource.calculatedIncome || 0,
-							type: income.type,
-							source: income.source,
-						});
-					}
-
-					break;
-				case CustomerIncomeTypeEnum.SELF_EMPLOYMENT:
-					summaryOfIncomes.incomeSources.push({
-						startDate: dayjs(incomeSource.date).toDate(),
-						year: dayjs(incomeSource.date).get('year'),
-						eoyExpected: (incomeSource.netProfit ?? 0) + (incomeSource.annualWages ?? 0),
-						type: income.type,
-						source: income.source,
-					});
-
-					break;
-				case CustomerIncomeTypeEnum.ADDITIONAL_INCOME:
-				case CustomerIncomeTypeEnum.HOUSING_ALLOWANCE:
-					summaryOfIncomes.incomeSources.push({
-						startDate: dayjs(incomeSource.date).toDate(),
-						year: currentYear,
-						eoyExpected: 12 * (incomeSource.monthlyBenefit || 0),
-						type: income.type,
-						source: [income.source, incomeSource.source].filter((s) => Boolean(s)).join(' - '),
-					});
-
-					incomeSource.previousIncomes?.forEach((previousIncome) => {
-						if (previousIncome.year >= last3Years && previousIncome.year < currentYear) {
-							summaryOfIncomes.incomeSources.push({
-								startDate: dayjs(incomeSource.date).toDate(),
-								year: previousIncome.year,
-								eoyExpected: previousIncome.yearIncome,
-								type: income.type,
-								source: [income.source, incomeSource.source].filter((s) => Boolean(s)).join(' - '),
-							});
-						}
-					});
-					break;
-				default:
-					break;
-			}
-		});
-
-		summaryOfIncomes.incomeSources.push(...paystubIncomes);
-	});
-
-	return summaryOfIncomes;
-};
-
 const calculateDebtDetails = async (creditEvaluation: LeanDocument<ICreditEvaluation>, includeHousehold: boolean) => {
 	const debtDetails: CreditEvaluationDebtDetails = {
 		...creditEvaluation.debtDetails,
@@ -187,7 +99,6 @@ const calculateDebtDetails = async (creditEvaluation: LeanDocument<ICreditEvalua
 			const spouseCreditEval = (await CreditEvaluation.findOne({
 				customer: customer.spouse,
 			}).lean()) as ICreditEvaluation;
-			spouseCreditEval.summaryOfIncomes = calculateSummaryOfIncomes(spouseCreditEval);
 			spouseCreditEval.debtDetails = await calculateDebtDetails(spouseCreditEval, false);
 			spouseCreditEval.incomesOverview = calculateIncomesOverview(spouseCreditEval);
 
@@ -264,7 +175,9 @@ const calculateIncomesOverview = (creditEvaluation: LeanDocument<ICreditEvaluati
 		dti: 0,
 	};
 
+	//@ts-expect-error
 	creditEvaluation.summaryOfIncomes.incomeSources?.forEach((income) => {
+		if (!income.selected) return;
 		switch (income.year) {
 			case currentYear:
 				currentYearIncome.annual += income.eoyExpected;
