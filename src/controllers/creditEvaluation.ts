@@ -273,6 +273,8 @@ const calculateSummaryOfIncomes = (incomes: CustomerIncome[]) => {
 		let paystubIncomes: CustomerSummaryOfIncomes['incomeSources'] = [];
 
 		income.incomeSources?.reverse().forEach((incomeSource) => {
+			//@ts-expect-error
+			const incomeSourceId = incomeSource._id;
 			switch (income.type) {
 				case CustomerIncomeTypeEnum.PAYSTUB:
 					if (dayjs(incomeSource.date).get('year') < last3Years) {
@@ -286,6 +288,7 @@ const calculateSummaryOfIncomes = (incomes: CustomerIncome[]) => {
 							paystubIncomes = paystubIncomes.filter((income) => income.startDate !== incomeSameYear.startDate);
 
 							paystubIncomes.push({
+								incomeSourceId,
 								selected: true,
 								startDate: incomeSource.date && dayjs(incomeSource.date).toDate(),
 								year: dayjs(incomeSource.date).get('year'),
@@ -296,6 +299,7 @@ const calculateSummaryOfIncomes = (incomes: CustomerIncome[]) => {
 						}
 					} else {
 						paystubIncomes.push({
+							incomeSourceId,
 							selected: true,
 							startDate: incomeSource.date && dayjs(incomeSource.date).toDate(),
 							year: dayjs(incomeSource.date).get('year'),
@@ -308,6 +312,7 @@ const calculateSummaryOfIncomes = (incomes: CustomerIncome[]) => {
 					break;
 				case CustomerIncomeTypeEnum.SELF_EMPLOYMENT:
 					summaryOfIncomes.incomeSources.push({
+						incomeSourceId,
 						selected: true,
 						startDate: incomeSource.date && dayjs(incomeSource.date).toDate(),
 						year: dayjs(incomeSource.date).get('year'),
@@ -320,6 +325,7 @@ const calculateSummaryOfIncomes = (incomes: CustomerIncome[]) => {
 				case CustomerIncomeTypeEnum.ADDITIONAL_INCOME:
 				case CustomerIncomeTypeEnum.HOUSING_ALLOWANCE:
 					summaryOfIncomes.incomeSources.push({
+						incomeSourceId,
 						selected: true,
 						startDate: incomeSource.date && dayjs(incomeSource.date).toDate(),
 						year: currentYear,
@@ -331,6 +337,7 @@ const calculateSummaryOfIncomes = (incomes: CustomerIncome[]) => {
 					incomeSource.previousIncomes?.forEach((previousIncome) => {
 						if (previousIncome.year >= last3Years && previousIncome.year < currentYear) {
 							summaryOfIncomes.incomeSources.push({
+								incomeSourceId,
 								selected: true,
 								startDate: incomeSource.date && dayjs(incomeSource.date).toDate(),
 								year: previousIncome.year,
@@ -385,14 +392,15 @@ export const putCreditEvaluationIncome: RequestHandler = async (req, res, next) 
 		incomes = calculateIncomes(type, source, period, incomes);
 
 		const creditEvaluation = await CreditEvaluation.findById(id).lean();
-		await Customer.findByIdAndUpdate(creditEvaluation?.customer, {
-			$pull: {
-				incomes: { _id: incomeId },
+		await Customer.findOneAndUpdate(
+			{
+				_id: creditEvaluation?.customer,
+				'incomes._id': incomeId,
 			},
-		});
-		await Customer.findByIdAndUpdate(creditEvaluation?.customer, {
-			$push: { incomes },
-		});
+			{
+				'incomes.$': incomes,
+			}
+		);
 
 		// Update Summary Of Incomes
 		const customer = await Customer.findById(creditEvaluation?.customer).lean();

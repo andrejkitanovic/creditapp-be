@@ -73,6 +73,7 @@ export type CustomerIncome = {
 // Summary Of Incomes
 export type CustomerSummaryOfIncomes = {
 	incomeSources: {
+		incomeSourceId: string;
 		selected: boolean;
 		startDate?: Date;
 		source?: string;
