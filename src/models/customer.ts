@@ -73,7 +73,7 @@ export type CustomerIncome = {
 // Summary Of Incomes
 export type CustomerSummaryOfIncomes = {
 	incomeSources: {
-		incomeSourceId: string;
+		incomeId: string;
 		selected: boolean;
 		startDate?: Date;
 		source?: string;
@@ -438,6 +438,9 @@ const customerSchema: Schema = new Schema(
 		summaryOfIncomes: {
 			incomeSources: [
 				{
+					incomeId: {
+						type: String,
+					},
 					selected: {
 						type: Boolean,
 						default: true,
