@@ -487,6 +487,9 @@ export const putCreditEvaluationSummaryOfIncome: RequestHandler = async (req, re
 		});
 		await Customer.findByIdAndUpdate(creditEvaluation?.customer, { summaryOfIncomes });
 
+		res.json({
+
+		})
 	} catch (err) {
 		next(err);
 	}
