@@ -286,7 +286,7 @@ const calculateSummaryOfIncomes = (customer: LeanDocument<ICustomer>) => {
 
 		income.incomeSources?.reverse().forEach((incomeSource) => {
 			//@ts-expect-error
-			const incomeId = incomeSource._id;
+			const incomeId = incomeSource._id.toString();
 			switch (income.type) {
 				case CustomerIncomeTypeEnum.PAYSTUB:
 					if (dayjs(incomeSource.date).get('year') < last3Years) {
