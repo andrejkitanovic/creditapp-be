@@ -290,7 +290,7 @@ const calculateSummaryOfIncomes = (customer: LeanDocument<ICustomer>) => {
 		let year;
 		let selected;
 
-		income.incomeSources?.reverse().forEach((incomeSource) => {
+		income?.incomeSources?.reverse().forEach((incomeSource) => {
 			//@ts-expect-error
 			const incomeId = incomeSource._id.toString();
 			switch (income.type) {

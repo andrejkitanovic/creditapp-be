@@ -176,7 +176,7 @@ const calculateIncomesOverview = (creditEvaluation: LeanDocument<ICreditEvaluati
 	};
 
 	//@ts-expect-error
-	creditEvaluation.summaryOfIncomes.incomeSources?.forEach((income) => {
+	creditEvaluation.summaryOfIncomes?.incomeSources?.forEach((income) => {
 		if (!income.selected) return;
 		switch (income.year) {
 			case currentYear:
