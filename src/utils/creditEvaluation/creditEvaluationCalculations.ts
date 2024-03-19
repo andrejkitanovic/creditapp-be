@@ -30,9 +30,9 @@ export const creditEvaluationCalculations = async (creditEvaluation: LeanDocumen
 
 	creditEvaluation.tradelines = jointTradelines(creditEvaluation, spouseCreditEvaluation);
 	creditEvaluation.loans = jointLoans(creditEvaluation, spouseCreditEvaluation);
-	creditEvaluation.debtDetails = await calculateDebtDetails(creditEvaluation, true);
+	creditEvaluation.debtDetails = await calculateDebtDetails(creditEvaluation, spouseCreditEvaluation);
 	creditEvaluation.incomesOverview = calculateIncomesOverview(creditEvaluation);
-	creditEvaluation.loanAffordability = await calculateLoanAffordability(creditEvaluation);
+	creditEvaluation.loanAffordability = await calculateLoanAffordability(creditEvaluation, spouseCreditEvaluation);
 	return creditEvaluation;
 };
 
@@ -75,7 +75,7 @@ const jointLoans = (
 };
 
 // Single Credit Evaluation Calculations
-const calculateDebtDetails = async (creditEvaluation: LeanDocument<ICreditEvaluation>, includeHousehold: boolean) => {
+const calculateDebtDetails = async (creditEvaluation: LeanDocument<ICreditEvaluation>, spouseCreditEvaluation: LeanDocument<ICreditEvaluation> | null | undefined) => {
 	const debtDetails: CreditEvaluationDebtDetails = {
 		...creditEvaluation.debtDetails,
 	};
@@ -98,22 +98,19 @@ const calculateDebtDetails = async (creditEvaluation: LeanDocument<ICreditEvalua
 	debtDetails.totalPayment =
 		debtDetails.totalDebtPayment - (debtDetails.mortgagePayment ? debtDetails.mortgagePayment / 2 : 0);
 
-	if (includeHousehold) {
+	if (spouseCreditEvaluation) {
 		const customer = await Customer.findById(creditEvaluation.customer);
 		if (customer?.spouse) {
-			const spouseCreditEval = (await CreditEvaluation.findOne({
-				customer: customer.spouse,
-			}).lean()) as ICreditEvaluation;
-			spouseCreditEval.debtDetails = await calculateDebtDetails(spouseCreditEval, false);
-			spouseCreditEval.incomesOverview = calculateIncomesOverview(spouseCreditEval);
+			spouseCreditEvaluation.debtDetails = await calculateDebtDetails(spouseCreditEvaluation, null);
+			spouseCreditEvaluation.incomesOverview = calculateIncomesOverview(spouseCreditEvaluation);
 
-			if (spouseCreditEval.selectedHouseholdIncome) {
+			if (spouseCreditEvaluation.selectedHouseholdIncome) {
 				debtDetails.spouseIncome =
-					spouseCreditEval.incomesOverview.find((income) => income.type === spouseCreditEval.selectedHouseholdIncome)
+				spouseCreditEvaluation.incomesOverview.find((income) => income.type === spouseCreditEvaluation.selectedHouseholdIncome)
 						?.monthly ?? 0;
 			}
 
-			debtDetails.spousalDebt = spouseCreditEval.debtDetails.totalDebtPayment;
+			debtDetails.spousalDebt = spouseCreditEvaluation.debtDetails.totalDebtPayment;
 
 			const jointLoans = creditEvaluation.loans.filter((loan) => loan.status === 'opened' && loan.joint);
 			if (jointLoans.length) {
@@ -286,7 +283,7 @@ const calculateIncomesOverview = (creditEvaluation: LeanDocument<ICreditEvaluati
 	return incomesOverview;
 };
 
-const calculateLoanAffordability = async (creditEvaluation: LeanDocument<ICreditEvaluation>) => {
+const calculateLoanAffordability = async (creditEvaluation: LeanDocument<ICreditEvaluation>, spouseCreditEvaluation: LeanDocument<ICreditEvaluation > | null | undefined ) => {
 	const loanAffordabilitiesRaw: { source: CreditEvaluationLoanAffordabilityEnum; annual: number; debt: number }[] = [];
 	const loanAffordabilities: CreditEvaluationLoanAffordability[] = [];
 	const rate = creditEvaluation.loanAffordabilityRate || 14;
@@ -339,12 +336,9 @@ const calculateLoanAffordability = async (creditEvaluation: LeanDocument<ICredit
 		// SPOUSE
 
 		const customer = await Customer.findById(creditEvaluation.customer);
-		if (customer?.spouse) {
-			const spouseCreditEval = (await CreditEvaluation.findOne({
-				customer: customer.spouse,
-			}).lean()) as ICreditEvaluation;
+		if (customer?.spouse && spouseCreditEvaluation) {
 			const spouseDebtPayment =
-				spouseCreditEval.debtDetails.overrideDebtPayment || spouseCreditEval.debtDetails.debtPayment;
+				spouseCreditEvaluation.debtDetails.overrideDebtPayment || spouseCreditEvaluation.debtDetails.debtPayment;
 
 			if (creditEvaluation.debtDetails.spouseIncome) {
 				loanAffordabilitiesRaw.push({
@@ -356,7 +350,7 @@ const calculateLoanAffordability = async (creditEvaluation: LeanDocument<ICredit
 
 			if (
 				creditEvaluation.debtDetails.spouseIncome &&
-				(creditEvaluation.debtDetails.deferredStudentLoans || spouseCreditEval.debtDetails.deferredStudentLoans)
+				(creditEvaluation.debtDetails.deferredStudentLoans || spouseCreditEvaluation.debtDetails.deferredStudentLoans)
 			) {
 				loanAffordabilitiesRaw.push({
 					source:
@@ -367,12 +361,12 @@ const calculateLoanAffordability = async (creditEvaluation: LeanDocument<ICredit
 						creditEvaluation.debtDetails.mortgagePayment / 2 +
 						(spouseDebtPayment - creditEvaluation.debtDetails.mortgagePayment / 2) +
 						(creditEvaluation.debtDetails.deferredStudentLoans || 0) +
-						(spouseCreditEval.debtDetails.deferredStudentLoans || 0),
+						(spouseCreditEvaluation.debtDetails.deferredStudentLoans || 0),
 				});
 			}
 			if (
 				creditEvaluation.debtDetails.spouseIncome &&
-				(creditEvaluation.debtDetails.rentPayment || spouseCreditEval.debtDetails.rentPayment)
+				(creditEvaluation.debtDetails.rentPayment || spouseCreditEvaluation.debtDetails.rentPayment)
 			) {
 				loanAffordabilitiesRaw.push({
 					source: CreditEvaluationLoanAffordabilityEnum.HOUSEHOLD_AFFORDABILITY_INCLUDING_RENT,
@@ -382,13 +376,13 @@ const calculateLoanAffordability = async (creditEvaluation: LeanDocument<ICredit
 						creditEvaluation.debtDetails.mortgagePayment / 2 +
 						(spouseDebtPayment - creditEvaluation.debtDetails.mortgagePayment / 2) +
 						(creditEvaluation.debtDetails.rentPayment || 0) +
-						(spouseCreditEval.debtDetails.rentPayment || 0),
+						(spouseCreditEvaluation.debtDetails.rentPayment || 0),
 				});
 			}
 			if (
 				creditEvaluation.debtDetails.spouseIncome &&
-				(creditEvaluation.debtDetails.deferredStudentLoans || spouseCreditEval.debtDetails.deferredStudentLoans) &&
-				(creditEvaluation.debtDetails.rentPayment || spouseCreditEval.debtDetails.rentPayment)
+				(creditEvaluation.debtDetails.deferredStudentLoans || spouseCreditEvaluation.debtDetails.deferredStudentLoans) &&
+				(creditEvaluation.debtDetails.rentPayment || spouseCreditEvaluation.debtDetails.rentPayment)
 			) {
 				loanAffordabilitiesRaw.push({
 					source:
@@ -399,9 +393,9 @@ const calculateLoanAffordability = async (creditEvaluation: LeanDocument<ICredit
 						creditEvaluation.debtDetails.mortgagePayment / 2 +
 						(spouseDebtPayment - creditEvaluation.debtDetails.mortgagePayment / 2) +
 						(creditEvaluation.debtDetails.deferredStudentLoans || 0) +
-						(spouseCreditEval.debtDetails.deferredStudentLoans || 0) +
+						(spouseCreditEvaluation.debtDetails.deferredStudentLoans || 0) +
 						(creditEvaluation.debtDetails.rentPayment || 0) +
-						(spouseCreditEval.debtDetails.rentPayment || 0),
+						(spouseCreditEvaluation.debtDetails.rentPayment || 0),
 				});
 			}
 		}
