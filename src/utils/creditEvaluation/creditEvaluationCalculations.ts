@@ -15,7 +15,12 @@ export const creditEvaluationCalculations = async (creditEvaluation: LeanDocumen
 	let spouseCreditEvaluation;
 	const customer = await Customer.findById(creditEvaluation.customer).select('spouse incomes summaryOfIncomes').lean();
 	if (customer?.spouse) {
+		const spouse = await Customer.findById(customer.spouse).select('incomes summaryOfIncomes').lean();
 		spouseCreditEvaluation = await CreditEvaluation.findOne({ customer: customer.spouse }).sort('createdAt').lean();
+		//@ts-expect-error
+		spouseCreditEvaluation.incomes = (spouse.incomes ?? []) as CustomerIncome[];
+		//@ts-expect-error
+		spouseCreditEvaluation.summaryOfIncomes = spouse?.summaryOfIncomes;
 	}
 
 	//@ts-expect-error
