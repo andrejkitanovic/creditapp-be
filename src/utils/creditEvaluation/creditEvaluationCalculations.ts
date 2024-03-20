@@ -43,7 +43,7 @@ const jointTradelines = (
 	return creditEvaluation.tradelines.map((tradeline) => {
 		return {
 			joint:
-				// tradeline.accountType === 'Joint Account' &&
+				tradeline.accountType === 'Authorized User' &&
 				spouseCreditEvaluation?.tradelines.some(
 					(spouseTradeline) =>
 						tradeline.creditor === spouseTradeline.creditor &&
