@@ -43,9 +43,10 @@ const jointTradelines = (
 	return creditEvaluation.tradelines.map((tradeline) => {
 		return {
 			joint:
-				tradeline.accountType === 'Authorized User' &&
 				spouseCreditEvaluation?.tradelines.some(
 					(spouseTradeline) =>
+						(tradeline.accountType === 'Authorized User' ||
+						spouseTradeline.accountType === 'Authorized User') &&
 						tradeline.creditor === spouseTradeline.creditor &&
 						dayjs(tradeline.opened).isSame(dayjs(spouseTradeline.opened)) &&
 						tradeline.creditLimit === spouseTradeline.creditLimit
@@ -127,7 +128,7 @@ const calculateDebtDetails = async (creditEvaluation: LeanDocument<ICreditEvalua
 			}
 
 			const jointTradelines = creditEvaluation.tradelines.filter(
-				(tradeline) => tradeline.status === 'opened' && tradeline.joint
+				(tradeline) => tradeline.status === 'opened' && tradeline.accountType === "Authorized User" && tradeline.joint
 			);
 			if (jointTradelines.length) {
 				debtDetails.spousalDebt -= jointTradelines.reduce((total, tradeline) => total + tradeline.payment, 0);
