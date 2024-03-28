@@ -16,7 +16,8 @@ export const creditEvaluationCalculations = async (creditEvaluation: LeanDocumen
 	const customer = await Customer.findById(creditEvaluation.customer).select('spouse incomes summaryOfIncomes').lean();
 	if (customer?.spouse) {
 		const spouse = await Customer.findById(customer.spouse).select('incomes summaryOfIncomes').lean();
-		spouseCreditEvaluation = await CreditEvaluation.findOne({ customer: customer.spouse }).sort('createdAt').lean();
+		spouseCreditEvaluation = await CreditEvaluation.findOne({ customer: customer.spouse }).sort('-createdAt').lean();
+
 		//@ts-expect-error
 		spouseCreditEvaluation.incomes = (spouse.incomes ?? []) as CustomerIncome[];
 		//@ts-expect-error
@@ -42,15 +43,13 @@ const jointTradelines = (
 ) => {
 	return creditEvaluation.tradelines.map((tradeline) => {
 		return {
-			joint:
-				spouseCreditEvaluation?.tradelines.some(
-					(spouseTradeline) =>
-						(tradeline.accountType === 'Authorized User' ||
-						spouseTradeline.accountType === 'Authorized User') &&
-						tradeline.creditor === spouseTradeline.creditor &&
-						dayjs(tradeline.opened).isSame(dayjs(spouseTradeline.opened)) &&
-						tradeline.creditLimit === spouseTradeline.creditLimit
-				),
+			joint: spouseCreditEvaluation?.tradelines.some(
+				(spouseTradeline) =>
+					(tradeline.accountType === 'Authorized User' || spouseTradeline.accountType === 'Authorized User') &&
+					tradeline.creditor === spouseTradeline.creditor &&
+					dayjs(tradeline.opened).isSame(dayjs(spouseTradeline.opened)) &&
+					tradeline.creditLimit === spouseTradeline.creditLimit
+			),
 			...tradeline,
 		};
 	});
@@ -76,7 +75,10 @@ const jointLoans = (
 };
 
 // Single Credit Evaluation Calculations
-const calculateDebtDetails = async (creditEvaluation: LeanDocument<ICreditEvaluation>, spouseCreditEvaluation: LeanDocument<ICreditEvaluation> | null | undefined) => {
+const calculateDebtDetails = async (
+	creditEvaluation: LeanDocument<ICreditEvaluation>,
+	spouseCreditEvaluation: LeanDocument<ICreditEvaluation> | null | undefined
+) => {
 	const debtDetails: CreditEvaluationDebtDetails = {
 		...creditEvaluation.debtDetails,
 	};
@@ -100,48 +102,46 @@ const calculateDebtDetails = async (creditEvaluation: LeanDocument<ICreditEvalua
 		debtDetails.totalDebtPayment - (debtDetails.mortgagePayment ? debtDetails.mortgagePayment / 2 : 0);
 
 	if (spouseCreditEvaluation) {
-		const customer = await Customer.findById(creditEvaluation.customer);
-		if (customer?.spouse) {
-			spouseCreditEvaluation.debtDetails = await calculateDebtDetails(spouseCreditEvaluation, null);
-			spouseCreditEvaluation.incomesOverview = calculateIncomesOverview(spouseCreditEvaluation);
+		spouseCreditEvaluation.debtDetails = await calculateDebtDetails(spouseCreditEvaluation, null);
+		spouseCreditEvaluation.incomesOverview = calculateIncomesOverview(spouseCreditEvaluation);
 
-			if (spouseCreditEvaluation.selectedHouseholdIncome) {
-				debtDetails.spouseIncome =
-				spouseCreditEvaluation.incomesOverview.find((income) => income.type === spouseCreditEvaluation.selectedHouseholdIncome)
-						?.monthly ?? 0;
-			}
+		if (spouseCreditEvaluation.selectedHouseholdIncome) {
+			debtDetails.spouseIncome =
+				spouseCreditEvaluation.incomesOverview.find(
+					(income) => income.type === spouseCreditEvaluation.selectedHouseholdIncome
+				)?.monthly ?? 0;
+		}
 
-			debtDetails.spousalDebt = spouseCreditEvaluation.debtDetails.totalDebtPayment;
+		debtDetails.spousalDebt = spouseCreditEvaluation.debtDetails.totalDebtPayment;
 
-			const jointLoans = creditEvaluation.loans.filter((loan) => loan.status === 'opened' && loan.joint);
-			if (jointLoans.length) {
-				debtDetails.spousalDebt -= jointLoans.reduce((total, loan) => total + loan.payment, 0);
-			} else {
-				debtDetails.spousalDebt -=
-					creditEvaluation.loans
-						.filter((loan) => loan.status === 'opened' && loan.accountType === 'Joint Account')
-						?.sort((a, b) => {
-							const dateA = new Date(a.reportDate).getTime();
-							const dateB = new Date(b.reportDate).getTime();
-							return dateA > dateB ? -1 : 1;
-						})?.[0]?.payment ?? 0;
-			}
+		const jointLoans = creditEvaluation.loans.filter((loan) => loan.status === 'opened' && loan.joint);
+		if (jointLoans.length) {
+			debtDetails.spousalDebt -= jointLoans.reduce((total, loan) => total + loan.payment, 0);
+		} else {
+			debtDetails.spousalDebt -=
+				creditEvaluation.loans
+					.filter((loan) => loan.status === 'opened' && loan.accountType === 'Joint Account')
+					?.sort((a, b) => {
+						const dateA = new Date(a.reportDate).getTime();
+						const dateB = new Date(b.reportDate).getTime();
+						return dateA > dateB ? -1 : 1;
+					})?.[0]?.payment ?? 0;
+		}
 
-			const jointTradelines = creditEvaluation.tradelines.filter(
-				(tradeline) => tradeline.status === 'opened' && tradeline.accountType === "Authorized User" && tradeline.joint
-			);
-			if (jointTradelines.length) {
-				debtDetails.spousalDebt -= jointTradelines.reduce((total, tradeline) => total + tradeline.payment, 0);
-			} else {
-				debtDetails.spousalDebt -=
-					creditEvaluation.tradelines
-						.filter((tradeline) => tradeline.accountType === 'Joint Account')
-						?.sort((a, b) => {
-							const dateA = new Date(a.reportDate).getTime();
-							const dateB = new Date(b.reportDate).getTime();
-							return dateA > dateB ? 1 : -1;
-						})?.[0]?.payment ?? 0;
-			}
+		const jointTradelines = creditEvaluation.tradelines.filter(
+			(tradeline) => tradeline.status === 'opened' && tradeline.accountType === 'Authorized User' && tradeline.joint
+		);
+		if (jointTradelines.length) {
+			debtDetails.spousalDebt -= jointTradelines.reduce((total, tradeline) => total + tradeline.payment, 0);
+		} else {
+			debtDetails.spousalDebt -=
+				creditEvaluation.tradelines
+					.filter((tradeline) => tradeline.accountType === 'Joint Account')
+					?.sort((a, b) => {
+						const dateA = new Date(a.reportDate).getTime();
+						const dateB = new Date(b.reportDate).getTime();
+						return dateA > dateB ? 1 : -1;
+					})?.[0]?.payment ?? 0;
 		}
 
 		debtDetails.totalPayment =
@@ -284,7 +284,10 @@ const calculateIncomesOverview = (creditEvaluation: LeanDocument<ICreditEvaluati
 	return incomesOverview;
 };
 
-const calculateLoanAffordability = async (creditEvaluation: LeanDocument<ICreditEvaluation>, spouseCreditEvaluation: LeanDocument<ICreditEvaluation > | null | undefined ) => {
+const calculateLoanAffordability = async (
+	creditEvaluation: LeanDocument<ICreditEvaluation>,
+	spouseCreditEvaluation: LeanDocument<ICreditEvaluation> | null | undefined
+) => {
 	const loanAffordabilitiesRaw: { source: CreditEvaluationLoanAffordabilityEnum; annual: number; debt: number }[] = [];
 	const loanAffordabilities: CreditEvaluationLoanAffordability[] = [];
 	const rate = creditEvaluation.loanAffordabilityRate || 14;
@@ -335,9 +338,7 @@ const calculateLoanAffordability = async (creditEvaluation: LeanDocument<ICredit
 		}
 
 		// SPOUSE
-
-		const customer = await Customer.findById(creditEvaluation.customer);
-		if (customer?.spouse && spouseCreditEvaluation) {
+		if (spouseCreditEvaluation) {
 			const spouseDebtPayment =
 				spouseCreditEvaluation.debtDetails.overrideDebtPayment || spouseCreditEvaluation.debtDetails.debtPayment;
 
@@ -382,7 +383,8 @@ const calculateLoanAffordability = async (creditEvaluation: LeanDocument<ICredit
 			}
 			if (
 				creditEvaluation.debtDetails.spouseIncome &&
-				(creditEvaluation.debtDetails.deferredStudentLoans || spouseCreditEvaluation.debtDetails.deferredStudentLoans) &&
+				(creditEvaluation.debtDetails.deferredStudentLoans ||
+					spouseCreditEvaluation.debtDetails.deferredStudentLoans) &&
 				(creditEvaluation.debtDetails.rentPayment || spouseCreditEvaluation.debtDetails.rentPayment)
 			) {
 				loanAffordabilitiesRaw.push({
