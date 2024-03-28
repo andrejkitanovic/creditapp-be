@@ -19,7 +19,7 @@ const hasPermissions = (permissions: PermissionsType[], role: RoleType) => {
 	return true;
 };
 
-const isOrganisationActive = async (organisation: LeanDocument<IOrganisation>) => {
+export const isOrganisationActive = async (organisation: LeanDocument<IOrganisation>) => {
 	if (organisation.type === 'partner') {
 		// Check is user still partner
 		// Referral Partner Hubspot ID => 913574

@@ -7,6 +7,8 @@ import User, { IUser } from 'models/user';
 import { rolePermissions } from 'helpers/permissions';
 import { sendResetPassword } from 'utils/mailer';
 import { LeanDocument } from 'mongoose';
+import Organisation, { IOrganisation } from 'models/organisation';
+import { isOrganisationActive } from 'middlewares/auth';
 
 export const getMe: RequestHandler = async (req, res, next) => {
 	try {
@@ -30,6 +32,14 @@ export const postLogin: RequestHandler = async (req, res, next) => {
 		const { email } = req.body;
 
 		const user = await User.findOne({ email: email.toLowerCase() });
+		const organisation = await Organisation.findById(user?.organisation).lean();
+		const organisationActive = await isOrganisationActive(organisation as LeanDocument<IOrganisation>);
+
+		if (!user) {
+			res.status(403).json({ message: i18n.__('MIDDLEWARE.AUTH.USER_NOT_FOUND') });
+		} else if (!organisationActive) {
+			res.status(403).json({ message: i18n.__('MIDDLEWARE.AUTH.ORGANISATION_INACTIVE') });
+		}
 
 		const token = jwt.sign({ id: user?._id }, process.env.DECODE_KEY || '', {
 			// expiresIn: "1h",
