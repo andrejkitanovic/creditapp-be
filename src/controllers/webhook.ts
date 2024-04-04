@@ -17,6 +17,7 @@ import { omitBy, isNil } from 'lodash';
 
 const hsAffordabilities = {
 	'Pending Eval': CreditEvaluationAffordabilityEnum.PENDING_EVAL,
+	'None': CreditEvaluationAffordabilityEnum.NONE,
 	Low: CreditEvaluationAffordabilityEnum.LOW,
 	Medium: CreditEvaluationAffordabilityEnum.MEDIUM,
 	High: CreditEvaluationAffordabilityEnum.HIGH,
