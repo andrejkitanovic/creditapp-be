@@ -69,6 +69,7 @@ export type CreditEvaluationDebtDetails = {
 	deferredStudentLoans: number;
 	rentPayment: number;
 	totalDebtPayment: number;
+	totalDebtPaymentHalfMortage: number;
 	spouseIncome: number;
 	spousalDebt: number;
 	totalPayment: number;

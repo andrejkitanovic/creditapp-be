@@ -16,7 +16,11 @@ export const creditEvaluationCalculations = async (creditEvaluation: LeanDocumen
 	const customer = await Customer.findById(creditEvaluation.customer).select('spouse incomes summaryOfIncomes').lean();
 	if (customer?.spouse) {
 		const spouse = await Customer.findById(customer.spouse).select('incomes summaryOfIncomes').lean();
-		spouseCreditEvaluation = await CreditEvaluation.findOne({ customer: customer.spouse }).sort('-createdAt').lean();
+		spouseCreditEvaluation = await CreditEvaluation.findOne({
+			customer: customer.spouse,
+		})
+			.sort('-createdAt')
+			.lean();
 
 		//@ts-expect-error
 		spouseCreditEvaluation.incomes = (spouse.incomes ?? []) as CustomerIncome[];
@@ -144,10 +148,9 @@ const calculateDebtDetails = async (
 					})?.[0]?.payment ?? 0;
 		}
 
-		debtDetails.totalPayment =
-			debtDetails.totalDebtPayment +
-			(debtDetails.spousalDebt || 0) -
-			(debtDetails.mortgagePayment ? debtDetails.mortgagePayment / 2 : 0);
+		debtDetails.totalDebtPaymentHalfMortage =
+			debtDetails.totalDebtPayment - (debtDetails.mortgagePayment ? debtDetails.mortgagePayment / 2 : 0);
+		debtDetails.totalPayment = debtDetails.totalDebtPayment + (debtDetails.spousalDebt || 0);
 	}
 
 	return debtDetails;
@@ -288,7 +291,11 @@ const calculateLoanAffordability = async (
 	creditEvaluation: LeanDocument<ICreditEvaluation>,
 	spouseCreditEvaluation: LeanDocument<ICreditEvaluation> | null | undefined
 ) => {
-	const loanAffordabilitiesRaw: { source: CreditEvaluationLoanAffordabilityEnum; annual: number; debt: number }[] = [];
+	const loanAffordabilitiesRaw: {
+		source: CreditEvaluationLoanAffordabilityEnum;
+		annual: number;
+		debt: number;
+	}[] = [];
 	const loanAffordabilities: CreditEvaluationLoanAffordability[] = [];
 	const rate = creditEvaluation.loanAffordabilityRate || 14;
 	const dti = 43;
