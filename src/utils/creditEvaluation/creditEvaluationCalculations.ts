@@ -353,7 +353,7 @@ const calculateLoanAffordability = async (
 				loanAffordabilitiesRaw.push({
 					source: CreditEvaluationLoanAffordabilityEnum.HOUSEHOLD_INCOME,
 					annual: selectedIncome.annual + creditEvaluation.debtDetails.spouseIncome * 12,
-					debt: debtPayment + spouseDebtPayment,
+					debt: creditEvaluation.debtDetails.totalPayment,
 				});
 			}
 
