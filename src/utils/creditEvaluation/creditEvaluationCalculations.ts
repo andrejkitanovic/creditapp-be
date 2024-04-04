@@ -133,7 +133,7 @@ const calculateDebtDetails = async (
 		}
 
 		const jointTradelines = creditEvaluation.tradelines.filter(
-			(tradeline) => tradeline.status === 'opened' && tradeline.accountType === 'Authorized User' && tradeline.joint
+			(tradeline) => tradeline.status === 'opened' && tradeline.joint
 		);
 		if (jointTradelines.length) {
 			debtDetails.spousalDebt -= jointTradelines.reduce((total, tradeline) => total + tradeline.payment, 0);
