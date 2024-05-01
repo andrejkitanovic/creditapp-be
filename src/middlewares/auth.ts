@@ -6,7 +6,7 @@ import User, { IUser, RoleType } from 'models/user';
 import Organisation, { IOrganisation } from 'models/organisation';
 import { LeanDocument } from 'mongoose';
 import { PermissionsType, rolePermissions } from 'helpers/permissions';
-import { hsGetUserById } from 'controllers/hubspot';
+import { hsGetUserByEmail } from 'controllers/hubspot';
 
 const hasPermissions = (permissions: PermissionsType[], role: RoleType) => {
 	const userPermissions = rolePermissions[role];
@@ -24,12 +24,12 @@ export const isOrganisationActive = async (organisation: LeanDocument<IOrganisat
 		// Check is user still partner
 		// Referral Partner Hubspot ID => 913574
 
-		const { roleId } = await hsGetUserById(organisation.hubspotId);
+		const { roleId } = await hsGetUserByEmail(organisation.email);
 
 		if (roleId !== '913574') {
-			await Organisation.findByIdAndUpdate(organisation._id, {
-				active: false,
-			});
+			// await Organisation.findByIdAndUpdate(organisation._id, {
+			// 	active: false,
+			// });
 
 			return false;
 		}

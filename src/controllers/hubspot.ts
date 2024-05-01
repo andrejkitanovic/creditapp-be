@@ -86,7 +86,7 @@ export const hsGetUserByEmail = async (email: string) => {
 
 		return data;
 	} catch (err) {
-		console.log(err);
+		// console.log(err);
 
 		return {};
 	}
