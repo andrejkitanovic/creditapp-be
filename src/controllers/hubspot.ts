@@ -101,7 +101,7 @@ export const hsCreateUser = async ({ email: userEmail, role }: { email: string; 
 			},
 			partner: {
 				roleId: '913574',
-				primaryTeamId: '38607165',
+				// primaryTeamId: '38607165',
 			},
 		};
 
