@@ -26,7 +26,7 @@ export const isOrganisationActive = async (organisation: LeanDocument<IOrganisat
 
 		const { roleId } = await hsGetUserByEmail(organisation.email);
 
-		if (roleId !== '913574') {
+		if (roleId !== '913574' || roleId === "929986") {
 			// await Organisation.findByIdAndUpdate(organisation._id, {
 			// 	active: false,
 			// });
