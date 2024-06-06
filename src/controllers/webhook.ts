@@ -17,7 +17,7 @@ import { omitBy, isNil } from 'lodash';
 
 const hsAffordabilities = {
 	'Pending Eval': CreditEvaluationAffordabilityEnum.PENDING_EVAL,
-	'None': CreditEvaluationAffordabilityEnum.NONE,
+	None: CreditEvaluationAffordabilityEnum.NONE,
 	Low: CreditEvaluationAffordabilityEnum.LOW,
 	Medium: CreditEvaluationAffordabilityEnum.MEDIUM,
 	High: CreditEvaluationAffordabilityEnum.HIGH,
@@ -289,7 +289,6 @@ export const putSyncCustomer: RequestHandler = async (req, res, next) => {
 					franchiseChoice: contact.franchise_choice,
 					leadSource: contact.lead_source,
 
-
 					// PERSONAL INFORMATION
 					'personalInfo.driversLicenseId': contact?.driver_s_license_number,
 					'personalInfo.driversLicenseIssueDate': contact?.dl_issuance_date,
@@ -335,8 +334,18 @@ export const putSyncCustomer: RequestHandler = async (req, res, next) => {
 
 					// SECURITY QUESTIONS
 					'securityQuestions.birthCity': contact?.birth_city,
-					'securityQuestions.bronInForeignCountry': contact?.were_you_born_in_a_foreign_country_,
-					'securityQuestions.legalPermanentResident': contact?.are_you_a_legal_permanent_resident_,
+					'securityQuestions.bronInForeignCountry':
+						contact?.were_you_born_in_a_foreign_country_ === 'Yes'
+							? true
+							: contact?.were_you_born_in_a_foreign_country_ === 'No'
+							? false
+							: undefined,
+					'securityQuestions.legalPermanentResident':
+						contact?.are_you_a_legal_permanent_resident_ === 'Yes'
+							? true
+							: contact?.are_you_a_legal_permanent_resident_ === 'No'
+							? false
+							: undefined,
 					'securityQuestions.greenCardExpirationDate': contact?.green_card_expiration_date,
 					'securityQuestions.mothersMaidenName': contact?.mother_s_maiden_name,
 					'securityQuestions.highSchoolMascot': contact?.high_school_mascot,
@@ -374,11 +383,14 @@ export const putSyncCustomer: RequestHandler = async (req, res, next) => {
 				isNil
 			);
 			await Customer.findByIdAndUpdate(customer._id, updateContactProperties);
-			await CreditEvaluation.updateMany({ customer: customer._id }, {
-				$set: {
-					leadSource: contact?.lead_source,
-				},
-			});
+			await CreditEvaluation.updateMany(
+				{ customer: customer._id },
+				{
+					$set: {
+						leadSource: contact?.lead_source,
+					},
+				}
+			);
 
 			res.json({
 				message: 'Customer Updated!',

@@ -611,8 +611,8 @@ export const hsUpdateContact = async (
 
 				// SECURITY QUESTIONS
 				birth_city: customer.securityQuestions.birthCity,
-				were_you_born_in_a_foreign_country_: customer.securityQuestions.bronInForeignCountry,
-				are_you_a_legal_permanent_resident_: customer.securityQuestions.legalPermanentResident,
+				were_you_born_in_a_foreign_country_: customer.securityQuestions.bronInForeignCountry ? "Yes" : "No",
+				are_you_a_legal_permanent_resident_: customer.securityQuestions.legalPermanentResident ? "Yes" : "No",
 				green_card_expiration_date:
 					customer.securityQuestions.greenCardExpirationDate &&
 					dayjs(customer.securityQuestions.greenCardExpirationDate).utc().startOf('day').toDate(),
