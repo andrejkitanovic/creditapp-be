@@ -22,10 +22,12 @@ export const creditEvaluationCalculations = async (creditEvaluation: LeanDocumen
 			.sort('-createdAt')
 			.lean();
 
-		//@ts-expect-error
-		spouseCreditEvaluation.incomes = (spouse.incomes ?? []) as CustomerIncome[];
-		//@ts-expect-error
-		spouseCreditEvaluation.summaryOfIncomes = spouse?.summaryOfIncomes;
+		if (spouseCreditEvaluation) {
+			//@ts-expect-error
+			spouseCreditEvaluation.incomes = (spouse.incomes ?? []) as CustomerIncome[];
+			//@ts-expect-error
+			spouseCreditEvaluation.summaryOfIncomes = spouse?.summaryOfIncomes;
+		}
 	}
 
 	//@ts-expect-error
