@@ -36,11 +36,11 @@ export const getHubspotLenders: RequestHandler = async (req, res, next) => {
 		const hsLenders: any[] = [];
 
 		while (hasMore) {
-			const { results, paging } = await hubspotClient.crm.objects.basicApi.getPage(HS_OBJECT_LENDERS, limit, after, [
+			const { results, paging } = (await hubspotClient.crm.objects.basicApi.getPage(HS_OBJECT_LENDERS, limit, after, [
 				'lender_name',
 				'origination_fee',
 				'credit_bureau',
-			]) as any;
+			])) as any;
 
 			hsLenders.push(...results);
 			hasMore = Boolean(paging?.next?.after);
@@ -127,11 +127,13 @@ export const hsCreateUser = async ({ email: userEmail, role }: { email: string; 
 export const hsCreateLeadSource = async (leadSource: string) => {
 	try {
 		const { properties: contactSchema } = await hubspotClient.crm.schemas.coreApi.getById('contact');
+		const { properties: companySchema } = await hubspotClient.crm.schemas.coreApi.getById('companies');
 		const { properties: dealSchema } = await hubspotClient.crm.schemas.coreApi.getById('deals');
 		const { properties: loanSchema } = await hubspotClient.crm.schemas.coreApi.getById('loans');
 		const { properties: leaseSchema } = await hubspotClient.crm.schemas.coreApi.getById('leases');
 
 		const contactSchemaLeadSource = contactSchema.find((property) => property.name === 'lead_source') as Property;
+		const companySchemaLeadSource = companySchema.find((property) => property.name === 'lead_source_given') as Property;
 		const dealSchemaLeadSource = dealSchema.find(
 			(property) => property.name === 'lead_source___companies___li_and_fb'
 		) as Property;
@@ -163,6 +165,32 @@ export const hsCreateLeadSource = async (leadSource: string) => {
 					label: contactSchemaLeadSource.label,
 					options: [
 						...contactSchemaLeadSource.options,
+						{
+							label: leadSource,
+							value: leadSource,
+							hidden: false,
+						},
+					],
+				},
+			})
+		).json();
+
+		// UPDATE COMPANY PROPERTY
+		await (
+			await hubspotClient.apiRequest({
+				path: `/properties/v1/companies/properties/named/lead_source_given`,
+				method: 'PUT',
+				body: {
+					name: companySchemaLeadSource.name,
+					groupName: companySchemaLeadSource.groupName,
+					description: companySchemaLeadSource.description,
+					fieldType: companySchemaLeadSource.fieldType,
+					formField: companySchemaLeadSource.formField,
+					type: companySchemaLeadSource.type,
+					displayOrder: companySchemaLeadSource.displayOrder,
+					label: companySchemaLeadSource.label,
+					options: [
+						...companySchemaLeadSource.options,
 						{
 							label: leadSource,
 							value: leadSource,
@@ -611,8 +639,8 @@ export const hsUpdateContact = async (
 
 				// SECURITY QUESTIONS
 				birth_city: customer.securityQuestions.birthCity,
-				were_you_born_in_a_foreign_country_: customer.securityQuestions.bronInForeignCountry ? "Yes" : "No",
-				are_you_a_legal_permanent_resident_: customer.securityQuestions.legalPermanentResident ? "Yes" : "No",
+				were_you_born_in_a_foreign_country_: customer.securityQuestions.bronInForeignCountry ? 'Yes' : 'No',
+				are_you_a_legal_permanent_resident_: customer.securityQuestions.legalPermanentResident ? 'Yes' : 'No',
 				green_card_expiration_date:
 					customer.securityQuestions.greenCardExpirationDate &&
 					dayjs(customer.securityQuestions.greenCardExpirationDate).utc().startOf('day').toDate(),
