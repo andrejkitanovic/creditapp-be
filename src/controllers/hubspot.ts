@@ -787,9 +787,13 @@ export const LoanStatus = {
 };
 
 export const LoanAccountType = {
-	[LoanApplicationAccountType.UNSECURED_LOAN_INDIVIDUAL]: 'Unsecured Loan - Individual',
-	[LoanApplicationAccountType.UNSECURED_LOAN_JOINT]: 'Unsecured Loan - Joint',
-	[LoanApplicationAccountType.BUSINESS_LOAN_PERSONALLY_GUARANTEED]: 'Business Loan - Personally Guaranteed',
+    [LoanApplicationAccountType.UNSECURED_LOAN_INDIVIDUAL]: 'Unsecured Loan - Individual',
+    [LoanApplicationAccountType.UNSECURED_LOAN_JOINT]: 'Unsecured Loan - Joint',
+    [LoanApplicationAccountType.BUSINESS_LOAN_PERSONALLY_GUARANTEED]: 'Business Loan - Personally Guaranteed',
+    [LoanApplicationAccountType.BUSINESS_LOAN_PERSONALLY_GUARANTEED_JOINT]: 'Business Loan - Personally Guaranteed - Joint',
+    [LoanApplicationAccountType.HELOC]: 'HELOC',
+    [LoanApplicationAccountType.SBA_7A]: 'SBA 7(a)',
+    [LoanApplicationAccountType.SBA_504]: 'SBA 504',
 };
 
 export const LoanCreditInquiry = {
