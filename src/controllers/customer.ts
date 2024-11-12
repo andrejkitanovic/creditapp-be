@@ -9,7 +9,7 @@ import CreditEvaluation from 'models/creditEvaluation';
 import LoanApplication from 'models/loanApplication';
 import LoanPackage from 'models/loanPackage';
 
-import { hsGetSingleContact, hsCreateContact, hsGetDealById, hsGetDealstageById } from './hubspot';
+import { hsGetSingleContact, hsCreateContact, hsGetDealById, hsGetDealstageById, hubspotClient } from './hubspot';
 import { dayjsUnix } from 'utils/dayjs';
 import { CBCApplicant, cbcPullCreditReport } from './cbc';
 import xmlToJson from 'xml2json';
@@ -245,6 +245,14 @@ export const deleteCustomerSpouse: RequestHandler = async (req, res, next) => {
 export const deleteCustomer: RequestHandler = async (req, res, next) => {
 	try {
 		const { id } = req.params;
+
+		const customer = await Customer.findById(id);
+		const { total, results } = await hsGetSingleContact('email', customer?.email as string);
+
+		if (total) {
+			const contactId = results[0].id;
+			await hubspotClient.crm.contacts.basicApi.archive(contactId)
+		}
 
 		await Customer.findByIdAndDelete(id);
 
