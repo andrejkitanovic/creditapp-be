@@ -19,7 +19,7 @@ import { LeanDocument } from 'mongoose';
 import { creditEvaluationCalculations } from 'utils/creditEvaluation/creditEvaluationCalculations';
 import { startOfYear } from 'utils/dayjs';
 import { cbcFormatDate, cbcFormatMonths, cbcFormatString } from './cbc';
-import { hsCreateLoan, hsGetDealById, hsGetDealstageById, hsUpdateLoan } from './hubspot';
+import { hsCreateLoan, hsGetDealById, hsGetDealstageById, hsUpdateLoan, hubspotClient } from './hubspot';
 
 export const getCreditEvaluations: RequestHandler = async (req, res, next) => {
 	try {
@@ -81,6 +81,11 @@ export const putCreditEvaluation: RequestHandler = async (req, res, next) => {
 export const deleteCreditEvaluation: RequestHandler = async (req, res, next) => {
 	try {
 		const { id } = req.params;
+
+		const creditEvaluation = await CreditEvaluation.findById(id);
+		if (creditEvaluation?.hubspotDealId) {
+			await hubspotClient.crm.deals.basicApi.archive(creditEvaluation.hubspotDealId);
+		}
 
 		await CreditEvaluation.findByIdAndDelete(id);
 
