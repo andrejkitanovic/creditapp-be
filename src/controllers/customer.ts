@@ -424,7 +424,7 @@ export const putHubspotContactId: RequestHandler = async (req, res, next) => {
 		const { hubspotContactId } = req.body;
 
 		const contact = await hsGetContactById(hubspotContactId);
-		if (!contact) {
+		if (!contact?.email) {
 			return res.status(404).json({ message: 'Hubspot Contact ID not found' });
 		}
 
