@@ -9,7 +9,7 @@ import CreditEvaluation from 'models/creditEvaluation';
 import LoanApplication from 'models/loanApplication';
 import LoanPackage from 'models/loanPackage';
 
-import { hsGetSingleContact, hsCreateContact, hsGetDealById, hsGetDealstageById, hubspotClient } from './hubspot';
+import { hsGetSingleContact, hsCreateContact, hsGetDealById, hsGetDealstageById, hubspotClient, hsGetContactById } from './hubspot';
 import { dayjsUnix } from 'utils/dayjs';
 import { CBCApplicant, cbcPullCreditReport } from './cbc';
 import xmlToJson from 'xml2json';
@@ -417,6 +417,29 @@ export const getSingleCustomer: RequestHandler = async (req, res, next) => {
 // 		next(err);
 // 	}
 // };
+
+export const putHubspotContactId: RequestHandler = async (req, res, next) => {
+	try {
+		const { id } = req.params;
+		const { hubspotContactId } = req.body;
+
+		const contact = await hsGetContactById(hubspotContactId);
+		if (!contact) {
+			return res.status(404).json({ message: 'Hubspot Contact ID not found' });
+		}
+
+
+		await Customer.findByIdAndUpdate(id, {
+			hubspotId: hubspotContactId,
+		});
+
+		res.json({
+			// data: result,
+		});
+	} catch (err) {
+		next(err);
+	}
+};
 
 export const putRefetchCustomer: RequestHandler = async (req, res, next) => {
 	try {

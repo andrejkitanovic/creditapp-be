@@ -13,6 +13,7 @@ import {
 	// putCustomerSyncHubspot as putCustomerSyncHubspotController, - TO WORKFLOW
 	// putCustomerPushHubspot as putCustomerPushHubspotController, - AUTOMATIC
 	putRefetchCustomer as putRefetchCustomerController,
+	putHubspotContactId as putHubspotContactIdController,
 } from 'controllers/customer';
 // import {
 // } from 'validators/customer';
@@ -92,6 +93,12 @@ defineRoutes(router, [
 		permissions: ['update:customers'],
 		// validator: putCustomerValidator,
 		controller: putRefetchCustomerController,
+	},
+	{
+		method: 'put',
+		route: '/hubspot/contact/:id',
+		permissions: ['update:customers'],
+		controller: putHubspotContactIdController,
 	},
 ]);
 
