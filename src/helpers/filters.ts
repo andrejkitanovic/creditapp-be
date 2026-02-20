@@ -80,12 +80,15 @@ export const queryFilter = async ({ Model, query, populate, searchFields, defaul
 		modelQuery = modelQuery.sort(sort);
 	}
 
-	const data = await modelQuery
-		.limit(limit)
-		.skip((page - 1) * limit)
+
+	const [data, count] = await Promise.all([
+		modelQuery
 		.sort(sort)
-		.lean();
-	const count = (await Model.find(findBy)).length;
+		  .limit(limit)
+		  .skip((page - 1) * limit)
+		  .lean(),
+		Model.countDocuments(findBy),
+	  ]);
 
 	return { data, count };
 };
