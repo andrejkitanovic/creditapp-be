@@ -76,14 +76,10 @@ export const queryFilter = async ({ Model, query, populate, searchFields, defaul
 	if (populate) {
 		modelQuery = modelQuery.populate({ path: populate });
 	}
-	if (sort) {
-		modelQuery = modelQuery.sort(sort);
-	}
-
+	modelQuery = modelQuery.sort(sort || { _id: -1 });
 
 	const [data, count] = await Promise.all([
 		modelQuery
-		.sort(sort)
 		  .limit(limit)
 		  .skip((page - 1) * limit)
 		  .lean(),
