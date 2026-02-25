@@ -470,7 +470,6 @@ export const putRefetchCustomer: RequestHandler = async (req, res, next) => {
 			middleName: customer?.middleName || '',
 			lastName: customer?.lastName || '',
 			email: customer?.email || '',
-			//@ts-expect-error
 			birthdate: dayjsUnix(customer?.birthday).format('MM/DD/YYYY'),
 			ssn: customer?.social || '',
 			address: {

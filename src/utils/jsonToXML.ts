@@ -1,6 +1,8 @@
 export const jsonToXml = (obj: any) => {
 	let xml = '';
 	for (const prop in obj) {
+		if (obj[prop] === '' || obj[prop] === undefined || obj[prop] === null) continue;
+
 		let parameter = '';
 		let propText = prop;
 

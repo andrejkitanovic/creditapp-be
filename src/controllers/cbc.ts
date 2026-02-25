@@ -84,10 +84,7 @@ const cbcXML = (data: CBCJsonType) => {
 		},
 	};
 
-	return `
-	<?xml version="1.0" encoding="utf-8"?>
-	${jsonToXml(dataWCredentials)}
-	`;
+	return `<?xml version="1.0" encoding="utf-8"?>${jsonToXml(dataWCredentials)}`;
 };
 
 // CBC FUNCTIONS
@@ -180,12 +177,13 @@ export type CBCApplicant = {
 };
 
 export const cbcPullCreditReport = async (applicant: CBCApplicant) => {
+	const password = await cbcPassword();
 	const xml = cbcXML({
 		data_area: {
 			header_data: {
-				user_pwd: await cbcPassword(),
+				user_pwd: password,
 				action: 'XPN',
-				single_joint: 1,
+				single_joint: 0,
 				// deal_status: dealStatus,
 				pre_qual: 1,
 				// app_id: '{8F7C2F65-D242-73F2-8242-746D080D5A8C}',
@@ -244,6 +242,7 @@ export const cbcPullCreditReport = async (applicant: CBCApplicant) => {
 			// sale_type: sale.type,
 		},
 	});
+	console.log(xml);
 
 	return await axiosCbc.post('', xml);
 };
