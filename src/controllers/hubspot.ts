@@ -4,7 +4,12 @@ import {
 	Filter as ContactFilter,
 	FilterGroup as ContactFilterGroup,
 } from '@hubspot/api-client/lib/codegen/crm/contacts';
+import {
+	Filter as DealFilter,
+	FilterGroup as DealFilterGroup,
+} from '@hubspot/api-client/lib/codegen/crm/deals';
 import { RequestHandler } from 'express';
+import CreditEvaluation from 'models/creditEvaluation';
 import { ICustomer } from 'models/customer';
 import LoanPackage from 'models/loanPackage';
 import {
@@ -126,6 +131,8 @@ export const hsCreateUser = async ({ email: userEmail, role }: { email: string; 
 // LEAD SOURCE
 export const hsCreateLeadSource = async (leadSource: string) => {
 	try {
+		if (!leadSource) return false;
+
 		const { properties: contactSchema } = await hubspotClient.crm.schemas.coreApi.getById('contact');
 		const { properties: companySchema } = await hubspotClient.crm.schemas.coreApi.getById('companies');
 		const { properties: dealSchema } = await hubspotClient.crm.schemas.coreApi.getById('deals');
@@ -140,17 +147,23 @@ export const hsCreateLeadSource = async (leadSource: string) => {
 		const loanSchemaLeadSource = loanSchema.find((property) => property.name === 'lead_source') as Property;
 		const leaseSchemaLeadSource = leaseSchema.find((property) => property.name === 'lead_source') as Property;
 
-		if (
-			contactSchemaLeadSource.options.some((option) => option.value === leadSource) ||
-			dealSchemaLeadSource.options.some((option) => option.value === leadSource) ||
-			loanSchemaLeadSource.options.some((option) => option.value === leadSource) ||
-			leaseSchemaLeadSource.options.some((option) => option.value === leadSource)
-		) {
+		// Per-schema "is it already there?". The old code used OR across all five,
+		// which meant if the value existed in (e.g.) contact but not loan, the loan
+		// would never get the option added and Push to Hubspot would still fail with
+		// an "invalid option" error. We now check and write each independently.
+		const inContact = !!contactSchemaLeadSource?.options?.some((option) => option.value === leadSource);
+		const inCompany = !!companySchemaLeadSource?.options?.some((option) => option.value === leadSource);
+		const inDeal = !!dealSchemaLeadSource?.options?.some((option) => option.value === leadSource);
+		const inLoan = !!loanSchemaLeadSource?.options?.some((option) => option.value === leadSource);
+		const inLease = !!leaseSchemaLeadSource?.options?.some((option) => option.value === leadSource);
+
+		// Already registered everywhere — nothing to do.
+		if (inContact && inCompany && inDeal && inLoan && inLease) {
 			return false;
 		}
 
 		// UPDATE CONTACT PROPERTY
-		await (
+		if (!inContact && contactSchemaLeadSource) await (
 			await hubspotClient.apiRequest({
 				path: `/properties/v1/contacts/properties/named/lead_source`,
 				method: 'PUT',
@@ -176,7 +189,7 @@ export const hsCreateLeadSource = async (leadSource: string) => {
 		).json();
 
 		// UPDATE COMPANY PROPERTY
-		await (
+		if (!inCompany && companySchemaLeadSource) await (
 			await hubspotClient.apiRequest({
 				path: `/properties/v1/companies/properties/named/lead_source_given`,
 				method: 'PUT',
@@ -202,7 +215,7 @@ export const hsCreateLeadSource = async (leadSource: string) => {
 		).json();
 
 		// UPDATE DEAL PROPERTY
-		await (
+		if (!inDeal && dealSchemaLeadSource) await (
 			await hubspotClient.apiRequest({
 				path: `/properties/v1/deals/properties/named/lead_source___companies___li_and_fb`,
 				method: 'PUT',
@@ -227,8 +240,8 @@ export const hsCreateLeadSource = async (leadSource: string) => {
 			})
 		).json();
 
-		// UPDATE LOAN PROPERTY
-		await (
+		// UPDATE LOAN PROPERTY  ← this is the one that unblocks Push to Hubspot
+		if (!inLoan && loanSchemaLeadSource) await (
 			await hubspotClient.apiRequest({
 				path: `/properties/v2/loans/properties/named/lead_source`,
 				method: 'PUT',
@@ -254,7 +267,7 @@ export const hsCreateLeadSource = async (leadSource: string) => {
 		).json();
 
 		// UPDATE LEASE PROPERTY
-		await (
+		if (!inLease && leaseSchemaLeadSource) await (
 			await hubspotClient.apiRequest({
 				path: `/properties/v2/leases/properties/named/lead_source`,
 				method: 'PUT',
@@ -715,6 +728,49 @@ export const hsGetDealById = async (dealId: string): Promise<{ [key: string]: st
 	}
 };
 
+export const hsGetDealsByContactId = async (
+	contactId: string
+): Promise<{ id: string; [key: string]: string }[]> => {
+	try {
+		const filter: DealFilter = {
+			propertyName: 'associations.contact',
+			operator: 'EQ',
+			value: contactId,
+		};
+		const filterGroup: DealFilterGroup = { filters: [filter] };
+
+		const { results } = await hubspotClient.crm.deals.searchApi.doSearch({
+			filterGroups: [filterGroup],
+			properties: [
+				'dealname',
+				'dealstage',
+				'amount',
+				'monthly_payment',
+				'term_months',
+				'interest_rate',
+				'origination_fee',
+				'underwriter_comments',
+				'affordability',
+				'hs_lastmodifieddate',
+			],
+			sorts: [],
+			limit: 10,
+			after: 0,
+		});
+
+		return (results || [])
+			.slice()
+			.sort((a, b) =>
+				(b.properties?.hs_lastmodifieddate ?? '').localeCompare(a.properties?.hs_lastmodifieddate ?? '')
+			)
+			.map((deal) => ({ id: deal.id, ...deal.properties } as { id: string; [key: string]: string }));
+	} catch (err) {
+		console.log(err);
+
+		return [];
+	}
+};
+
 export const hsGetDealstageById = async (dealstageId: string): Promise<PipelineStage | undefined> => {
 	try {
 		const { results: dealnamePipelines } = await hubspotClient.crm.pipelines.pipelinesApi.getAll('deals');
@@ -858,22 +914,80 @@ export const hsCreateLoan = async (loanApplication: LeanDocument<ILoanApplicatio
 			);
 		}
 
+		// Customer is populated by caller (creditEvaluation controller does .populate('customer')).
+		const populatedCustomer = loanApplication.customer as unknown as
+			| { hubspotId?: string }
+			| string
+			| null
+			| undefined;
+		const contactId =
+			populatedCustomer && typeof populatedCustomer === 'object' ? populatedCustomer.hubspotId : undefined;
+
+		// Associate borrower (Contact) — always attempt when we have a contact id.
+		if (contactId) {
+			try {
+				await hubspotClient.crm.objects.associationsApi.create(
+					HS_OBJECT_LOAN,
+					loanId,
+					'contact',
+					contactId,
+					'association_loans_contact_1'
+				);
+			} catch (err) {
+				console.log('hsCreateLoan: failed to associate loan->contact (borrower)', err);
+			}
+		}
+
+		// Resolve deal id via fallback chain: loanPackage -> creditEvaluation -> contact's most recent deal.
 		const loanPackage = await LoanPackage.findOne({
 			creditEvaluation: loanApplication.creditEvaluation,
 		});
-		if (loanPackage) {
-			// Get Deal
-			const { id: dealId } = await hubspotClient.crm.deals.basicApi.getById(loanPackage.hubspotId ?? '');
+		const creditEvaluation = await CreditEvaluation.findById(loanApplication.creditEvaluation);
 
-			if (dealId) {
-				// Associate deal
+		let resolvedDealId: string | undefined;
+
+		if (loanPackage?.hubspotId) {
+			try {
+				const { id } = await hubspotClient.crm.deals.basicApi.getById(loanPackage.hubspotId);
+				if (id) resolvedDealId = id;
+			} catch (err) {
+				// Stale id — fall through.
+			}
+		}
+
+		if (!resolvedDealId && creditEvaluation?.hubspotDealId) {
+			try {
+				const { id } = await hubspotClient.crm.deals.basicApi.getById(creditEvaluation.hubspotDealId);
+				if (id) resolvedDealId = id;
+			} catch (err) {
+				// Stale id — fall through.
+			}
+		}
+
+		if (!resolvedDealId && contactId) {
+			const deals = await hsGetDealsByContactId(contactId);
+			if (deals.length > 0) resolvedDealId = deals[0].id;
+		}
+
+		if (resolvedDealId) {
+			// Persist back so the next sync doesn't replay the fallback.
+			if (creditEvaluation && creditEvaluation.hubspotDealId !== resolvedDealId) {
+				await CreditEvaluation.findByIdAndUpdate(creditEvaluation._id, { hubspotDealId: resolvedDealId });
+			}
+			if (loanPackage && loanPackage.hubspotId !== resolvedDealId) {
+				await LoanPackage.findByIdAndUpdate(loanPackage._id, { hubspotId: resolvedDealId });
+			}
+
+			try {
 				await hubspotClient.crm.objects.associationsApi.create(
 					HS_OBJECT_LOAN,
 					loanId,
 					'deal',
-					dealId,
+					resolvedDealId,
 					'association_loans_deal_3'
 				);
+			} catch (err) {
+				console.log('hsCreateLoan: failed to associate loan->deal', err);
 			}
 		}
 

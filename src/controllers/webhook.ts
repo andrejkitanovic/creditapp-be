@@ -11,7 +11,7 @@ import Customer from 'models/customer';
 
 import { absoluteFilePath } from 'utils/absoluteFilePath';
 import { cbcReportToCreditEvaluation } from './creditEvaluation';
-import { hsGetContactById, hsGetDealById, hsGetDealstageById } from './hubspot';
+import { hsGetContactById, hsGetDealById, hsGetDealsByContactId, hsGetDealstageById } from './hubspot';
 import { htmlToPDF } from 'utils/htmlToPdf';
 import { omitBy, isNil } from 'lodash';
 
@@ -147,10 +147,18 @@ export const postWebhookCustomer: RequestHandler = async (req, res, next) => {
 				let dealstage;
 				if (dealId && dealId !== 'NODEALID') {
 					deal = await hsGetDealById(dealId);
+				}
 
-					if (deal?.dealstage) {
-						dealstage = await hsGetDealstageById(deal.dealstage);
+				// Fallback: if no deal id was supplied (or it was stale), find one by contact.
+				if (!deal && customer.hubspotId) {
+					const contactDeals = await hsGetDealsByContactId(customer.hubspotId);
+					if (contactDeals.length > 0) {
+						deal = await hsGetDealById(contactDeals[0].id);
 					}
+				}
+
+				if (deal?.dealstage) {
+					dealstage = await hsGetDealstageById(deal.dealstage);
 				}
 
 				creditEvaluation = await CreditEvaluation.create({

@@ -19,7 +19,7 @@ import { LeanDocument } from 'mongoose';
 import { creditEvaluationCalculations } from 'utils/creditEvaluation/creditEvaluationCalculations';
 import { startOfYear } from 'utils/dayjs';
 import { cbcFormatDate, cbcFormatMonths, cbcFormatString } from './cbc';
-import { hsCreateLoan, hsGetDealById, hsGetDealstageById, hsUpdateLoan, hubspotClient } from './hubspot';
+import { hsCreateLeadSource, hsCreateLoan, hsGetDealById, hsGetDealstageById, hsUpdateLoan, hubspotClient } from './hubspot';
 
 export const getCreditEvaluations: RequestHandler = async (req, res, next) => {
 	try {
@@ -527,6 +527,14 @@ export const putCreditEvaluationLoanApplicationsToHubspot: RequestHandler = asyn
 		const loanApplications = await LoanApplication.find({ creditEvaluation: id }).populate('customer');
 
 		for await (const loanApplication of loanApplications) {
+			// Ensure the loan's lead source exists as an option on HubSpot's lead_source
+			// enumeration properties (contact/company/deal/loan/lease). Without this, any
+			// loan whose leadSource wasn't seeded via postOrganisation will be rejected
+			// by HubSpot with an "invalid option" error and the push will fail.
+			if (loanApplication.leadSource) {
+				await hsCreateLeadSource(loanApplication.leadSource);
+			}
+
 			if (!loanApplication.hubspotId) {
 				const hubspotId = await hsCreateLoan(loanApplication);
 

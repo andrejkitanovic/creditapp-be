@@ -9,7 +9,7 @@ import CreditEvaluation from 'models/creditEvaluation';
 import LoanApplication from 'models/loanApplication';
 import LoanPackage from 'models/loanPackage';
 
-import { hsGetSingleContact, hsCreateContact, hsGetDealById, hsGetDealstageById, hubspotClient, hsGetContactById } from './hubspot';
+import { hsGetSingleContact, hsCreateContact, hsGetDealById, hsGetDealsByContactId, hsGetDealstageById, hubspotClient, hsGetContactById } from './hubspot';
 import { dayjsUnix } from 'utils/dayjs';
 import { CBCApplicant, cbcPullCreditReport } from './cbc';
 import xmlToJson from 'xml2json';
@@ -522,10 +522,18 @@ export const putRefetchCustomer: RequestHandler = async (req, res, next) => {
 			let dealstage;
 			if (dealId && dealId !== 'NODEALID') {
 				deal = await hsGetDealById(dealId);
+			}
 
-				if (deal?.dealstage) {
-					dealstage = await hsGetDealstageById(deal.dealstage);
+			// Fallback: if no deal id was supplied (or it was stale), find one by contact.
+			if (!deal && customer?.hubspotId) {
+				const contactDeals = await hsGetDealsByContactId(customer.hubspotId);
+				if (contactDeals.length > 0) {
+					deal = await hsGetDealById(contactDeals[0].id);
 				}
+			}
+
+			if (deal?.dealstage) {
+				dealstage = await hsGetDealstageById(deal.dealstage);
 			}
 
 			await CreditEvaluation.create({
