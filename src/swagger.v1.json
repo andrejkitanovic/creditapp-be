@@ -1,0 +1,232 @@
+{
+	"swagger": "2.0",
+	"info": {
+		"version": "1.0.0",
+		"title": "Credit App - External API (v1)",
+		"description": "Public, key-authenticated API for reading credit evaluations. Authenticate every request with an `x-api-key` header. Keys are scoped (read-only by default) and revocable. This surface is separate from the internal application API and exposes only a curated set of fields."
+	},
+	"host": "164.92.103.154",
+	"basePath": "/api/v1",
+	"schemes": ["http"],
+	"consumes": ["application/json"],
+	"produces": ["application/json"],
+	"securityDefinitions": {
+		"ApiKeyAuth": {
+			"type": "apiKey",
+			"name": "x-api-key",
+			"in": "header",
+			"description": "Scoped API key issued by an admin. Send as the `x-api-key` request header."
+		}
+	},
+	"security": [{ "ApiKeyAuth": [] }],
+	"tags": [
+		{
+			"name": "Credit Evaluations",
+			"description": "Read credit evaluation data"
+		}
+	],
+	"paths": {
+		"/credit-evaluations": {
+			"get": {
+				"tags": ["Credit Evaluations"],
+				"summary": "List credit evaluations",
+				"description": "Returns the credit evaluations visible to the key's organisation. A partner-scoped key sees only its own lead source. Pass `hubspotDealId` to fetch the evaluation linked to a specific HubSpot deal.",
+				"security": [{ "ApiKeyAuth": [] }],
+				"parameters": [
+					{
+						"name": "hubspotDealId",
+						"in": "query",
+						"required": false,
+						"type": "string",
+						"description": "Return only the evaluation(s) linked to this HubSpot deal id."
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"type": "object",
+							"properties": {
+								"data": {
+									"type": "array",
+									"items": { "$ref": "#/definitions/CreditEvaluation" }
+								}
+							}
+						}
+					},
+					"401": { "description": "Missing API key" },
+					"403": { "description": "Invalid key or insufficient scope" }
+				}
+			}
+		},
+		"/credit-evaluations/{id}": {
+			"get": {
+				"tags": ["Credit Evaluations"],
+				"summary": "Get a single credit evaluation",
+				"description": "Fetch one credit evaluation by id.",
+				"security": [{ "ApiKeyAuth": [] }],
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"required": true,
+						"type": "string",
+						"description": "Credit evaluation id"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"type": "object",
+							"properties": {
+								"data": { "$ref": "#/definitions/CreditEvaluation" }
+							}
+						}
+					},
+					"401": { "description": "Missing API key" },
+					"403": { "description": "Invalid key, insufficient scope, or lead source not permitted" },
+					"404": { "description": "Credit evaluation not found" }
+				}
+			}
+		}
+	},
+	"definitions": {
+		"CreditScore": {
+			"type": "object",
+			"properties": {
+				"type": { "type": "string", "example": "XPN" },
+				"score": { "type": "integer", "example": 712 }
+			}
+		},
+		"Tradeline": {
+			"type": "object",
+			"properties": {
+				"status": { "type": "string", "enum": ["opened", "closed"] },
+				"creditor": { "type": "string" },
+				"balance": { "type": "number" },
+				"payment": { "type": "number" },
+				"hpb": { "type": "number", "description": "High prior balance - a.k.a. high credit / starting balance" },
+				"creditLimit": { "type": "number" },
+				"opened": { "type": "string", "format": "date-time" },
+				"reportDate": { "type": "string", "format": "date-time" },
+				"accountType": { "type": "string" },
+				"utilizationRate": { "type": "number" },
+				"typeDetail": { "type": "string" }
+			}
+		},
+		"Loan": {
+			"type": "object",
+			"properties": {
+				"status": { "type": "string", "enum": ["opened", "closed"] },
+				"creditor": { "type": "string" },
+				"balance": { "type": "number" },
+				"payment": { "type": "number" },
+				"hpb": { "type": "number", "description": "High prior balance - a.k.a. high credit / starting balance" },
+				"limit": { "type": "number" },
+				"opened": { "type": "string", "format": "date-time" },
+				"reportDate": { "type": "string", "format": "date-time" },
+				"accountType": { "type": "string" },
+				"debitToCreditRatio": { "type": "number" },
+				"typeDetail": { "type": "string" }
+			}
+		},
+		"IncomeOverview": {
+			"type": "object",
+			"properties": {
+				"type": { "type": "string", "example": "individual-income-current-year" },
+				"monthly": { "type": "number" },
+				"annual": { "type": "number" },
+				"dti": { "type": "number" }
+			}
+		},
+		"LoanAffordability": {
+			"type": "object",
+			"properties": {
+				"source": { "type": "string", "example": "selected-income" },
+				"rate": { "type": "number" },
+				"dti": { "type": "number" },
+				"annualTotal": { "type": "number" },
+				"monthlyTotal": { "type": "number" },
+				"monthlyTotalWithDebt": { "type": "number" },
+				"term60": { "type": "number" },
+				"term72": { "type": "number" },
+				"term84": { "type": "number" },
+				"term120": { "type": "number" },
+				"term144": { "type": "number" }
+			}
+		},
+		"InquirySummary": {
+			"type": "object",
+			"properties": {
+				"type": { "type": "string", "example": "XPN" },
+				"lastSixMonths": { "type": "integer" },
+				"lastTwelveMonths": { "type": "integer" }
+			}
+		},
+		"CreditEvaluationSummary": {
+			"type": "object",
+			"properties": {
+				"tradelines": { "type": "integer" },
+				"openTradelines": { "type": "integer" },
+				"loans": { "type": "integer" },
+				"collections": { "type": "integer" },
+				"publicRecords": { "type": "integer" },
+				"chargeOffs": { "type": "integer" },
+				"latePayments": { "type": "integer" }
+			}
+		},
+		"CreditEvaluation": {
+			"type": "object",
+			"properties": {
+				"id": { "type": "string" },
+				"hubspotDealId": { "type": "string" },
+				"leadSource": { "type": "string" },
+				"state": { "type": "string" },
+				"reportDate": { "type": "string", "format": "date-time" },
+				"createdAt": { "type": "string", "format": "date-time" },
+				"updatedAt": { "type": "string", "format": "date-time" },
+				"affordability": {
+					"type": "string",
+					"enum": ["Pending Eval", "Low", "Medium", "High", "None"]
+				},
+				"dealStatus": { "type": "string" },
+				"loanPackageAmount": { "type": "number" },
+				"statedMonthlyIncome": { "type": "number" },
+				"loanAffordabilityRate": { "type": "number" },
+				"averageMonthsOfOpenRevolvingCredit": { "type": "number" },
+				"ageOfFile": { "type": "string", "format": "date-time" },
+				"creditScores": {
+					"type": "array",
+					"items": { "$ref": "#/definitions/CreditScore" }
+				},
+				"declineReasonCodes": {
+					"type": "array",
+					"items": { "type": "string" }
+				},
+				"debtDetails": { "type": "object" },
+				"incomesOverview": {
+					"type": "array",
+					"items": { "$ref": "#/definitions/IncomeOverview" }
+				},
+				"loanAffordability": {
+					"type": "array",
+					"items": { "$ref": "#/definitions/LoanAffordability" }
+				},
+				"tradelines": {
+					"type": "array",
+					"items": { "$ref": "#/definitions/Tradeline" }
+				},
+				"loans": {
+					"type": "array",
+					"items": { "$ref": "#/definitions/Loan" }
+				},
+				"recentInquiries": {
+					"type": "array",
+					"items": { "$ref": "#/definitions/InquirySummary" }
+				},
+				"summary": { "$ref": "#/definitions/CreditEvaluationSummary" }
+			}
+		}
+	}
+}
