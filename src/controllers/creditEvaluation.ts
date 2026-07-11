@@ -17,6 +17,7 @@ import LoanApplication from 'models/loanApplication';
 
 import { LeanDocument } from 'mongoose';
 import { creditEvaluationCalculations } from 'utils/creditEvaluation/creditEvaluationCalculations';
+import { slackNotifyCreditEvaluationUpdated } from 'utils/slackNotifier';
 import { startOfYear } from 'utils/dayjs';
 import { cbcFormatDate, cbcFormatMonths, cbcFormatString } from './cbc';
 import { hsCreateLeadSource, hsCreateLoan, hsGetDealById, hsGetDealstageById, hsUpdateLoan, hubspotClient } from './hubspot';
@@ -409,6 +410,8 @@ export const postCreditEvaluationIncome: RequestHandler = async (req, res, next)
 		const summaryOfIncomes = calculateSummaryOfIncomes(customer as LeanDocument<ICustomer>);
 		await Customer.findByIdAndUpdate(creditEvaluation?.customer, { summaryOfIncomes });
 
+		void slackNotifyCreditEvaluationUpdated(id);
+
 		res.json({
 			// data: result,
 		});
@@ -441,6 +444,8 @@ export const putCreditEvaluationIncome: RequestHandler = async (req, res, next) 
 		const summaryOfIncomes = calculateSummaryOfIncomes(customer as LeanDocument<ICustomer>);
 		await Customer.findByIdAndUpdate(creditEvaluation?.customer, { summaryOfIncomes });
 
+		void slackNotifyCreditEvaluationUpdated(id);
+
 		res.json({
 			// data: result,
 		});
@@ -464,6 +469,8 @@ export const deleteCreditEvaluationIncome: RequestHandler = async (req, res, nex
 		const customer = await Customer.findById(creditEvaluation?.customer).lean();
 		const summaryOfIncomes = calculateSummaryOfIncomes(customer as LeanDocument<ICustomer>);
 		await Customer.findByIdAndUpdate(creditEvaluation?.customer, { summaryOfIncomes });
+
+		void slackNotifyCreditEvaluationUpdated(id);
 
 		res.json({
 			// data: result,
@@ -492,6 +499,8 @@ export const putCreditEvaluationSummaryOfIncome: RequestHandler = async (req, re
 		});
 		await Customer.findByIdAndUpdate(creditEvaluation?.customer, { summaryOfIncomes });
 
+		void slackNotifyCreditEvaluationUpdated(id);
+
 		res.json({
 
 		})
@@ -511,6 +520,8 @@ export const putCreditEvaluationDebt: RequestHandler = async (req, res, next) =>
 			'debtDetails.rentPayment': rentPayment,
 			'debtDetails.mortgagePayment': mortgagePayment,
 		});
+
+		void slackNotifyCreditEvaluationUpdated(id);
 
 		res.json({
 			// data: result,
@@ -585,6 +596,8 @@ export const putCreditEvaluationHouseholdIncome: RequestHandler = async (req, re
 			'employmentInfo.totalAnnualHouseholdIncome': householdIncome?.annual,
 		});
 
+		void slackNotifyCreditEvaluationUpdated(id);
+
 		res.json({
 			// data: result,
 		});
@@ -602,6 +615,8 @@ export const putCreditEvaluationAffordability: RequestHandler = async (req, res,
 			affordability,
 		});
 
+		void slackNotifyCreditEvaluationUpdated(id);
+
 		res.json({
 			// data: result,
 		});
@@ -618,6 +633,8 @@ export const putCreditEvaluationLoanAffordabilityRate: RequestHandler = async (r
 		await CreditEvaluation.findByIdAndUpdate(id, {
 			loanAffordabilityRate: rate,
 		});
+
+		void slackNotifyCreditEvaluationUpdated(id);
 
 		res.json({
 			// data: result,
@@ -644,6 +661,8 @@ export const putCreditEvaluationHubspotDealId: RequestHandler = async (req, res,
 			notes: deal.underwriter_comments,
 			dealStatus: dealstage?.label,
 		});
+
+		void slackNotifyCreditEvaluationUpdated(id);
 
 		res.json({
 			// data: result,

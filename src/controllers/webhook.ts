@@ -10,6 +10,7 @@ import CreditEvaluation, { CreditEvaluationAffordabilityEnum } from 'models/cred
 import Customer from 'models/customer';
 
 import { absoluteFilePath } from 'utils/absoluteFilePath';
+import { slackNotifyCreditEvaluationCreated, slackNotifyCreditEvaluationUpdated } from 'utils/slackNotifier';
 import { cbcReportToCreditEvaluation } from './creditEvaluation';
 import { hsGetContactById, hsGetDealById, hsGetDealsByContactId, hsGetDealstageById } from './hubspot';
 import { htmlToPDF } from 'utils/htmlToPdf';
@@ -192,6 +193,8 @@ export const postWebhookCustomer: RequestHandler = async (req, res, next) => {
 						originationFee: deal?.origination_fee,
 					});
 				}
+
+				void slackNotifyCreditEvaluationCreated(String(creditEvaluation._id));
 
 				if (creditEvaluation.declineReasonCodes) {
 					creditReportResponse.decline_reason_codes = creditEvaluation.declineReasonCodes.join(';');
@@ -440,6 +443,8 @@ export const putSyncCreditEvaluationDeal: RequestHandler = async (req, res, next
 				affordability: affordability ?? creditEvaluation.affordability,
 				dealStatus: dealstage?.label,
 			});
+
+			void slackNotifyCreditEvaluationUpdated(String(creditEvaluation._id));
 		}
 
 		res.json({

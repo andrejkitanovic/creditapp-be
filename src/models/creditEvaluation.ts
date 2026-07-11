@@ -283,6 +283,12 @@ interface ICreditEvaluation extends Document {
 	notes: string;
 	// Deal Status
 	dealStatus: string;
+	// Slack
+	slackMessage?: {
+		channel?: string;
+		ts?: string;
+		evalTs?: string;
+	};
 }
 
 const creditEvaluationSchema: Schema = new Schema(
@@ -579,6 +585,11 @@ const creditEvaluationSchema: Schema = new Schema(
 		},
 		dealStatus: {
 			type: String,
+		},
+		slackMessage: {
+			channel: { type: String },
+			ts: { type: String },
+			evalTs: { type: String },
 		},
 	},
 
