@@ -1,4 +1,5 @@
 import axios from 'axios';
+import cron from 'node-cron';
 import dayjs from 'dayjs';
 import { LeanDocument } from 'mongoose';
 
@@ -9,6 +10,7 @@ import CreditEvaluation, {
 } from 'models/creditEvaluation';
 import { ICustomer } from 'models/customer';
 import { creditEvaluationCalculations } from 'utils/creditEvaluation/creditEvaluationCalculations';
+import { hubspotClient } from 'controllers/hubspot';
 
 const APP_URL = 'https://app.lendzee.ai';
 
@@ -185,12 +187,107 @@ export const slackNotifyCreditEvaluationCreated = async (creditEvaluationId: str
 		});
 
 		await CreditEvaluation.findByIdAndUpdate(creditEvaluationId, {
-			slackMessage: { channel: card.channel, ts: card.ts, evalTs: evalMessage?.ts },
+			slackMessage: { channel: card.channel, ts: card.ts, evalTs: evalMessage?.ts, lastNoteAt: new Date() },
 		});
 	} catch (err) {
 		console.error('slack notify (created) failed:', (err as Error).message);
 	}
 };
+
+const htmlToText = (html: string) =>
+	html
+		.replace(/<br\s*\/?>/gi, '\n')
+		.replace(/<\/(p|div)>/gi, '\n')
+		.replace(/<[^>]+>/g, '')
+		.replace(/&nbsp;/g, ' ')
+		.replace(/&amp;/g, '&')
+		.replace(/&lt;/g, '<')
+		.replace(/&gt;/g, '>')
+		.replace(/&quot;/g, '"')
+		.replace(/&#39;/g, "'")
+		.trim();
+
+const slackEscape = (text: string) => text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+// HubSpot has no webhooks for notes, so new deal notes are polled back into the Slack thread.
+// ponytail: two notes on the same deal landing within HubSpot's ~30s search-index lag can skip
+// the earlier one — acceptable for human comment volume.
+let pollingNotes = false;
+export const pollHubspotNotesToSlack = async () => {
+	if (pollingNotes || !process.env.SLACK_NOTIFIER_URL) return;
+	pollingNotes = true;
+
+	try {
+		const allEvaluations = await CreditEvaluation.find({
+			'slackMessage.ts': { $exists: true },
+			'slackMessage.lastNoteAt': { $exists: true },
+			hubspotDealId: { $exists: true, $ne: null },
+		})
+			.sort('-createdAt')
+			.select('hubspotDealId slackMessage')
+			.lean();
+
+		// newest evaluation per deal — older cards for the same deal stay quiet
+		const evaluations = [...new Map(allEvaluations.reverse().map((e) => [e.hubspotDealId, e])).values()];
+		if (!evaluations.length) return;
+
+		const since = Math.min(...evaluations.map((e) => new Date(e.slackMessage?.lastNoteAt as Date).getTime()));
+
+		const { results: notes } = await hubspotClient.crm.objects.searchApi.doSearch('notes', {
+			filterGroups: [{ filters: [{ propertyName: 'hs_createdate', operator: 'GT', value: String(since) }] }],
+			sorts: ['hs_createdate'],
+			properties: ['hs_note_body', 'hubspot_owner_id', 'hs_created_by_user_id'],
+			limit: 100,
+			after: 0,
+			//eslint-disable-next-line @typescript-eslint/no-explicit-any
+		} as any);
+		if (!notes.length) return;
+
+		let owners: { id?: string; userId?: number; firstName?: string; lastName?: string; email?: string }[] = [];
+		try {
+			owners = (await hubspotClient.crm.owners.ownersApi.getPage(undefined, undefined, 500)).results;
+		} catch {
+			// author names are nice-to-have
+		}
+
+		for (const note of notes) {
+			const body = note.properties.hs_note_body || '';
+			if (!body || body.includes('replied in Slack:')) continue; // our own Slack->HubSpot echo
+
+			const noteWithAssociations = await hubspotClient.crm.objects.basicApi.getById('notes', note.id, undefined, undefined, [
+				'deals',
+			]);
+			const dealIds = (noteWithAssociations.associations?.deals?.results || []).map((result) => String(result.id));
+			if (!dealIds.length) continue;
+
+			const noteCreated = new Date(note.properties.hs_createdate || note.createdAt);
+			const owner = owners.find(
+				(owner) =>
+					String(owner.id) === String(note.properties.hubspot_owner_id) ||
+					String(owner.userId) === String(note.properties.hs_created_by_user_id)
+			);
+			const author = [owner?.firstName, owner?.lastName].filter(Boolean).join(' ') || owner?.email || 'Someone';
+			const text = `:speech_balloon: *${slackEscape(author)}* commented in HubSpot:\n>${slackEscape(
+				htmlToText(body)
+			).replace(/\n/g, '\n>')}`;
+
+			for (const evaluation of evaluations) {
+				if (!dealIds.includes(String(evaluation.hubspotDealId))) continue;
+				if (noteCreated <= new Date(evaluation.slackMessage?.lastNoteAt as Date)) continue;
+
+				await postToNotifier({ text, channel: evaluation.slackMessage?.channel, thread_ts: evaluation.slackMessage?.ts });
+				await CreditEvaluation.findByIdAndUpdate(evaluation._id, { 'slackMessage.lastNoteAt': noteCreated });
+				if (evaluation.slackMessage) evaluation.slackMessage.lastNoteAt = noteCreated;
+			}
+		}
+	} catch (err) {
+		console.error('hubspot note poll failed:', (err as Error).message);
+	} finally {
+		pollingNotes = false;
+	}
+};
+
+cron.schedule('*/10 * * * *', () => void pollHubspotNotesToSlack());
 
 // edits: update the threaded evaluation message in place (post it if the card exists without one)
 export const slackNotifyCreditEvaluationUpdated = async (creditEvaluationId: string) => {
