@@ -288,6 +288,7 @@ interface ICreditEvaluation extends Document {
 		channel?: string;
 		ts?: string;
 		evalTs?: string;
+		lastNoteAt?: Date;
 	};
 }
 
@@ -590,6 +591,7 @@ const creditEvaluationSchema: Schema = new Schema(
 			channel: { type: String },
 			ts: { type: String },
 			evalTs: { type: String },
+			lastNoteAt: { type: Date },
 		},
 	},
 
